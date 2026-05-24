@@ -1,0 +1,352 @@
+﻿<Window x:Class="RubexOps.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        mc:Ignorable="d"
+        Title="RubexOps - Integrated Operations Management System"
+        Height="900"
+        Width="1500"
+        WindowStartupLocation="CenterScreen"
+        Background="#F4F7F8">
+
+    <Grid>
+
+        <!-- MAIN GRID -->
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="260"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+
+        <!-- SIDEBAR -->
+        <Border Grid.Column="0"
+                Background="#0B7A81">
+
+            <Grid>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+
+                <!-- LOGO -->
+                <StackPanel Margin="20">
+
+                    <TextBlock Text="RubexOps"
+                               FontSize="34"
+                               FontWeight="Bold"
+                               Foreground="White"/>
+
+                    <TextBlock Text="Integrated Operations&#x0a;Management System"
+                               Foreground="#D7F2F3"
+                               FontSize="15"
+                               Margin="0,10,0,0"/>
+                </StackPanel>
+
+
+                <!-- NAVIGATION -->
+                <StackPanel Grid.Row="1"
+                            Margin="15,40,15,0">
+
+                    <!-- HOME -->
+                    <Button Height="55"
+                            Margin="0,0,0,15"
+                            Background="#1B9AA0"
+                            Foreground="White"
+                            FontSize="16"
+                            BorderThickness="0"
+                            Cursor="Hand"
+                            Click="HomeButton_Click">
+
+                        <StackPanel Orientation="Horizontal">
+
+                            <materialDesign:PackIcon Kind="Home"
+                                                     Width="22"
+                                                     Height="22"
+                                                     Margin="10,0,15,0"/>
+
+                            <TextBlock Text="Home"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+
+                    <!-- PURCHASE -->
+                    <Button Height="55"
+                            Margin="0,0,0,15"
+                            Background="#1B9AA0"
+                            Foreground="White"
+                            FontSize="16"
+                            BorderThickness="0"
+                            Cursor="Hand"
+                            Click="PurchaseButton_Click">
+
+                        <StackPanel Orientation="Horizontal">
+
+                            <materialDesign:PackIcon Kind="Cart"
+                                                     Width="22"
+                                                     Height="22"
+                                                     Margin="10,0,15,0"/>
+
+                            <TextBlock Text="Purchase"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+
+                    <!-- SALES -->
+                    <Button Height="55"
+                            Margin="0,0,0,15"
+                            Background="#1B9AA0"
+                            Foreground="White"
+                            FontSize="16"
+                            BorderThickness="0"
+                            Cursor="Hand"
+                            Click="SalesButton_Click">
+
+                        <StackPanel Orientation="Horizontal">
+
+                            <materialDesign:PackIcon Kind="TrendingUp"
+                                                     Width="22"
+                                                     Height="22"
+                                                     Margin="10,0,15,0"/>
+
+                            <TextBlock Text="Sales"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+
+                    <!-- PRODUCTION -->
+                    <Button Height="55"
+                            Margin="0,0,0,15"
+                            Background="#1B9AA0"
+                            Foreground="White"
+                            FontSize="16"
+                            BorderThickness="0"
+                            Cursor="Hand"
+                            Click="ProductionButton_Click">
+
+                        <StackPanel Orientation="Horizontal">
+
+                            <materialDesign:PackIcon Kind="Factory"
+                                                     Width="22"
+                                                     Height="22"
+                                                     Margin="10,0,15,0"/>
+
+                            <TextBlock Text="Production"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                </StackPanel>
+
+
+                <!-- BOTTOM BUTTONS -->
+                <StackPanel Grid.Row="2"
+                            Margin="15,0,15,20">
+
+                    <Separator Margin="0,0,0,15"
+                               Background="#6CCED3"/>
+
+
+                    <!-- SETTINGS -->
+                    <Button Height="45"
+        Margin="0,0,0,10"
+        Background="Transparent"
+        Foreground="White"
+        BorderThickness="0"
+        Cursor="Hand"
+        Click="SettingsButton_Click">
+
+                        <StackPanel Orientation="Horizontal">
+
+                            <materialDesign:PackIcon Kind="Cog"
+                                 Width="20"
+                                 Height="20"
+                                 Margin="10,0,15,0"/>
+
+                            <TextBlock Text="Settings"
+                   VerticalAlignment="Center"
+                   FontSize="14"/>
+                        </StackPanel>
+                    </Button>
+
+
+                    <!-- ABOUT -->
+                    <Button Height="45"
+        Background="Transparent"
+        Foreground="White"
+        BorderThickness="0"
+        Cursor="Hand"
+        Click="AboutButton_Click">
+
+                        <StackPanel Orientation="Horizontal">
+
+                            <materialDesign:PackIcon Kind="Information"
+                                 Width="20"
+                                 Height="20"
+                                 Margin="10,0,15,0"/>
+
+                            <TextBlock Text="About"
+                   VerticalAlignment="Center" FontSize="14"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+
+        <!-- RIGHT SIDE -->
+        <Grid Grid.Column="1">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="120"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="40"/>
+            </Grid.RowDefinitions>
+
+
+            <!-- TOP HEADER -->
+            <Border Background="White"
+                    BorderBrush="#E4E7E8"
+                    BorderThickness="0,0,0,1">
+
+                <Grid Margin="30,0">
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="350"/>
+                    </Grid.ColumnDefinitions>
+
+
+                    <!-- COMPANY -->
+                    <StackPanel Orientation="Horizontal"
+                                VerticalAlignment="Center">
+
+                        <Border Width="70"
+                                Height="70"
+                                CornerRadius="35"
+                                Background="#EAF7F7">
+
+                            <materialDesign:PackIcon Kind="OfficeBuilding"
+                                                     Width="35"
+                                                     Height="35"
+                                                     Foreground="#0B7A81"
+                                                     HorizontalAlignment="Center"
+                                                     VerticalAlignment="Center"/>
+                        </Border>
+
+                        <StackPanel Margin="18,0,0,0">
+
+                            <TextBlock Text="Alwaye Rubex Private Limited"
+                                       FontSize="24"
+                                       FontWeight="SemiBold"
+                                       Foreground="#18424A"/>
+
+                            <TextBlock Text="3/192 A, Desom P.O., Aluva - 683 103, Kerala, India"
+                                       FontSize="14"
+                                       Margin="0,6,0,0"
+                                       Foreground="#666"/>
+
+                            <TextBlock Text="(0484) 2609041, 2609540, 2604724"
+                                       FontSize="14"
+                                       Foreground="#666"/>
+
+                            <TextBlock Text="alwayerubexpltd@yahoo.com"
+                                       FontSize="14"
+                                       Foreground="#666"/>
+                        </StackPanel>
+                    </StackPanel>
+
+
+                    <!-- DATE + PROFILE -->
+                    <StackPanel Grid.Column="1"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center">
+
+                        <!-- DATE -->
+                        <StackPanel Orientation="Horizontal"
+                                    VerticalAlignment="Center">
+
+                            <materialDesign:PackIcon Kind="CalendarMonth"
+                                                     Width="28"
+                                                     Height="28"
+                                                     Foreground="#0B7A81"
+                                                     Margin="0,0,15,0"/>
+
+                            <StackPanel>
+
+                                <TextBlock x:Name="CurrentTimeText"
+           FontSize="16"
+           Foreground="#18424A"/>
+
+                                <TextBlock x:Name="CurrentDateText"
+           FontSize="14"
+           Margin="0,4,0,0"
+           Foreground="#777"/>
+                            </StackPanel>
+                        </StackPanel>
+
+
+                        <!-- PROFILE -->
+                        <Border Width="55"
+                                Height="55"
+                                CornerRadius="27.5"
+                                Background="#EAF7F7"
+                                Margin="30,0,0,0">
+
+                            <materialDesign:PackIcon Kind="Account"
+                                                     Width="28"
+                                                     Height="28"
+                                                     Foreground="#0B7A81"
+                                                     HorizontalAlignment="Center"
+                                                     VerticalAlignment="Center"/>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+
+            <!-- DYNAMIC CONTENT -->
+            <Frame x:Name="MainFrame"
+                   Grid.Row="1"
+                   NavigationUIVisibility="Hidden"
+                   Background="#F4F7F8"/>
+
+
+            <!-- FOOTER -->
+            <Border Grid.Row="2"
+                    Background="White"
+                    BorderBrush="#E4E7E8"
+                    BorderThickness="1,0,0,0">
+
+                <Grid Margin="20,0">
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="© 2026 Alwaye Rubex Private Limited. All rights reserved."
+                               VerticalAlignment="Center"
+                               Foreground="#666"
+                               FontSize="13"/>
+
+                    <TextBlock Grid.Column="1"
+                               Text="Developed by Vasudevan S Nair and Aadi R Santhosh | RubexOps v1.0.0"
+                               VerticalAlignment="Center"
+                               Foreground="#0B7A81"
+                               FontWeight="SemiBold"
+                               FontSize="13"/>
+                </Grid>
+            </Border>
+
+        </Grid>
+    </Grid>
+</Window>

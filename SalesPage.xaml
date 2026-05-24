@@ -1,0 +1,190 @@
+﻿<Page x:Class="RubexOps.SalesPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+      Background="#F4F7F8">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Margin="35">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- ================================================= -->
+            <!-- PAGE HEADER -->
+            <!-- ================================================= -->
+
+            <StackPanel Orientation="Horizontal">
+
+                <Border Width="65"
+                        Height="65"
+                        CornerRadius="32.5"
+                        Background="#EAF7F7">
+
+                    <materialDesign:PackIcon Kind="TrendingUp"
+                                             Width="30"
+                                             Height="30"
+                                             Foreground="#0B7A81"
+                                             HorizontalAlignment="Center"
+                                             VerticalAlignment="Center"/>
+                </Border>
+
+                <StackPanel Margin="18,0,0,0">
+
+                    <TextBlock Text="Sales"
+                               FontSize="42"
+                               FontWeight="Bold"
+                               Foreground="#1E2F35"/>
+
+                    <Border Width="100"
+                            Height="4"
+                            Background="#F4A261"
+                            Margin="0,8,0,0"
+                            HorizontalAlignment="Left"/>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- ================================================= -->
+            <!-- CONTENT AREA -->
+            <!-- ================================================= -->
+
+            <Grid Grid.Row="1"
+                  Margin="0,40,0,0">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="25"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- ================================================= -->
+                <!-- CONTRACT MANAGEMENT -->
+                <!-- ================================================= -->
+
+                <Border Grid.Column="0"
+                        Background="White"
+                        CornerRadius="18"
+                        Padding="35"
+                        BorderBrush="#E4E7E8"
+                        BorderThickness="1">
+
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Orientation="Horizontal">
+
+                            <materialDesign:PackIcon Kind="FileDocumentEdit"
+                                                     Width="40"
+                                                     Height="40"
+                                                     Foreground="#0B7A81"
+                                                     Margin="0,0,18,0"/>
+
+                            <StackPanel>
+                                <TextBlock Text="Contract Management"
+                                           FontSize="30"
+                                           FontWeight="Bold"
+                                           Foreground="#0B7A81"/>
+
+                                <TextBlock Text="Manage sales contracts and renewals"
+                                           FontSize="16"
+                                           Margin="0,6,0,0"
+                                           Foreground="#777"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="1"
+                                    Margin="0,40,0,0">
+
+                            <Button Content="Create Contract"
+                                    Height="60"
+                                    FontSize="17"
+                                    Margin="0,0,0,18"
+                                    Background="#1B9AA0"
+                                    Foreground="White"
+                                    BorderThickness="0"
+                                    Cursor="Hand"
+                                    Click="CreateContract_Click"/>
+
+                            <Button Content="View Contracts"
+                                    Height="60"
+                                    FontSize="17"
+                                    Background="#1B9AA0"
+                                    Foreground="White"
+                                    BorderThickness="0"
+                                    Cursor="Hand"
+                                    Click="ViewContracts_Click"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- ================================================= -->
+                <!-- DATA MANAGEMENT -->
+                <!-- ================================================= -->
+
+                <Border Grid.Column="2"
+                        Background="White"
+                        CornerRadius="18"
+                        Padding="35"
+                        BorderBrush="#E4E7E8"
+                        BorderThickness="1">
+
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Orientation="Horizontal">
+
+                            <materialDesign:PackIcon Kind="DatabaseEdit"
+                                                     Width="40"
+                                                     Height="40"
+                                                     Foreground="#0B7A81"
+                                                     Margin="0,0,18,0"/>
+
+                            <StackPanel>
+                                <TextBlock Text="Data Management"
+                                           FontSize="30"
+                                           FontWeight="Bold"
+                                           Foreground="#0B7A81"/>
+
+                                <TextBlock Text="Manage sales entries and records"
+                                           FontSize="16"
+                                           Margin="0,6,0,0"
+                                           Foreground="#777"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="1"
+                                    Margin="0,40,0,0">
+
+                            <Button Content="Enter Sales Data"
+                                    Height="60"
+                                    FontSize="17"
+                                    Margin="0,0,0,18"
+                                    Background="#1B9AA0"
+                                    Foreground="White"
+                                    BorderThickness="0"
+                                    Cursor="Hand"
+                                    Click="EnterSalesData_Click"/>
+
+                            <Button Content="View / Edit Sales Data"
+                                    Height="60"
+                                    FontSize="17"
+                                    Background="#1B9AA0"
+                                    Foreground="White"
+                                    BorderThickness="0"
+                                    Cursor="Hand"
+                                    Click="ViewSalesData_Click"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+    </ScrollViewer>
+</Page>

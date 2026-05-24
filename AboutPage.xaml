@@ -1,0 +1,494 @@
+﻿<Page x:Class="RubexOps.AboutPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+      mc:Ignorable="d"
+      Background="#F5F7F8">
+
+    <Grid Margin="24">
+
+        <!-- PAGE STRUCTURE -->
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="24"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+
+
+        <!-- ================================================= -->
+        <!-- PAGE HEADER -->
+        <!-- ================================================= -->
+
+        <Grid Grid.Row="0">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+
+
+            <!-- ICON -->
+
+            <Border Width="64"
+                    Height="64"
+                    CornerRadius="32"
+                    Background="#E7F6F7">
+
+                <materialDesign:PackIcon Kind="Information"
+                                         Width="30"
+                                         Height="30"
+                                         Foreground="#0B8A8F"
+                                         HorizontalAlignment="Center"
+                                         VerticalAlignment="Center"/>
+            </Border>
+
+
+
+            <!-- TITLE -->
+
+            <StackPanel Grid.Column="1"
+                        Margin="18,0,0,0"
+                        VerticalAlignment="Center">
+
+                <TextBlock Text="About RubexOps"
+                           FontSize="40"
+                           FontWeight="Bold"
+                           Foreground="#111827"/>
+
+                <Border Width="240"
+                        Height="4"
+                        Background="#F59E42"
+                        CornerRadius="2"
+                        Margin="0,8,0,0"
+                        HorizontalAlignment="Left"/>
+            </StackPanel>
+        </Grid>
+
+
+
+        <!-- ================================================= -->
+        <!-- MAIN CARD -->
+        <!-- ================================================= -->
+
+        <Border Grid.Row="2"
+                Background="White"
+                CornerRadius="20"
+                BorderBrush="#E5E7EB"
+                BorderThickness="1"
+                Padding="40">
+
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+
+                <StackPanel>
+
+
+
+                    <!-- SOFTWARE NAME -->
+
+                    <TextBlock Text="RubexOps"
+                               FontSize="36"
+                               FontWeight="Bold"
+                               Foreground="#0B8A8F"/>
+
+                    <TextBlock Text="Integrated Operations Management System"
+                               FontSize="17"
+                               Margin="0,8,0,28"
+                               Foreground="#6B7280"/>
+
+
+
+                    <!-- DESCRIPTION -->
+
+                    <TextBlock TextWrapping="Wrap"
+                               FontSize="16"
+                               Foreground="#374151"
+                               LineHeight="30">
+
+                        RubexOps is a modern desktop-based enterprise management system
+                        developed to streamline and centralize industrial operations for
+                        manufacturing and rubber processing businesses.
+
+                        The software integrates Purchase Management, Sales Management,
+                        Production Tracking, Contract Handling, and Database Management
+                        into one unified platform.
+
+                        Built with a strong focus on usability, efficiency, and organized
+                        data handling, RubexOps provides a clean and professional interface
+                        that allows users to manage day-to-day business operations more
+                        effectively and accurately.
+                    </TextBlock>
+
+
+
+                    <!-- DIVIDER -->
+
+                    <Border Height="1"
+                            Background="#E5E7EB"
+                            Margin="0,32,0,32"/>
+
+
+
+                    <!-- SYSTEM ARCHITECTURE -->
+
+                    <TextBlock Text="System Architecture"
+                               FontSize="26"
+                               FontWeight="Bold"
+                               Foreground="#111827"
+                               Margin="0,0,0,22"/>
+
+
+
+                    <!-- FRONTEND -->
+
+                    <Border Background="#F9FAFB"
+                            CornerRadius="16"
+                            Padding="24"
+                            Margin="0,0,0,20"
+                            BorderBrush="#E5E7EB"
+                            BorderThickness="1">
+
+                        <StackPanel>
+
+                            <TextBlock Text="Frontend Technology"
+                                       FontSize="22"
+                                       FontWeight="Bold"
+                                       Foreground="#0B8A8F"/>
+
+                            <TextBlock TextWrapping="Wrap"
+                                       FontSize="15"
+                                       Margin="0,12,0,0"
+                                       Foreground="#374151"
+                                       LineHeight="26">
+
+                                The frontend of RubexOps is developed using C# with
+                                Windows Presentation Foundation (WPF) in Microsoft
+                                Visual Studio.
+
+                                The interface follows a modern enterprise-style dashboard
+                                design focused on responsiveness, professional aesthetics,
+                                and user-friendly navigation.
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+
+
+
+                    <!-- BACKEND -->
+
+                    <Border Background="#F9FAFB"
+                            CornerRadius="16"
+                            Padding="24"
+                            Margin="0,0,0,20"
+                            BorderBrush="#E5E7EB"
+                            BorderThickness="1">
+
+                        <StackPanel>
+
+                            <TextBlock Text="Backend Technology"
+                                       FontSize="22"
+                                       FontWeight="Bold"
+                                       Foreground="#0B8A8F"/>
+
+                            <TextBlock TextWrapping="Wrap"
+                                       FontSize="15"
+                                       Margin="0,12,0,0"
+                                       Foreground="#374151"
+                                       LineHeight="26">
+
+                                The backend logic of RubexOps is powered using Python.
+
+                                Python handles CRUD operations (Create, Read, Update,
+                                Delete), data processing, automation, Excel database
+                                communication, record management, and operational logic.
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+
+
+
+                    <!-- DATABASE -->
+
+                    <Border Background="#F9FAFB"
+                            CornerRadius="16"
+                            Padding="24"
+                            Margin="0,0,0,20"
+                            BorderBrush="#E5E7EB"
+                            BorderThickness="1">
+
+                        <StackPanel>
+
+                            <TextBlock Text="Database System"
+                                       FontSize="22"
+                                       FontWeight="Bold"
+                                       Foreground="#0B8A8F"/>
+
+                            <TextBlock TextWrapping="Wrap"
+                                       FontSize="15"
+                                       Margin="0,12,0,0"
+                                       Foreground="#374151"
+                                       LineHeight="26">
+
+                                RubexOps uses Microsoft Excel Workbook (.xlsx) as its
+                                primary database system.
+
+                                The Excel database is structured into multiple
+                                interconnected sheets designed specifically for
+                                operational management, including Purchase Contracts,
+                                Purchase Entries, Sales Contracts, Sales Entries,
+                                and Production Data.
+
+                                The database includes fixed column structures,
+                                formulas, quantity calculations, DRC tracking,
+                                invoice references, GST handling, and operational
+                                records to ensure consistency and accuracy across
+                                workflows.
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+
+
+
+                    <!-- DIVIDER -->
+
+                    <Border Height="1"
+                            Background="#E5E7EB"
+                            Margin="0,32,0,32"/>
+
+
+
+                    <!-- CORE FEATURES -->
+
+                    <TextBlock Text="Core Functionalities"
+                               FontSize="26"
+                               FontWeight="Bold"
+                               Foreground="#111827"
+                               Margin="0,0,0,22"/>
+
+
+
+                    <!-- PURCHASE -->
+
+                    <Border Background="#F9FAFB"
+                            CornerRadius="16"
+                            Padding="24"
+                            Margin="0,0,0,18"
+                            BorderBrush="#E5E7EB"
+                            BorderThickness="1">
+
+                        <StackPanel>
+
+                            <TextBlock Text="Purchase Management"
+                                       FontSize="22"
+                                       FontWeight="Bold"
+                                       Foreground="#0B8A8F"/>
+
+                            <TextBlock TextWrapping="Wrap"
+                                       FontSize="15"
+                                       Margin="0,12,0,0"
+                                       Foreground="#374151"
+                                       LineHeight="26">
+
+                                Manage purchase contracts, vendor details,
+                                quantity records, invoices, DRC values,
+                                taxable calculations, and purchase history.
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+
+
+
+                    <!-- SALES -->
+
+                    <Border Background="#F9FAFB"
+                            CornerRadius="16"
+                            Padding="24"
+                            Margin="0,0,0,18"
+                            BorderBrush="#E5E7EB"
+                            BorderThickness="1">
+
+                        <StackPanel>
+
+                            <TextBlock Text="Sales Management"
+                                       FontSize="22"
+                                       FontWeight="Bold"
+                                       Foreground="#0B8A8F"/>
+
+                            <TextBlock TextWrapping="Wrap"
+                                       FontSize="15"
+                                       Margin="0,12,0,0"
+                                       Foreground="#374151"
+                                       LineHeight="26">
+
+                                Handle customer contracts, GST calculations,
+                                dispatch records, invoice management,
+                                taxable amount tracking, and operational
+                                sales workflows.
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+
+
+
+                    <!-- PRODUCTION -->
+
+                    <Border Background="#F9FAFB"
+                            CornerRadius="16"
+                            Padding="24"
+                            Margin="0,0,0,18"
+                            BorderBrush="#E5E7EB"
+                            BorderThickness="1">
+
+                        <StackPanel>
+
+                            <TextBlock Text="Production Management"
+                                       FontSize="22"
+                                       FontWeight="Bold"
+                                       Foreground="#0B8A8F"/>
+
+                            <TextBlock TextWrapping="Wrap"
+                                       FontSize="15"
+                                       Margin="0,12,0,0"
+                                       Foreground="#374151"
+                                       LineHeight="26">
+
+                                Track production batches, material usage,
+                                operational output, batch history,
+                                and production workflow management.
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+
+
+
+                    <!-- DATABASE MANAGEMENT -->
+
+                    <Border Background="#F9FAFB"
+                            CornerRadius="16"
+                            Padding="24"
+                            BorderBrush="#E5E7EB"
+                            BorderThickness="1">
+
+                        <StackPanel>
+
+                            <TextBlock Text="Database &amp; Export Management"
+                                       FontSize="22"
+                                       FontWeight="Bold"
+                                       Foreground="#0B8A8F"/>
+
+                            <TextBlock TextWrapping="Wrap"
+                                       FontSize="15"
+                                       Margin="0,12,0,0"
+                                       Foreground="#374151"
+                                       LineHeight="26">
+
+                                Supports centralized Excel database management,
+                                import/export functionalities, structured data
+                                organization, and operational backups.
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+
+
+
+                    <!-- DIVIDER -->
+
+                    <Border Height="1"
+                            Background="#E5E7EB"
+                            Margin="0,32,0,32"/>
+
+
+
+                    <!-- DEVELOPERS -->
+
+                    <TextBlock Text="Development Team"
+                               FontSize="26"
+                               FontWeight="Bold"
+                               Foreground="#111827"
+                               Margin="0,0,0,24"/>
+
+
+
+                    <!-- DEVELOPER 1 -->
+
+                    <Border Background="#F9FAFB"
+                            CornerRadius="16"
+                            Padding="22"
+                            Margin="0,0,0,18"
+                            BorderBrush="#E5E7EB"
+                            BorderThickness="1">
+
+                        <StackPanel>
+
+                            <TextBlock Text="Vasudevan S Nair"
+                                       FontSize="22"
+                                       FontWeight="Bold"
+                                       Foreground="#0B8A8F"/>
+
+                            <TextBlock Text="System Architect, Backend Developer and Database Designer."
+                                       FontSize="15"
+                                       Margin="0,6,0,12"
+                                       Foreground="#6B7280"/>
+
+                            <TextBlock TextWrapping="Wrap"
+                                       FontSize="15"
+                                       Foreground="#374151"
+                                       LineHeight="26">
+
+                               Responsible for the core system architecture, backend logic,
+operational workflow planning, and database design of RubexOps. Led the development of the Excel-based database structure, including sheet architecture, operational logic, CRUD workflow planning, data organization, automation concepts, and system functionality design.
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+
+
+
+                    <!-- DEVELOPER 2 -->
+
+                    <Border Background="#F9FAFB"
+                            CornerRadius="16"
+                            Padding="22"
+                            BorderBrush="#E5E7EB"
+                            BorderThickness="1">
+
+                        <StackPanel>
+
+                            <TextBlock Text="Aadi R Santhosh"
+                                       FontSize="22"
+                                       FontWeight="Bold"
+                                       Foreground="#0B8A8F"/>
+
+                            <TextBlock Text="Frontend Developer and Application."
+                                       FontSize="15"
+                                       Margin="0,6,0,12"
+                                       Foreground="#6B7280"/>
+
+                            <TextBlock TextWrapping="Wrap"
+                                       FontSize="15"
+                                       Foreground="#374151"
+                                       LineHeight="26">
+
+                                Responsible for the frontend application development and interface implementation of RubexOps using C# and Windows Presentation Foundation (WPF) in Microsoft Visual Studio.
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+
+
+
+                    <!-- FOOTER -->
+
+                    <TextBlock Text="© 2026 RubexOps — Integrated Operations Management System"
+                               FontSize="14"
+                               Foreground="#6B7280"
+                               HorizontalAlignment="Center"
+                               Margin="0,40,0,0"/>
+
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</Page>

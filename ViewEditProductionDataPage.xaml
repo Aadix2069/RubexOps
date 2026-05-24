@@ -1,0 +1,321 @@
+<Page x:Class="RubexOps.ViewEditProductionDataPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+      mc:Ignorable="d"
+      Background="#F5F7F8">
+
+    <Grid x:Name="MainGrid" Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="18"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="18"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="18"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- ================================================= -->
+        <!-- HEADER -->
+        <!-- ================================================= -->
+
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Orientation="Horizontal">
+                <Border Width="68"
+                        Height="68"
+                        CornerRadius="34"
+                        Background="#E7F6F7">
+                    <materialDesign:PackIcon Kind="DatabaseSearch"
+                                             Width="32"
+                                             Height="32"
+                                             Foreground="#0B8A8F"
+                                             HorizontalAlignment="Center"
+                                             VerticalAlignment="Center"/>
+                </Border>
+
+                <StackPanel Margin="18,0,0,0" VerticalAlignment="Center">
+                    <TextBlock Text="View / Edit Production Data"
+                               FontSize="38"
+                               FontWeight="Bold"
+                               Foreground="#111827"/>
+                    <TextBlock Text="Operational production dashboard, batch history and manufacturing analytics"
+                               FontSize="15"
+                               Foreground="#6B7280"
+                               Margin="0,5,0,0"/>
+                </StackPanel>
+            </StackPanel>
+
+            <Button Grid.Column="1"
+                    Width="58"
+                    Height="58"
+                    Background="#0EA5A8"
+                    BorderThickness="0"
+                    Cursor="Hand"
+                    ToolTip="Refresh production records"
+                    Click="RefreshButton_Click">
+                <materialDesign:PackIcon Kind="Refresh"
+                                         Width="24"
+                                         Height="24"
+                                         Foreground="White"/>
+            </Button>
+        </Grid>
+
+        <!-- ================================================= -->
+        <!-- ANALYTICS PANELS -->
+        <!-- ================================================= -->
+
+        <UniformGrid Grid.Row="2" Columns="6">
+            <Border Background="White" CornerRadius="14" BorderBrush="#E5E7EB" BorderThickness="1" Padding="16" Margin="0,0,12,0">
+                <StackPanel>
+                    <TextBlock Text="Total Production Today" FontSize="12" Foreground="#6B7280"/>
+                    <TextBlock x:Name="TodayOutputText" Text="0" FontSize="24" FontWeight="Bold" Foreground="#0B8A8F" Margin="0,6,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <Border Background="White" CornerRadius="14" BorderBrush="#E5E7EB" BorderThickness="1" Padding="16" Margin="0,0,12,0">
+                <StackPanel>
+                    <TextBlock Text="Total Output" FontSize="12" Foreground="#6B7280"/>
+                    <TextBlock x:Name="TotalOutputText" Text="0" FontSize="24" FontWeight="Bold" Foreground="#111827" Margin="0,6,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <Border Background="White" CornerRadius="14" BorderBrush="#E5E7EB" BorderThickness="1" Padding="16" Margin="0,0,12,0">
+                <StackPanel>
+                    <TextBlock Text="Total Loss" FontSize="12" Foreground="#6B7280"/>
+                    <TextBlock x:Name="TotalLossText" Text="0" FontSize="24" FontWeight="Bold" Foreground="#EF4444" Margin="0,6,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <Border Background="White" CornerRadius="14" BorderBrush="#E5E7EB" BorderThickness="1" Padding="16" Margin="0,0,12,0">
+                <StackPanel>
+                    <TextBlock Text="Avg DRC Variance" FontSize="12" Foreground="#6B7280"/>
+                    <TextBlock x:Name="AverageVarianceText" Text="0%" FontSize="24" FontWeight="Bold" Foreground="#F59E0B" Margin="0,6,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <Border Background="White" CornerRadius="14" BorderBrush="#E5E7EB" BorderThickness="1" Padding="16" Margin="0,0,12,0">
+                <StackPanel>
+                    <TextBlock Text="Active Batches" FontSize="12" Foreground="#6B7280"/>
+                    <TextBlock x:Name="ActiveBatchesText" Text="0" FontSize="24" FontWeight="Bold" Foreground="#111827" Margin="0,6,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <Border Background="White" CornerRadius="14" BorderBrush="#E5E7EB" BorderThickness="1" Padding="16">
+                <StackPanel>
+                    <TextBlock Text="Highest Loss Batch" FontSize="12" Foreground="#6B7280"/>
+                    <TextBlock x:Name="HighestLossBatchText" Text="-" FontSize="22" FontWeight="Bold" Foreground="#111827" Margin="0,6,0,0"/>
+                </StackPanel>
+            </Border>
+        </UniformGrid>
+
+        <!-- ================================================= -->
+        <!-- FILTER BAR -->
+        <!-- ================================================= -->
+
+        <Border Grid.Row="4"
+                Background="White"
+                CornerRadius="16"
+                BorderBrush="#E5E7EB"
+                BorderThickness="1"
+                Padding="18">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="12"/>
+                    <ColumnDefinition Width="1.3*"/>
+                    <ColumnDefinition Width="12"/>
+                    <ColumnDefinition Width="1.3*"/>
+                    <ColumnDefinition Width="12"/>
+                    <ColumnDefinition Width="1.3*"/>
+                    <ColumnDefinition Width="12"/>
+                    <ColumnDefinition Width="1.1*"/>
+                    <ColumnDefinition Width="12"/>
+                    <ColumnDefinition Width="1.1*"/>
+                    <ColumnDefinition Width="12"/>
+                    <ColumnDefinition Width="1.5*"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBox x:Name="SearchBox"
+                         Grid.Column="0"
+                         Height="48"
+                         FontSize="14"
+                         Padding="14,5"
+                         VerticalContentAlignment="Center"
+                         ToolTip="Search batch, supplier, invoice, raw material, or product"
+                         TextChanged="FilterChanged"/>
+
+                <TextBox x:Name="SupplierFilterBox"
+                         Grid.Column="2"
+                         Height="48"
+                         FontSize="14"
+                         Padding="14,5"
+                         VerticalContentAlignment="Center"
+                         ToolTip="Supplier filter"
+                         TextChanged="FilterChanged"/>
+
+                <TextBox x:Name="MaterialFilterBox"
+                         Grid.Column="4"
+                         Height="48"
+                         FontSize="14"
+                         Padding="14,5"
+                         VerticalContentAlignment="Center"
+                         ToolTip="Raw material filter"
+                         TextChanged="FilterChanged"/>
+
+                <TextBox x:Name="ProductFilterBox"
+                         Grid.Column="6"
+                         Height="48"
+                         FontSize="14"
+                         Padding="14,5"
+                         VerticalContentAlignment="Center"
+                         ToolTip="Finished product filter"
+                         TextChanged="FilterChanged"/>
+
+                <DatePicker x:Name="FromDatePicker"
+                            Grid.Column="8"
+                            Height="48"
+                            FontSize="14"
+                            SelectedDateChanged="DateFilterChanged"/>
+
+                <DatePicker x:Name="ToDatePicker"
+                            Grid.Column="10"
+                            Height="48"
+                            FontSize="14"
+                            SelectedDateChanged="DateFilterChanged"/>
+
+                <ComboBox x:Name="SortComboBox"
+                          Grid.Column="12"
+                          Height="48"
+                          FontSize="14"
+                          Padding="12,0"
+                          SelectionChanged="SortComboBox_SelectionChanged">
+                    <ComboBoxItem Content="Production Date Newest"/>
+                    <ComboBoxItem Content="Production Date Oldest"/>
+                    <ComboBoxItem Content="Batch ID Ascending"/>
+                    <ComboBoxItem Content="Batch ID Descending"/>
+                    <ComboBoxItem Content="Loss High to Low"/>
+                    <ComboBoxItem Content="DRC Variance High to Low"/>
+                    <ComboBoxItem Content="Output High to Low"/>
+                </ComboBox>
+            </Grid>
+        </Border>
+
+        <!-- ================================================= -->
+        <!-- TABLE -->
+        <!-- ================================================= -->
+
+        <DataGrid x:Name="ProductionDataGrid"
+                  Grid.Row="6"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  SelectionMode="Single"
+                  CanUserAddRows="False"
+                  HeadersVisibility="Column"
+                  GridLinesVisibility="Horizontal"
+                  RowDetailsVisibilityMode="VisibleWhenSelected"
+                  FontSize="14"
+                  SelectionChanged="ProductionDataGrid_SelectionChanged">
+
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow">
+                    <Setter Property="Background" Value="White"/>
+                    <Setter Property="MinHeight" Value="42"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding is_high_loss}" Value="True">
+                            <Setter Property="Background" Value="#FEF2F2"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding is_high_drc_variance}" Value="True">
+                            <Setter Property="Background" Value="#FFFBEB"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.RowStyle>
+
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Header="" Width="62">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Width="38"
+                                    Height="34"
+                                    Background="#0EA5A8"
+                                    BorderThickness="0"
+                                    Click="EditButton_Click"
+                                    ToolTip="Edit production record">
+                                <materialDesign:PackIcon Kind="Pencil"
+                                                         Width="16"
+                                                         Height="16"
+                                                         Foreground="White"/>
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTextColumn Header="Batch ID" Binding="{Binding batch_id}" Width="120"/>
+                <DataGridTextColumn Header="Production Date" Binding="{Binding production_date}" Width="130"/>
+                <DataGridTextColumn Header="Supplier" Binding="{Binding supplier_name}" Width="180"/>
+                <DataGridTextColumn Header="Invoice" Binding="{Binding invoice_number}" Width="130"/>
+                <DataGridTextColumn Header="Raw Material" Binding="{Binding raw_material}" Width="170"/>
+                <DataGridTextColumn Header="Finished Product" Binding="{Binding finished_product}" Width="170"/>
+                <DataGridTextColumn Header="Input" Binding="{Binding InputDisplay}" Width="95"/>
+                <DataGridTextColumn Header="Output" Binding="{Binding OutputDisplay}" Width="95"/>
+                <DataGridTextColumn Header="Loss" Binding="{Binding LossDisplay}" Width="95"/>
+                <DataGridTextColumn Header="DRC Var." Binding="{Binding VarianceDisplay}" Width="95"/>
+            </DataGrid.Columns>
+
+            <DataGrid.RowDetailsTemplate>
+                <DataTemplate>
+                    <Border Background="#F9FAFB"
+                            BorderBrush="#E5E7EB"
+                            BorderThickness="1"
+                            CornerRadius="12"
+                            Padding="16"
+                            Margin="8,4,8,12">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel>
+                                <TextBlock Text="Supplier ID" FontSize="12" Foreground="#6B7280"/>
+                                <TextBlock Text="{Binding supplier_id}" FontSize="15" FontWeight="SemiBold"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="Raw Code" FontSize="12" Foreground="#6B7280"/>
+                                <TextBlock Text="{Binding raw_material_code}" FontSize="15" FontWeight="SemiBold"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Product Code" FontSize="12" Foreground="#6B7280"/>
+                                <TextBlock Text="{Binding finished_product_code}" FontSize="15" FontWeight="SemiBold"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="3">
+                                <TextBlock Text="Available / Remaining" FontSize="12" Foreground="#6B7280"/>
+                                <TextBlock Text="{Binding AvailabilityDisplay}" FontSize="15" FontWeight="SemiBold"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="4">
+                                <TextBlock Text="Initial / Actual DRC" FontSize="12" Foreground="#6B7280"/>
+                                <TextBlock Text="{Binding DrcDisplay}" FontSize="15" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </DataGrid.RowDetailsTemplate>
+        </DataGrid>
+    </Grid>
+</Page>
+
