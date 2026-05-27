@@ -8,451 +8,588 @@
       Background="#F5F7F8">
 
     <Page.Resources>
+
         <Style TargetType="Button">
             <Setter Property="SnapsToDevicePixels" Value="True"/>
         </Style>
+
     </Page.Resources>
 
-    <Grid x:Name="MainGrid"
-          Margin="24">
+
+
+    <!-- ================================================= -->
+    <!-- ROOT GRID -->
+    <!-- ================================================= -->
+
+    <Grid>
 
         <!-- ================================================= -->
-        <!-- PAGE STRUCTURE -->
+        <!-- FIXED WATERMARK -->
         <!-- ================================================= -->
 
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="24"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+        <Image Source="Images/Rubex_logo.png"
+               Width="500"
+               Height="500"
+               Opacity="0.2"
+               Stretch="Uniform"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"
+               IsHitTestVisible="False"
+               Panel.ZIndex="0"/>
 
 
 
         <!-- ================================================= -->
-        <!-- PAGE HEADER -->
+        <!-- MAIN CONTENT -->
         <!-- ================================================= -->
 
-        <Grid Grid.Row="0">
+        <Grid x:Name="MainGrid"
+              Margin="24"
+              Panel.ZIndex="1">
 
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+            <!-- ================================================= -->
+            <!-- PAGE STRUCTURE -->
+            <!-- ================================================= -->
 
-            <Border Width="68"
-                    Height="68"
-                    CornerRadius="34"
-                    Background="#E7F6F7">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="24"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-                <materialDesign:PackIcon Kind="DatabasePlus"
-                                         Width="32"
-                                         Height="32"
-                                         Foreground="#0B8A8F"
-                                         HorizontalAlignment="Center"
-                                         VerticalAlignment="Center"/>
+
+
+            <!-- ================================================= -->
+            <!-- PAGE HEADER -->
+            <!-- ================================================= -->
+
+            <Grid Grid.Row="0">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+
+
+                <!-- ICON -->
+
+                <Border Width="68"
+                        Height="68"
+                        CornerRadius="34"
+                        Background="#AAFFFFFF"
+                        BorderBrush="#90FFFFFF"
+                        BorderThickness="1">
+
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="20"
+                                          ShadowDepth="0"
+                                          Opacity="0.12"/>
+                    </Border.Effect>
+
+                    <materialDesign:PackIcon Kind="DatabasePlus"
+                                             Width="32"
+                                             Height="32"
+                                             Foreground="#0B8A8F"
+                                             HorizontalAlignment="Center"
+                                             VerticalAlignment="Center"/>
+                </Border>
+
+
+
+                <!-- TITLE -->
+
+                <StackPanel Grid.Column="1"
+                            Margin="18,0,0,0"
+                            VerticalAlignment="Center">
+
+                    <TextBlock Text="Enter Purchase Data"
+                               FontSize="38"
+                               FontWeight="Bold"
+                               Foreground="#111827"/>
+
+                    <Border Width="356"
+                            Height="4"
+                            Background="#F59E42"
+                            CornerRadius="2"
+                            Margin="0,8,0,0"
+                            HorizontalAlignment="Left"/>
+                </StackPanel>
+
+            </Grid>
+
+
+
+            <!-- ================================================= -->
+            <!-- MAIN GLASS CARD -->
+            <!-- ================================================= -->
+
+            <Border Grid.Row="2"
+                    Background="#88FFFFFF"
+                    CornerRadius="24"
+                    BorderBrush="#99FFFFFF"
+                    BorderThickness="1"
+                    Padding="35">
+
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="35"
+                                      ShadowDepth="0"
+                                      Opacity="0.10"/>
+                </Border.Effect>
+
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+
+                    <StackPanel>
+
+
+
+                        <!-- ================================================= -->
+                        <!-- VENDOR SELECTION -->
+                        <!-- ================================================= -->
+
+                        <TextBlock Text="Vendor Selection"
+                                   FontSize="26"
+                                   FontWeight="Bold"
+                                   Foreground="#0B8A8F"
+                                   Margin="0,0,0,28"/>
+
+                        <Border Background="#55FFFFFF"
+                                CornerRadius="18"
+                                BorderBrush="#88FFFFFF"
+                                BorderThickness="1"
+                                Padding="24">
+
+                            <Grid>
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="220"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="78"/>
+                                    <RowDefinition Height="78"/>
+                                    <RowDefinition Height="78"/>
+                                    <RowDefinition Height="78"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Text="Search Vendor"
+                                           Grid.Row="0"
+                                           FontSize="16"
+                                           FontWeight="SemiBold"
+                                           VerticalAlignment="Center"
+                                           Foreground="#111827"/>
+
+                                <TextBlock Text="Vendor Name"
+                                           Grid.Row="1"
+                                           FontSize="16"
+                                           FontWeight="SemiBold"
+                                           VerticalAlignment="Center"
+                                           Foreground="#111827"/>
+
+                                <TextBlock Text="Vendor ID"
+                                           Grid.Row="2"
+                                           FontSize="16"
+                                           FontWeight="SemiBold"
+                                           VerticalAlignment="Center"
+                                           Foreground="#111827"/>
+
+                                <TextBlock Text="Item Code"
+                                           Grid.Row="3"
+                                           FontSize="16"
+                                           FontWeight="SemiBold"
+                                           VerticalAlignment="Center"
+                                           Foreground="#111827"/>
+
+
+
+                                <!-- SEARCH -->
+
+                                <Grid Grid.Row="0"
+                                      Grid.Column="1">
+
+                                    <TextBox x:Name="VendorSearchBox"
+                                             Height="50"
+                                             FontSize="15"
+                                             Padding="14,5"
+                                             VerticalContentAlignment="Center"
+                                             Background="#66FFFFFF"
+                                             BorderBrush="#99FFFFFF"
+                                             BorderThickness="1.2"
+                                             TextChanged="VendorSearchBox_TextChanged"/>
+
+                                    <Popup x:Name="VendorSuggestionPopup"
+                                           PlacementTarget="{Binding ElementName=VendorSearchBox}"
+                                           Placement="Bottom"
+                                           StaysOpen="False"
+                                           AllowsTransparency="True"
+                                           Width="{Binding ActualWidth, ElementName=VendorSearchBox}">
+
+                                        <Border Background="#FDFDFD"
+                                                BorderBrush="#D1D5DB"
+                                                BorderThickness="1"
+                                                CornerRadius="10"
+                                                MaxHeight="220">
+
+                                            <ListBox x:Name="VendorSuggestionList"
+                                                     BorderThickness="0"
+                                                     Background="Transparent"
+                                                     SelectionChanged="VendorSuggestionList_SelectionChanged">
+
+                                                <ListBox.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <StackPanel Margin="10,8">
+                                                            <TextBlock Text="{Binding VendorName}"
+                                                                       FontSize="15"
+                                                                       FontWeight="SemiBold"
+                                                                       Foreground="#111827"/>
+                                                            <TextBlock Text="{Binding VendorID}"
+                                                                       FontSize="13"
+                                                                       Foreground="#6B7280"
+                                                                       Margin="0,3,0,0"/>
+                                                        </StackPanel>
+                                                    </DataTemplate>
+                                                </ListBox.ItemTemplate>
+
+                                            </ListBox>
+
+                                        </Border>
+
+                                    </Popup>
+
+                                </Grid>
+
+
+
+                                <!-- INPUTS -->
+
+                                <TextBox x:Name="VendorNameBox"
+                                         Grid.Row="1"
+                                         Grid.Column="1"
+                                         Height="50"
+                                         FontSize="15"
+                                         Padding="14,5"
+                                         VerticalContentAlignment="Center"
+                                         IsReadOnly="True"
+                                         Background="#66FFFFFF"
+                                         BorderBrush="#99FFFFFF"
+                                         BorderThickness="1.2"/>
+
+                                <TextBox x:Name="VendorIDBox"
+                                         Grid.Row="2"
+                                         Grid.Column="1"
+                                         Height="50"
+                                         FontSize="15"
+                                         Padding="14,5"
+                                         VerticalContentAlignment="Center"
+                                         Background="#66FFFFFF"
+                                         BorderBrush="#99FFFFFF"
+                                         BorderThickness="1.2"/>
+
+                                <TextBox x:Name="ItemCodeBox"
+                                         Grid.Row="3"
+                                         Grid.Column="1"
+                                         Height="50"
+                                         FontSize="15"
+                                         Padding="14,5"
+                                         VerticalContentAlignment="Center"
+                                         Text="NRFC"
+                                         IsReadOnly="True"
+                                         Background="#55FFFFFF"
+                                         BorderBrush="#99FFFFFF"
+                                         BorderThickness="1.2"/>
+
+                            </Grid>
+
+                        </Border>
+
+
+
+                        <!-- ================================================= -->
+                        <!-- PURCHASE DETAILS -->
+                        <!-- ================================================= -->
+
+                        <TextBlock Text="Purchase Details"
+                                   FontSize="26"
+                                   FontWeight="Bold"
+                                   Foreground="#0B8A8F"
+                                   Margin="0,42,0,28"/>
+
+                        <Border Background="#55FFFFFF"
+                                CornerRadius="18"
+                                BorderBrush="#88FFFFFF"
+                                BorderThickness="1"
+                                Padding="24">
+
+                            <Grid>
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="220"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="78"/>
+                                    <RowDefinition Height="78"/>
+                                    <RowDefinition Height="78"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Text="Invoice Number"
+                                           Grid.Row="0"
+                                           FontSize="16"
+                                           FontWeight="SemiBold"
+                                           VerticalAlignment="Center"
+                                           Foreground="#111827"/>
+
+                                <TextBlock Text="Purchase Order"
+                                           Grid.Row="1"
+                                           FontSize="16"
+                                           FontWeight="SemiBold"
+                                           VerticalAlignment="Center"
+                                           Foreground="#111827"/>
+
+                                <TextBlock Text="Delivery"
+                                           Grid.Row="2"
+                                           FontSize="16"
+                                           FontWeight="SemiBold"
+                                           VerticalAlignment="Center"
+                                           Foreground="#111827"/>
+
+                                <TextBox x:Name="InvoiceNumberBox"
+                                         Grid.Row="0"
+                                         Grid.Column="1"
+                                         Height="50"
+                                         FontSize="15"
+                                         Padding="14,5"
+                                         VerticalContentAlignment="Center"
+                                         Background="#66FFFFFF"
+                                         BorderBrush="#99FFFFFF"
+                                         BorderThickness="1.2"/>
+
+                                <Border Grid.Row="1"
+                                        Grid.Column="1"
+                                        Background="#66FFFFFF"
+                                        BorderBrush="#99FFFFFF"
+                                        BorderThickness="1.2"
+                                        CornerRadius="12">
+
+                                    <DatePicker x:Name="PurchaseOrderDatePicker"
+                                                Height="54"
+                                                FontSize="16"
+                                                Padding="12,0"
+                                                VerticalContentAlignment="Center"
+                                                Background="Transparent"
+                                                BorderThickness="0"/>
+                                </Border>
+
+                                <Border Grid.Row="2"
+                                        Grid.Column="1"
+                                        Background="#66FFFFFF"
+                                        BorderBrush="#99FFFFFF"
+                                        BorderThickness="1.2"
+                                        CornerRadius="12">
+
+                                    <DatePicker x:Name="DeliveryDatePicker"
+                                                Height="54"
+                                                FontSize="16"
+                                                Padding="12,0"
+                                                VerticalContentAlignment="Center"
+                                                Background="Transparent"
+                                                BorderThickness="0"/>
+                                </Border>
+
+                            </Grid>
+
+                        </Border>
+
+
+
+                        <!-- ================================================= -->
+                        <!-- WEIGHT DETAILS -->
+                        <!-- ================================================= -->
+
+                        <TextBlock Text="Weight Details"
+                                   FontSize="26"
+                                   FontWeight="Bold"
+                                   Foreground="#0B8A8F"
+                                   Margin="0,42,0,28"/>
+
+                        <Border Background="#55FFFFFF"
+                                CornerRadius="18"
+                                BorderBrush="#88FFFFFF"
+                                BorderThickness="1"
+                                Padding="24">
+
+                            <Grid>
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="220"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="78"/>
+                                    <RowDefinition Height="78"/>
+                                    <RowDefinition Height="78"/>
+                                    <RowDefinition Height="78"/>
+                                    <RowDefinition Height="78"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Text="Invoice Weight"
+                                           Grid.Row="0"
+                                           FontSize="16"
+                                           FontWeight="SemiBold"
+                                           VerticalAlignment="Center"
+                                           Foreground="#111827"/>
+
+                                <TextBlock Text="Before Unloading"
+                                           Grid.Row="1"
+                                           FontSize="16"
+                                           FontWeight="SemiBold"
+                                           VerticalAlignment="Center"
+                                           Foreground="#111827"/>
+
+                                <TextBlock Text="Carrier Weight"
+                                           Grid.Row="2"
+                                           FontSize="16"
+                                           FontWeight="SemiBold"
+                                           VerticalAlignment="Center"
+                                           Foreground="#111827"/>
+
+                                <TextBlock Text="No. of Bags"
+                                           Grid.Row="3"
+                                           FontSize="16"
+                                           FontWeight="SemiBold"
+                                           VerticalAlignment="Center"
+                                           Foreground="#111827"/>
+
+                                <TextBlock Text="Calculated DRC (%)"
+                                           Grid.Row="4"
+                                           FontSize="16"
+                                           FontWeight="SemiBold"
+                                           VerticalAlignment="Center"
+                                           Foreground="#111827"/>
+
+                                <TextBox x:Name="InvoiceWeightBox"
+                                         Grid.Row="0"
+                                         Grid.Column="1"
+                                         Height="50"
+                                         FontSize="15"
+                                         Padding="14,5"
+                                         VerticalContentAlignment="Center"
+                                         Background="#66FFFFFF"
+                                         BorderBrush="#99FFFFFF"
+                                         BorderThickness="1.2"/>
+
+                                <TextBox x:Name="BeforeUnloadingBox"
+                                         Grid.Row="1"
+                                         Grid.Column="1"
+                                         Height="50"
+                                         FontSize="15"
+                                         Padding="14,5"
+                                         VerticalContentAlignment="Center"
+                                         Background="#66FFFFFF"
+                                         BorderBrush="#99FFFFFF"
+                                         BorderThickness="1.2"/>
+
+                                <TextBox x:Name="CarrierWeightBox"
+                                         Grid.Row="2"
+                                         Grid.Column="1"
+                                         Height="50"
+                                         FontSize="15"
+                                         Padding="14,5"
+                                         VerticalContentAlignment="Center"
+                                         Background="#66FFFFFF"
+                                         BorderBrush="#99FFFFFF"
+                                         BorderThickness="1.2"/>
+
+                                <TextBox x:Name="NoOfBagsBox"
+                                         Grid.Row="3"
+                                         Grid.Column="1"
+                                         Height="50"
+                                         FontSize="15"
+                                         Padding="14,5"
+                                         VerticalContentAlignment="Center"
+                                         Background="#66FFFFFF"
+                                         BorderBrush="#99FFFFFF"
+                                         BorderThickness="1.2"/>
+
+                                <TextBox x:Name="CalculatedDrcBox"
+                                         Grid.Row="4"
+                                         Grid.Column="1"
+                                         Height="50"
+                                         FontSize="15"
+                                         Padding="14,5"
+                                         VerticalContentAlignment="Center"
+                                         Background="#66FFFFFF"
+                                         BorderBrush="#99FFFFFF"
+                                         BorderThickness="1.2"/>
+
+                            </Grid>
+
+                        </Border>
+
+
+
+                        <!-- ================================================= -->
+                        <!-- BUTTONS -->
+                        <!-- ================================================= -->
+
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Right"
+                                    Margin="0,45,0,0">
+
+                            <Button Content="Clear Form"
+                                    Width="160"
+                                    Height="54"
+                                    Margin="0,0,18,0"
+                                    Background="#E5E7EB"
+                                    Foreground="#111827"
+                                    FontSize="15"
+                                    FontWeight="SemiBold"
+                                    BorderThickness="0"
+                                    Cursor="Hand">
+
+                                <Button.Effect>
+                                    <DropShadowEffect BlurRadius="10"
+                                                      ShadowDepth="0"
+                                                      Opacity="0.10"/>
+                                </Button.Effect>
+
+                            </Button>
+
+
+
+                            <Button x:Name="SavePurchaseButton"
+                                    Content="Save Purchase"
+                                    Width="210"
+                                    Height="54"
+                                    Background="#0EA5A8"
+                                    Foreground="White"
+                                    FontSize="16"
+                                    FontWeight="Bold"
+                                    BorderThickness="0"
+                                    Cursor="Hand"
+                                    Click="SavePurchase_Click">
+
+                                <Button.Effect>
+                                    <DropShadowEffect BlurRadius="12"
+                                                      ShadowDepth="0"
+                                                      Opacity="0.18"/>
+                                </Button.Effect>
+
+                            </Button>
+
+                        </StackPanel>
+
+                    </StackPanel>
+
+                </ScrollViewer>
+
             </Border>
 
-            <StackPanel Grid.Column="1"
-                        Margin="18,0,0,0"
-                        VerticalAlignment="Center">
-
-                <TextBlock Text="Enter Purchase Data"
-                           FontSize="38"
-                           FontWeight="Bold"
-                           Foreground="#111827"/>
-
-                <Border Width="356"
-                        Height="4"
-                        Background="#F59E42"
-                        CornerRadius="2"
-                        Margin="0,8,0,0"
-                        HorizontalAlignment="Left"/>
-            </StackPanel>
         </Grid>
 
-
-
-        <!-- ================================================= -->
-        <!-- MAIN CARD -->
-        <!-- ================================================= -->
-
-        <Border Grid.Row="2"
-                Background="White"
-                CornerRadius="20"
-                BorderBrush="#E5E7EB"
-                BorderThickness="1"
-                Padding="35">
-
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
-
-                <StackPanel>
-
-
-
-                    <!-- ================================================= -->
-                    <!-- VENDOR SELECTION -->
-                    <!-- ================================================= -->
-
-                    <TextBlock Text="Vendor Selection"
-                               FontSize="26"
-                               FontWeight="Bold"
-                               Foreground="#0B8A8F"
-                               Margin="0,0,0,28"/>
-
-                    <Grid>
-
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="220"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="78"/>
-                            <RowDefinition Height="78"/>
-                            <RowDefinition Height="78"/>
-                            <RowDefinition Height="78"/>
-                        </Grid.RowDefinitions>
-
-                        <TextBlock Text="Search Vendor"
-                                   Grid.Row="0"
-                                   FontSize="16"
-                                   FontWeight="SemiBold"
-                                   VerticalAlignment="Center"
-                                   Foreground="#111827"/>
-
-                        <TextBlock Text="Vendor Name"
-                                   Grid.Row="1"
-                                   FontSize="16"
-                                   FontWeight="SemiBold"
-                                   VerticalAlignment="Center"
-                                   Foreground="#111827"/>
-
-                        <TextBlock Text="Vendor ID"
-                                   Grid.Row="2"
-                                   FontSize="16"
-                                   FontWeight="SemiBold"
-                                   VerticalAlignment="Center"
-                                   Foreground="#111827"/>
-
-                        <TextBlock Text="Item Code"
-                                   Grid.Row="3"
-                                   FontSize="16"
-                                   FontWeight="SemiBold"
-                                   VerticalAlignment="Center"
-                                   Foreground="#111827"/>
-
-                        <Grid Grid.Row="0"
-                              Grid.Column="1">
-
-                            <TextBox x:Name="VendorSearchBox"
-                                     Height="50"
-                                     FontSize="15"
-                                     Padding="14,5"
-                                     VerticalContentAlignment="Center"
-                                     BorderBrush="#D1D5DB"
-                                     BorderThickness="1.5"
-                                     TextChanged="VendorSearchBox_TextChanged"/>
-
-                            <Popup x:Name="VendorSuggestionPopup"
-                                   PlacementTarget="{Binding ElementName=VendorSearchBox}"
-                                   Placement="Bottom"
-                                   StaysOpen="False"
-                                   AllowsTransparency="True"
-                                   Width="{Binding ActualWidth, ElementName=VendorSearchBox}">
-
-                                <Border Background="White"
-                                        BorderBrush="#D1D5DB"
-                                        BorderThickness="1"
-                                        CornerRadius="6"
-                                        MaxHeight="220">
-
-                                    <ListBox x:Name="VendorSuggestionList"
-                                             BorderThickness="0"
-                                             SelectionChanged="VendorSuggestionList_SelectionChanged">
-
-                                        <ListBox.ItemTemplate>
-                                            <DataTemplate>
-                                                <StackPanel Margin="10,8">
-                                                    <TextBlock Text="{Binding VendorName}"
-                                                               FontSize="15"
-                                                               FontWeight="SemiBold"
-                                                               Foreground="#111827"/>
-                                                    <TextBlock Text="{Binding VendorID}"
-                                                               FontSize="13"
-                                                               Foreground="#6B7280"
-                                                               Margin="0,3,0,0"/>
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </ListBox.ItemTemplate>
-                                    </ListBox>
-                                </Border>
-                            </Popup>
-                        </Grid>
-
-                        <TextBox x:Name="VendorNameBox"
-                                 Grid.Row="1"
-                                 Grid.Column="1"
-                                 Height="50"
-                                 FontSize="15"
-                                 Padding="14,5"
-                                 VerticalContentAlignment="Center"
-                                 IsReadOnly="True"
-                                 Background="#F3F4F6"
-                                 BorderBrush="#D1D5DB"
-                                 BorderThickness="1.5"/>
-
-                        <TextBox x:Name="VendorIDBox"
-                                 Grid.Row="2"
-                                 Grid.Column="1"
-                                 Height="50"
-                                 FontSize="15"
-                                 Padding="14,5"
-                                 VerticalContentAlignment="Center"
-                                 BorderBrush="#D1D5DB"
-                                 BorderThickness="1.5"/>
-
-                        <TextBox x:Name="ItemCodeBox"
-                                 Grid.Row="3"
-                                 Grid.Column="1"
-                                 Height="50"
-                                 FontSize="15"
-                                 Padding="14,5"
-                                 VerticalContentAlignment="Center"
-                                 Text="NRFC"
-                                 IsReadOnly="True"
-                                 Background="#F3F4F6"
-                                 BorderBrush="#D1D5DB"
-                                 BorderThickness="1.5"/>
-                    </Grid>
-
-
-
-                    <!-- ================================================= -->
-                    <!-- PURCHASE DETAILS -->
-                    <!-- ================================================= -->
-
-                    <TextBlock Text="Purchase Details"
-                               FontSize="26"
-                               FontWeight="Bold"
-                               Foreground="#0B8A8F"
-                               Margin="0,42,0,28"/>
-
-                    <Grid>
-
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="220"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="78"/>
-                            <RowDefinition Height="78"/>
-                            <RowDefinition Height="78"/>
-                        </Grid.RowDefinitions>
-
-                        <TextBlock Text="Invoice Number"
-                                   Grid.Row="0"
-                                   FontSize="16"
-                                   FontWeight="SemiBold"
-                                   VerticalAlignment="Center"
-                                   Foreground="#111827"/>
-
-                        <TextBlock Text="Purchase Order"
-                                   Grid.Row="1"
-                                   FontSize="16"
-                                   FontWeight="SemiBold"
-                                   VerticalAlignment="Center"
-                                   Foreground="#111827"/>
-
-                        <TextBlock Text="Delivery"
-                                   Grid.Row="2"
-                                   FontSize="16"
-                                   FontWeight="SemiBold"
-                                   VerticalAlignment="Center"
-                                   Foreground="#111827"/>
-
-                        <TextBox x:Name="InvoiceNumberBox"
-                                 Grid.Row="0"
-                                 Grid.Column="1"
-                                 Height="50"
-                                 FontSize="15"
-                                 Padding="14,5"
-                                 VerticalContentAlignment="Center"
-                                 BorderBrush="#D1D5DB"
-                                 BorderThickness="1.5"/>
-
-                        <DatePicker x:Name="PurchaseOrderDatePicker"
-                                    Grid.Row="1"
-                                    Grid.Column="1"
-                                    Height="54"
-                                    FontSize="16"
-                                    Padding="12,0"
-                                    VerticalContentAlignment="Center"
-                                    BorderBrush="#D1D5DB"
-                                    BorderThickness="1.5"/>
-
-                        <DatePicker x:Name="DeliveryDatePicker"
-                                    Grid.Row="2"
-                                    Grid.Column="1"
-                                    Height="54"
-                                    FontSize="16"
-                                    Padding="12,0"
-                                    VerticalContentAlignment="Center"
-                                    BorderBrush="#D1D5DB"
-                                    BorderThickness="1.5"/>
-                    </Grid>
-
-
-
-                    <!-- ================================================= -->
-                    <!-- WEIGHT DETAILS -->
-                    <!-- ================================================= -->
-
-                    <TextBlock Text="Weight Details"
-                               FontSize="26"
-                               FontWeight="Bold"
-                               Foreground="#0B8A8F"
-                               Margin="0,42,0,28"/>
-
-                    <Grid>
-
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="220"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="78"/>
-                            <RowDefinition Height="78"/>
-                            <RowDefinition Height="78"/>
-                            <RowDefinition Height="78"/>
-                            <RowDefinition Height="78"/>
-                        </Grid.RowDefinitions>
-
-                        <TextBlock Text="Invoice Weight"
-                                   Grid.Row="0"
-                                   FontSize="16"
-                                   FontWeight="SemiBold"
-                                   VerticalAlignment="Center"
-                                   Foreground="#111827"/>
-
-                        <TextBlock Text="Before Unloading"
-                                   Grid.Row="1"
-                                   FontSize="16"
-                                   FontWeight="SemiBold"
-                                   VerticalAlignment="Center"
-                                   Foreground="#111827"/>
-
-                        <TextBlock Text="Carrier Weight"
-                                   Grid.Row="2"
-                                   FontSize="16"
-                                   FontWeight="SemiBold"
-                                   VerticalAlignment="Center"
-                                   Foreground="#111827"/>
-
-                        <TextBlock Text="No. of Bags"
-                                   Grid.Row="3"
-                                   FontSize="16"
-                                   FontWeight="SemiBold"
-                                   VerticalAlignment="Center"
-                                   Foreground="#111827"/>
-
-                        <TextBlock Text="Calculated DRC (%)"
-                                   Grid.Row="4"
-                                   FontSize="16"
-                                   FontWeight="SemiBold"
-                                   VerticalAlignment="Center"
-                                   Foreground="#111827"/>
-
-                        <TextBox x:Name="InvoiceWeightBox"
-                                 Grid.Row="0"
-                                 Grid.Column="1"
-                                 Height="50"
-                                 FontSize="15"
-                                 Padding="14,5"
-                                 VerticalContentAlignment="Center"
-                                 BorderBrush="#D1D5DB"
-                                 BorderThickness="1.5"/>
-
-                        <TextBox x:Name="BeforeUnloadingBox"
-                                 Grid.Row="1"
-                                 Grid.Column="1"
-                                 Height="50"
-                                 FontSize="15"
-                                 Padding="14,5"
-                                 VerticalContentAlignment="Center"
-                                 BorderBrush="#D1D5DB"
-                                 BorderThickness="1.5"/>
-
-                        <TextBox x:Name="CarrierWeightBox"
-                                 Grid.Row="2"
-                                 Grid.Column="1"
-                                 Height="50"
-                                 FontSize="15"
-                                 Padding="14,5"
-                                 VerticalContentAlignment="Center"
-                                 BorderBrush="#D1D5DB"
-                                 BorderThickness="1.5"/>
-
-                        <TextBox x:Name="NoOfBagsBox"
-                                 Grid.Row="3"
-                                 Grid.Column="1"
-                                 Height="50"
-                                 FontSize="15"
-                                 Padding="14,5"
-                                 VerticalContentAlignment="Center"
-                                 BorderBrush="#D1D5DB"
-                                 BorderThickness="1.5"/>
-
-                        <TextBox x:Name="CalculatedDrcBox"
-                                 Grid.Row="4"
-                                 Grid.Column="1"
-                                 Height="50"
-                                 FontSize="15"
-                                 Padding="14,5"
-                                 VerticalContentAlignment="Center"
-                                 BorderBrush="#D1D5DB"
-                                 BorderThickness="1.5"/>
-                    </Grid>
-
-
-
-                    <!-- ================================================= -->
-                    <!-- BUTTONS -->
-                    <!-- ================================================= -->
-
-                    <StackPanel Orientation="Horizontal"
-                                HorizontalAlignment="Right"
-                                Margin="0,45,0,0">
-
-                        <Button Content="Clear Form"
-                                Width="160"
-                                Height="54"
-                                Margin="0,0,18,0"
-                                Background="#E5E7EB"
-                                Foreground="#111827"
-                                FontSize="15"
-                                FontWeight="SemiBold"
-                                BorderThickness="0"
-                                Cursor="Hand"
-                                Click="ClearForm_Click"/>
-
-                        <Button x:Name="SavePurchaseButton"
-                                Content="Save Purchase"
-                                Width="210"
-                                Height="54"
-                                Background="#0EA5A8"
-                                Foreground="White"
-                                FontSize="16"
-                                FontWeight="Bold"
-                                BorderThickness="0"
-                                Cursor="Hand"
-                                Click="SavePurchase_Click"/>
-                    </StackPanel>
-                </StackPanel>
-            </ScrollViewer>
-        </Border>
     </Grid>
+
 </Page>
-
-

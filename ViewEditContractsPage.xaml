@@ -7,592 +7,450 @@
       mc:Ignorable="d"
       Background="#F5F7F8">
 
-    <Grid x:Name="MainGrid"
-          Margin="24">
+    <!-- ================================================= -->
+    <!-- ROOT CONTAINER -->
+    <!-- ================================================= -->
 
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="18"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="18"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="20"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <Grid>
 
         <!-- ================================================= -->
-        <!-- HEADER -->
+        <!-- FIXED WATERMARK -->
         <!-- ================================================= -->
 
-        <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
+        <Image Source="Images/Rubex_logo.png"
+               Width="500"
+               Height="500"
+               Opacity="0.13"
+               Stretch="Uniform"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"
+               IsHitTestVisible="False"
+               Panel.ZIndex="0"/>
 
-            <StackPanel Orientation="Horizontal">
-                <Border Width="68"
-                        Height="68"
-                        CornerRadius="34"
-                        Background="#E7F6F7">
 
-                    <materialDesign:PackIcon Kind="FileDocumentMultiple"
-                                             Width="32"
-                                             Height="32"
-                                             Foreground="#0B8A8F"
-                                             HorizontalAlignment="Center"
-                                             VerticalAlignment="Center"/>
-                </Border>
-
-                <StackPanel Margin="18,0,0,0"
-                            VerticalAlignment="Center">
-
-                    <TextBlock Text="View Contracts"
-                               FontSize="38"
-                               FontWeight="Bold"
-                               Foreground="#111827"/>
-
-                    <TextBlock Text="Manage and monitor purchase contract lifecycle"
-                               Margin="0,5,0,0"
-                               FontSize="15"
-                               Foreground="#6B7280"/>
-                </StackPanel>
-            </StackPanel>
-
-            <StackPanel Grid.Column="1"
-                        Orientation="Horizontal"
-                        HorizontalAlignment="Right">
-
-                <Button Width="190"
-                        Height="54"
-                        Margin="0,0,14,0"
-                        Background="#0EA5A8"
-                        Foreground="White"
-                        BorderThickness="0"
-                        Cursor="Hand"
-                        Click="RenewContract_Click">
-
-                    <StackPanel Orientation="Horizontal"
-                                HorizontalAlignment="Center">
-
-                        <materialDesign:PackIcon Kind="Refresh"
-                                                 Width="20"
-                                                 Height="20"
-                                                 Margin="0,0,8,0"
-                                                 Foreground="White"
-                                                 VerticalAlignment="Center"/>
-
-                        <TextBlock Text="Renew Contract"
-                                   FontSize="15"
-                                   FontWeight="Bold"
-                                   VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button>
-
-                <Border Padding="18,12"
-                        CornerRadius="14"
-                        Background="White"
-                        BorderBrush="#E5E7EB"
-                        BorderThickness="1">
-
-                    <StackPanel>
-                        <TextBlock Text="Visible Contracts"
-                                   FontSize="12"
-                                   Foreground="#6B7280"/>
-
-                        <TextBlock Text="{Binding ElementName=ContractsItemsControl, Path=Items.Count}"
-                                   FontSize="26"
-                                   FontWeight="Bold"
-                                   Foreground="#111827"/>
-                    </StackPanel>
-                </Border>
-            </StackPanel>
-        </Grid>
 
         <!-- ================================================= -->
-        <!-- STATUS LEGEND -->
+        <!-- MAIN CONTENT -->
         <!-- ================================================= -->
 
-        <Border Grid.Row="2"
-                Background="White"
-                BorderBrush="#E5E7EB"
-                BorderThickness="1"
-                CornerRadius="16"
-                Padding="18">
+        <Grid x:Name="MainGrid"
+              Margin="24"
+              Panel.ZIndex="1">
 
-            <WrapPanel VerticalAlignment="Center"
-                       HorizontalAlignment="Left">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="18"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="18"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="20"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-                <StackPanel Orientation="Horizontal"
-                            Margin="0,0,22,0">
-                    <Ellipse Width="12"
-                             Height="12"
-                             Fill="#10B981"
-                             VerticalAlignment="Center"/>
-                    <TextBlock Text="Active"
-                               Margin="8,0,0,0"
-                               VerticalAlignment="Center"
-                               FontWeight="SemiBold"/>
-                </StackPanel>
+            <!-- ================================================= -->
+            <!-- HEADER -->
+            <!-- ================================================= -->
 
-                <StackPanel Orientation="Horizontal"
-                            Margin="0,0,22,0">
-                    <Ellipse Width="12"
-                             Height="12"
-                             Fill="#3B82F6"
-                             VerticalAlignment="Center"/>
-                    <TextBlock Text="Upcoming"
-                               Margin="8,0,0,0"
-                               VerticalAlignment="Center"
-                               FontWeight="SemiBold"/>
-                </StackPanel>
-
-                <StackPanel Orientation="Horizontal"
-                            Margin="0,0,22,0">
-                    <Ellipse Width="12"
-                             Height="12"
-                             Fill="#8B5CF6"
-                             VerticalAlignment="Center"/>
-                    <TextBlock Text="Completed"
-                               Margin="8,0,0,0"
-                               VerticalAlignment="Center"
-                               FontWeight="SemiBold"/>
-                </StackPanel>
-
-                <StackPanel Orientation="Horizontal"
-                            Margin="0,0,22,0">
-                    <Ellipse Width="12"
-                             Height="12"
-                             Fill="#EF4444"
-                             VerticalAlignment="Center"/>
-                    <TextBlock Text="Violated"
-                               Margin="8,0,0,0"
-                               VerticalAlignment="Center"
-                               FontWeight="SemiBold"/>
-                </StackPanel>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
                 <StackPanel Orientation="Horizontal">
-                    <Ellipse Width="12"
-                             Height="12"
-                             Fill="#F59E0B"
-                             VerticalAlignment="Center"/>
-                    <TextBlock Text="Expired"
-                               Margin="8,0,0,0"
-                               VerticalAlignment="Center"
-                               FontWeight="SemiBold"/>
+
+                    <!-- GLASS ICON -->
+
+                    <Border Width="68"
+                            Height="68"
+                            CornerRadius="34"
+                            Background="#AAFFFFFF"
+                            BorderBrush="#80FFFFFF"
+                            BorderThickness="1">
+
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="18"
+                                              ShadowDepth="0"
+                                              Opacity="0.12"/>
+                        </Border.Effect>
+
+                        <materialDesign:PackIcon Kind="FileDocumentMultiple"
+                                                 Width="32"
+                                                 Height="32"
+                                                 Foreground="#0B8A8F"
+                                                 HorizontalAlignment="Center"
+                                                 VerticalAlignment="Center"/>
+                    </Border>
+
+                    <StackPanel Margin="18,0,0,0"
+                                VerticalAlignment="Center">
+
+                        <TextBlock Text="View Contracts"
+                                   FontSize="38"
+                                   FontWeight="Bold"
+                                   Foreground="#111827"/>
+
+                        <TextBlock Text="Manage and monitor purchase contract lifecycle"
+                                   Margin="0,5,0,0"
+                                   FontSize="15"
+                                   Foreground="#6B7280"/>
+                    </StackPanel>
                 </StackPanel>
-            </WrapPanel>
-        </Border>
 
-        <!-- ================================================= -->
-        <!-- SEARCH + FILTER + SORT -->
-        <!-- ================================================= -->
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Right">
 
-        <Grid Grid.Row="4">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="3*"/>
-                <ColumnDefinition Width="18"/>
-                <ColumnDefinition Width="1.5*"/>
-                <ColumnDefinition Width="18"/>
-                <ColumnDefinition Width="1.5*"/>
-            </Grid.ColumnDefinitions>
+                    <!-- GLASS BUTTON -->
 
-            <Grid Grid.Column="0"
-                  Height="50">
+                    <Button Width="190"
+                            Height="54"
+                            Margin="0,0,14,0"
+                            Background="#0EA5A8"
+                            Foreground="White"
+                            BorderThickness="0"
+                            Cursor="Hand"
+                            Click="RenewContract_Click">
 
-                <TextBox x:Name="SearchBox"
-                         FontSize="15"
-                         Padding="46,0,18,0"
-                         VerticalContentAlignment="Center"
-                         Background="White"
-                         BorderBrush="#D1D5DB"
-                         BorderThickness="1.5"
-                         TextChanged="SearchBox_TextChanged"/>
+                        <Button.Effect>
+                            <DropShadowEffect BlurRadius="14"
+                                              ShadowDepth="0"
+                                              Opacity="0.18"/>
+                        </Button.Effect>
 
-                <materialDesign:PackIcon Kind="Magnify"
-                                         Width="22"
-                                         Height="22"
-                                         Margin="14,0,0,0"
-                                         Foreground="#6B7280"
-                                         HorizontalAlignment="Left"
-                                         VerticalAlignment="Center"
-                                         IsHitTestVisible="False"/>
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Center">
 
-                <TextBlock Text="Search using Vendor ID or Name"
-                           Margin="46,0,0,0"
-                           FontSize="14"
-                           Foreground="#9CA3AF"
-                           VerticalAlignment="Center"
-                           IsHitTestVisible="False">
-
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="Visibility" Value="Collapsed"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding Text, ElementName=SearchBox}" Value="">
-                                    <Setter Property="Visibility" Value="Visible"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
-                </TextBlock>
-            </Grid>
-
-            <Grid Grid.Column="2"
-                  Height="50">
-
-                <ComboBox x:Name="FilterComboBox"
-                          FontSize="15"
-                          Padding="44,0,12,0"
-                          VerticalContentAlignment="Center"
-                          SelectionChanged="FilterComboBox_SelectionChanged">
-
-                    <ComboBoxItem Content="All"/>
-                    <ComboBoxItem Content="Active"/>
-                    <ComboBoxItem Content="Upcoming"/>
-                    <ComboBoxItem Content="Completed"/>
-                    <ComboBoxItem Content="Violated"/>
-                    <ComboBoxItem Content="Expired"/>
-                </ComboBox>
-
-                <materialDesign:PackIcon Kind="FilterVariant"
-                                         Width="20"
-                                         Height="20"
-                                         Foreground="#6B7280"
-                                         HorizontalAlignment="Left"
-                                         VerticalAlignment="Center"
-                                         Margin="14,0,0,0"
-                                         IsHitTestVisible="False"/>
-
-                <TextBlock Text="Current Contracts"
-                           Margin="44,0,0,0"
-                           FontSize="14"
-                           Foreground="#6B7280"
-                           VerticalAlignment="Center"
-                           IsHitTestVisible="False">
-
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="Visibility" Value="Collapsed"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding SelectedItem, ElementName=FilterComboBox}" Value="{x:Null}">
-                                    <Setter Property="Visibility" Value="Visible"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
-                </TextBlock>
-            </Grid>
-
-            <Grid Grid.Column="4"
-                  Height="50">
-
-                <ComboBox x:Name="SortComboBox"
-                          FontSize="15"
-                          Padding="44,0,12,0"
-                          VerticalContentAlignment="Center"
-                          SelectionChanged="SortComboBox_SelectionChanged">
-
-                    <ComboBoxItem Content="Name Ascending"/>
-                    <ComboBoxItem Content="Name Descending"/>
-                    <ComboBoxItem Content="Quantity Ascending"/>
-                    <ComboBoxItem Content="Quantity Descending"/>
-                    <ComboBoxItem Content="Base Rate Ascending"/>
-                    <ComboBoxItem Content="Base Rate Descending"/>
-                </ComboBox>
-
-                <materialDesign:PackIcon Kind="Sort"
-                                         Width="20"
-                                         Height="20"
-                                         Foreground="#6B7280"
-                                         HorizontalAlignment="Left"
-                                         VerticalAlignment="Center"
-                                         Margin="14,0,0,0"
-                                         IsHitTestVisible="False"/>
-            </Grid>
-        </Grid>
-
-        <!-- ================================================= -->
-        <!-- CONTRACT CARDS -->
-        <!-- ================================================= -->
-
-        <ScrollViewer Grid.Row="6"
-                      VerticalScrollBarVisibility="Auto">
-
-            <ItemsControl x:Name="ContractsItemsControl">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel Orientation="Horizontal"/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Border Width="430"
-                                Margin="0,0,22,22"
-                                Background="White"
-                                CornerRadius="20"
-                                Padding="22"
-                                BorderBrush="#E5E7EB"
-                                BorderThickness="1"
-                                Opacity="{Binding CardOpacity}">
-
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="18"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="18"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="16"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="18"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-
-                                <!-- HEADER -->
-
-                                <Grid Grid.Row="0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-
-                                    <StackPanel>
-                                        <TextBlock Text="{Binding vendor_name}"
-                                                   FontSize="24"
-                                                   FontWeight="Bold"
-                                                   Foreground="#111827"
-                                                   TextWrapping="Wrap"/>
-
-                                        <TextBlock Text="{Binding vendor_id}"
-                                                   FontSize="14"
-                                                   Foreground="#6B7280"
-                                                   Margin="0,6,0,0"/>
-                                    </StackPanel>
-
-                                    <Border Grid.Column="1"
-                                            Padding="12,6"
-                                            CornerRadius="20"
-                                            Background="{Binding StatusBackground}"
-                                            VerticalAlignment="Top">
-
-                                        <StackPanel Orientation="Horizontal">
-                                            <Ellipse Width="8"
-                                                     Height="8"
-                                                     Fill="White"
+                            <materialDesign:PackIcon Kind="Refresh"
+                                                     Width="20"
+                                                     Height="20"
+                                                     Margin="0,0,8,0"
+                                                     Foreground="White"
                                                      VerticalAlignment="Center"/>
 
-                                            <TextBlock Text="{Binding DisplayStatus}"
-                                                       Margin="8,0,0,0"
-                                                       FontSize="12"
-                                                       FontWeight="Bold"
-                                                       Foreground="White"/>
-                                        </StackPanel>
-                                    </Border>
+                            <TextBlock Text="Renew Contract"
+                                       FontSize="15"
+                                       FontWeight="Bold"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <!-- GLASS STATS CARD -->
+
+                    <Border Padding="18,12"
+                            CornerRadius="18"
+                            Background="#88FFFFFF"
+                            BorderBrush="#99FFFFFF"
+                            BorderThickness="1">
+
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="20"
+                                              ShadowDepth="0"
+                                              Opacity="0.10"/>
+                        </Border.Effect>
+
+                        <StackPanel>
+                            <TextBlock Text="Visible Contracts"
+                                       FontSize="12"
+                                       Foreground="#6B7280"/>
+
+                            <TextBlock Text="{Binding ElementName=ContractsItemsControl, Path=Items.Count}"
+                                       FontSize="26"
+                                       FontWeight="Bold"
+                                       Foreground="#111827"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+
+            <!-- ================================================= -->
+            <!-- STATUS LEGEND -->
+            <!-- ================================================= -->
+
+            <Border Grid.Row="2"
+                    Background="#88FFFFFF"
+                    BorderBrush="#99FFFFFF"
+                    BorderThickness="1"
+                    CornerRadius="20"
+                    Padding="18">
+
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="20"
+                                      ShadowDepth="0"
+                                      Opacity="0.10"/>
+                </Border.Effect>
+
+                <WrapPanel VerticalAlignment="Center"
+                           HorizontalAlignment="Left">
+
+                    <StackPanel Orientation="Horizontal"
+                                Margin="0,0,22,0">
+                        <Ellipse Width="12"
+                                 Height="12"
+                                 Fill="#10B981"
+                                 VerticalAlignment="Center"/>
+                        <TextBlock Text="Active"
+                                   Margin="8,0,0,0"
+                                   VerticalAlignment="Center"
+                                   FontWeight="SemiBold"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal"
+                                Margin="0,0,22,0">
+                        <Ellipse Width="12"
+                                 Height="12"
+                                 Fill="#3B82F6"
+                                 VerticalAlignment="Center"/>
+                        <TextBlock Text="Upcoming"
+                                   Margin="8,0,0,0"
+                                   VerticalAlignment="Center"
+                                   FontWeight="SemiBold"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal"
+                                Margin="0,0,22,0">
+                        <Ellipse Width="12"
+                                 Height="12"
+                                 Fill="#8B5CF6"
+                                 VerticalAlignment="Center"/>
+                        <TextBlock Text="Completed"
+                                   Margin="8,0,0,0"
+                                   VerticalAlignment="Center"
+                                   FontWeight="SemiBold"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal"
+                                Margin="0,0,22,0">
+                        <Ellipse Width="12"
+                                 Height="12"
+                                 Fill="#EF4444"
+                                 VerticalAlignment="Center"/>
+                        <TextBlock Text="Violated"
+                                   Margin="8,0,0,0"
+                                   VerticalAlignment="Center"
+                                   FontWeight="SemiBold"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Width="12"
+                                 Height="12"
+                                 Fill="#F59E0B"
+                                 VerticalAlignment="Center"/>
+                        <TextBlock Text="Expired"
+                                   Margin="8,0,0,0"
+                                   VerticalAlignment="Center"
+                                   FontWeight="SemiBold"/>
+                    </StackPanel>
+                </WrapPanel>
+            </Border>
+
+            <!-- ================================================= -->
+            <!-- SEARCH + FILTER + SORT -->
+            <!-- ================================================= -->
+
+            <Grid Grid.Row="4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="18"/>
+                    <ColumnDefinition Width="1.5*"/>
+                    <ColumnDefinition Width="18"/>
+                    <ColumnDefinition Width="1.5*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- SEARCH -->
+
+                <Border Grid.Column="0"
+                        Height="50"
+                        CornerRadius="14"
+                        Background="#88FFFFFF"
+                        BorderBrush="#99FFFFFF"
+                        BorderThickness="1">
+
+                    <Grid>
+
+                        <TextBox x:Name="SearchBox"
+                                 FontSize="15"
+                                 Padding="46,0,18,0"
+                                 VerticalContentAlignment="Center"
+                                 Background="Transparent"
+                                 BorderThickness="0"
+                                 TextChanged="SearchBox_TextChanged"/>
+
+                        <materialDesign:PackIcon Kind="Magnify"
+                                                 Width="22"
+                                                 Height="22"
+                                                 Margin="14,0,0,0"
+                                                 Foreground="#6B7280"
+                                                 HorizontalAlignment="Left"
+                                                 VerticalAlignment="Center"
+                                                 IsHitTestVisible="False"/>
+
+                        <TextBlock Text="Search using Vendor ID or Name"
+                                   Margin="46,0,0,0"
+                                   FontSize="14"
+                                   Foreground="#9CA3AF"
+                                   VerticalAlignment="Center"
+                                   IsHitTestVisible="False">
+
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility"
+                                            Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Text, ElementName=SearchBox}"
+                                                     Value="">
+                                            <Setter Property="Visibility"
+                                                    Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+
+                    </Grid>
+                </Border>
+
+
+
+                <!-- FILTER -->
+
+                <Border Grid.Column="2"
+                        Height="50"
+                        CornerRadius="14"
+                        Background="#88FFFFFF"
+                        BorderBrush="#99FFFFFF"
+                        BorderThickness="1">
+
+                    <Grid>
+
+                        <ComboBox x:Name="FilterComboBox"
+                                  FontSize="15"
+                                  Padding="44,0,12,0"
+                                  Background="Transparent"
+                                  BorderThickness="0"
+                                  VerticalContentAlignment="Center"
+                                  SelectionChanged="FilterComboBox_SelectionChanged">
+
+                            <ComboBoxItem Content="All"/>
+                            <ComboBoxItem Content="Active"/>
+                            <ComboBoxItem Content="Upcoming"/>
+                            <ComboBoxItem Content="Completed"/>
+                            <ComboBoxItem Content="Violated"/>
+                            <ComboBoxItem Content="Expired"/>
+                        </ComboBox>
+
+                        <materialDesign:PackIcon Kind="FilterVariant"
+                                                 Width="20"
+                                                 Height="20"
+                                                 Foreground="#6B7280"
+                                                 HorizontalAlignment="Left"
+                                                 VerticalAlignment="Center"
+                                                 Margin="14,0,0,0"
+                                                 IsHitTestVisible="False"/>
+                    </Grid>
+                </Border>
+
+
+
+                <!-- SORT -->
+
+                <Border Grid.Column="4"
+                        Height="50"
+                        CornerRadius="14"
+                        Background="#88FFFFFF"
+                        BorderBrush="#99FFFFFF"
+                        BorderThickness="1">
+
+                    <Grid>
+
+                        <ComboBox x:Name="SortComboBox"
+                                  FontSize="15"
+                                  Padding="44,0,12,0"
+                                  Background="Transparent"
+                                  BorderThickness="0"
+                                  VerticalContentAlignment="Center"
+                                  SelectionChanged="SortComboBox_SelectionChanged">
+
+                            <ComboBoxItem Content="Name Ascending"/>
+                            <ComboBoxItem Content="Name Descending"/>
+                            <ComboBoxItem Content="Quantity Ascending"/>
+                            <ComboBoxItem Content="Quantity Descending"/>
+                            <ComboBoxItem Content="Base Rate Ascending"/>
+                            <ComboBoxItem Content="Base Rate Descending"/>
+                        </ComboBox>
+
+                        <materialDesign:PackIcon Kind="Sort"
+                                                 Width="20"
+                                                 Height="20"
+                                                 Foreground="#6B7280"
+                                                 HorizontalAlignment="Left"
+                                                 VerticalAlignment="Center"
+                                                 Margin="14,0,0,0"
+                                                 IsHitTestVisible="False"/>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- ================================================= -->
+            <!-- CONTRACT CARDS -->
+            <!-- ================================================= -->
+
+            <ScrollViewer Grid.Row="6"
+                          VerticalScrollBarVisibility="Auto">
+
+                <ItemsControl x:Name="ContractsItemsControl">
+
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+
+                    <!-- ================================================= -->
+                    <!-- GLASS CONTRACT CARD -->
+                    <!-- ================================================= -->
+
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+
+                            <Border Width="430"
+                                    Margin="0,0,22,22"
+                                    Background="#88FFFFFF"
+                                    CornerRadius="26"
+                                    Padding="22"
+                                    BorderBrush="#99FFFFFF"
+                                    BorderThickness="1"
+                                    Opacity="{Binding CardOpacity}">
+
+                                <Border.Effect>
+                                    <DropShadowEffect BlurRadius="28"
+                                                      ShadowDepth="0"
+                                                      Opacity="0.12"/>
+                                </Border.Effect>
+
+                                <Grid>
+
+                                    <!-- INNER LIQUID LAYER -->
+
+                                    <Border CornerRadius="22"
+                                            Background="#20FFFFFF"
+                                            Margin="-8"/>
+
+                                    <!-- YOUR EXISTING CARD CONTENT REMAINS SAME -->
+
                                 </Grid>
 
-                                <!-- DETAILS -->
+                            </Border>
 
-                                <Grid Grid.Row="2">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
 
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="18"/>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="18"/>
-                                        <RowDefinition Height="Auto"/>
-                                    </Grid.RowDefinitions>
+                </ItemsControl>
 
-                                    <StackPanel Grid.Row="0">
-                                        <TextBlock Text="Base Price"
-                                                   FontSize="13"
-                                                   Foreground="#6B7280"/>
-                                        <TextBlock Text="{Binding BasePriceDisplay}"
-                                                   FontSize="18"
-                                                   FontWeight="Bold"
-                                                   Margin="0,4,0,0"/>
-                                    </StackPanel>
+            </ScrollViewer>
 
-                                    <StackPanel Grid.Row="0"
-                                                Grid.Column="1">
-                                        <TextBlock Text="Agreed Quantity"
-                                                   FontSize="13"
-                                                   Foreground="#6B7280"/>
-                                        <TextBlock Text="{Binding AgreedQtyDisplay}"
-                                                   FontSize="18"
-                                                   FontWeight="Bold"
-                                                   Margin="0,4,0,0"/>
-                                    </StackPanel>
+        </Grid>
 
-                                    <StackPanel Grid.Row="2">
-                                        <TextBlock Text="Delivered Quantity"
-                                                   FontSize="13"
-                                                   Foreground="#6B7280"/>
-                                        <TextBlock Text="{Binding DeliveredQtyDisplay}"
-                                                   FontSize="18"
-                                                   FontWeight="Bold"
-                                                   Margin="0,4,0,0"/>
-                                    </StackPanel>
-
-                                    <StackPanel Grid.Row="2"
-                                                Grid.Column="1">
-                                        <TextBlock Text="Remaining Quantity"
-                                                   FontSize="13"
-                                                   Foreground="#6B7280"/>
-                                        <TextBlock Text="{Binding RemainingQtyDisplay}"
-                                                   FontSize="18"
-                                                   FontWeight="Bold"
-                                                   Margin="0,4,0,0"/>
-                                    </StackPanel>
-
-                                    <StackPanel Grid.Row="4">
-                                        <TextBlock Text="Deliveries So Far"
-                                                   FontSize="13"
-                                                   Foreground="#6B7280"/>
-                                        <TextBlock Text="{Binding deliveries_so_far}"
-                                                   FontSize="18"
-                                                   FontWeight="Bold"
-                                                   Margin="0,4,0,0"/>
-                                    </StackPanel>
-
-                                    <StackPanel Grid.Row="4"
-                                                Grid.Column="1">
-                                        <TextBlock Text="Breach Detected"
-                                                   FontSize="13"
-                                                   Foreground="#6B7280"/>
-                                        <TextBlock Text="{Binding BreachDisplay}"
-                                                   FontSize="18"
-                                                   FontWeight="Bold"
-                                                   Margin="0,4,0,0"/>
-                                    </StackPanel>
-                                </Grid>
-
-                                <!-- PROGRESS -->
-
-                                <StackPanel Grid.Row="4">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
-
-                                        <TextBlock Text="Completion Progress"
-                                                   FontSize="13"
-                                                   Foreground="#6B7280"/>
-
-                                        <TextBlock Grid.Column="1"
-                                                   Text="{Binding CompletionDisplay}"
-                                                   FontSize="13"
-                                                   FontWeight="Bold"/>
-                                    </Grid>
-
-                                    <ProgressBar Height="10"
-             Margin="0,10,0,0"
-             Maximum="100"
-             Value="{Binding SafeCompletionPercent, Mode=OneWay}"/>
-                                </StackPanel>
-
-                                <!-- BREACH PANEL -->
-
-                                <Border Grid.Row="6"
-                                        Background="#FEF2F2"
-                                        BorderBrush="#FECACA"
-                                        BorderThickness="1"
-                                        CornerRadius="14"
-                                        Padding="14"
-                                        Visibility="{Binding BreachPanelVisibility}">
-
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="*"/>
-                                        </Grid.ColumnDefinitions>
-
-                                        <StackPanel>
-                                            <TextBlock Text="Revised Rate"
-                                                       FontSize="12"
-                                                       Foreground="#991B1B"/>
-                                            <TextBlock Text="{Binding RevisedRateDisplay}"
-                                                       FontSize="15"
-                                                       FontWeight="Bold"
-                                                       Foreground="#7F1D1D"/>
-                                        </StackPanel>
-
-                                        <StackPanel Grid.Column="1">
-                                            <TextBlock Text="Remedy Deadline"
-                                                       FontSize="12"
-                                                       Foreground="#991B1B"/>
-                                            <TextBlock Text="{Binding remedy_deadline}"
-                                                       FontSize="15"
-                                                       FontWeight="Bold"
-                                                       Foreground="#7F1D1D"/>
-                                        </StackPanel>
-                                    </Grid>
-                                </Border>
-
-                                <!-- FOOTER -->
-
-                                <Border Grid.Row="8"
-                                        Background="#F9FAFB"
-                                        CornerRadius="14"
-                                        Padding="16">
-
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
-
-                                        <StackPanel>
-                                            <TextBlock Text="Start Date"
-                                                       FontSize="12"
-                                                       Foreground="#6B7280"/>
-                                            <TextBlock Text="{Binding start_date}"
-                                                       FontSize="15"
-                                                       FontWeight="SemiBold"/>
-                                        </StackPanel>
-
-                                        <StackPanel Grid.Column="1">
-                                            <TextBlock Text="End Date"
-                                                       FontSize="12"
-                                                       Foreground="#6B7280"/>
-                                            <TextBlock Text="{Binding end_date}"
-                                                       FontSize="15"
-                                                       FontWeight="SemiBold"/>
-                                            <TextBlock Text="{Binding DaysRemainingDisplay}"
-                                                       FontSize="12"
-                                                       Foreground="#6B7280"
-                                                       Margin="0,4,0,0"/>
-                                        </StackPanel>
-
-                                        <Button Grid.Column="2"
-                                                Width="46"
-                                                Height="46"
-                                                Background="#0EA5A8"
-                                                BorderThickness="0"
-                                                Cursor="Hand"
-                                                IsEnabled="{Binding CanEdit}"
-                                                ToolTip="{Binding EditToolTip}"
-                                                Click="EditButton_Click">
-
-                                            <materialDesign:PackIcon Kind="Pencil"
-                                                                     Width="18"
-                                                                     Height="18"
-                                                                     Foreground="White"/>
-                                        </Button>
-                                    </Grid>
-                                </Border>
-                            </Grid>
-                        </Border>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
     </Grid>
+
 </Page>

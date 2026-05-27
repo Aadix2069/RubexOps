@@ -10,29 +10,37 @@ namespace RubexOps
     public partial class SettingsPage : Page
     {
         // =====================================================
-        // APP DATA FOLDER
+        // APPLICATION BASE DIRECTORY
         // =====================================================
 
-        private readonly string appDataFolder =
-            Path.Combine(
-                Environment.GetFolderPath(
-                    Environment.SpecialFolder.MyDocuments),
-                "RubexOps"
-            );
+        private readonly string baseDirectory =
+            AppDomain.CurrentDomain.BaseDirectory;
 
 
 
         // =====================================================
-        // CONFIG FILE PATH
+        // APPLICATION FOLDERS
         // =====================================================
 
-        private readonly string configPath =
-            Path.Combine(
-                Environment.GetFolderPath(
-                    Environment.SpecialFolder.MyDocuments),
-                "RubexOps",
-                "database_config.json"
-            );
+        private readonly string databaseFolder;
+
+        private readonly string configFolder;
+
+        private readonly string backupFolder;
+
+        private readonly string exportFolder;
+
+
+
+        // =====================================================
+        // DATABASE + CONFIG PATHS
+        // =====================================================
+
+        private readonly string databasePath;
+
+        private readonly string templateDatabasePath;
+
+        private readonly string configPath;
 
 
 
@@ -44,7 +52,83 @@ namespace RubexOps
         {
             InitializeComponent();
 
-            EnsureAppFolderExists();
+
+
+            // =============================================
+            // INITIALIZE FOLDER PATHS
+            // =============================================
+
+            databaseFolder =
+                Path.Combine(
+                    baseDirectory,
+                    "Database"
+                );
+
+
+
+            configFolder =
+                Path.Combine(
+                    baseDirectory,
+                    "Config"
+                );
+
+
+
+            backupFolder =
+                Path.Combine(
+                    baseDirectory,
+                    "Backups"
+                );
+
+
+
+            exportFolder =
+                Path.Combine(
+                    baseDirectory,
+                    "Exports"
+                );
+
+
+
+            // =============================================
+            // DATABASE FILES
+            // =============================================
+
+            databasePath =
+                Path.Combine(
+                    databaseFolder,
+                    "masterdata.xlsx"
+                );
+
+
+
+            templateDatabasePath =
+                Path.Combine(
+                    databaseFolder,
+                    "master_template.xlsx"
+                );
+
+
+
+            // =============================================
+            // CONFIG FILE
+            // =============================================
+
+            configPath =
+                Path.Combine(
+                    configFolder,
+                    "database_config.json"
+                );
+
+
+
+            // =============================================
+            // INITIALIZATION
+            // =============================================
+
+            EnsureApplicationFoldersExist();
+
+            EnsureDatabaseExists();
 
             EnsureConfigFileExists();
 
@@ -54,18 +138,60 @@ namespace RubexOps
 
 
         // =====================================================
-        // ENSURE APP FOLDER EXISTS
+        // ENSURE FOLDERS EXIST
         // =====================================================
 
-        private void EnsureAppFolderExists()
+        private void EnsureApplicationFoldersExist()
         {
             try
             {
-                if (!Directory.Exists(appDataFolder))
+                Directory.CreateDirectory(databaseFolder);
+
+                Directory.CreateDirectory(configFolder);
+
+                Directory.CreateDirectory(backupFolder);
+
+                Directory.CreateDirectory(exportFolder);
+            }
+
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    ex.Message,
+                    "Folder Initialization Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error
+                );
+            }
+        }
+
+
+
+        // =====================================================
+        // ENSURE DATABASE EXISTS
+        // =====================================================
+
+        private void EnsureDatabaseExists()
+        {
+            try
+            {
+                // =========================================
+                // IF WORKING DATABASE DOESN'T EXIST
+                // =========================================
+
+                if (!File.Exists(databasePath))
                 {
-                    Directory.CreateDirectory(
-                        appDataFolder
-                    );
+                    // =====================================
+                    // COPY FROM TEMPLATE
+                    // =====================================
+
+                    if (File.Exists(templateDatabasePath))
+                    {
+                        File.Copy(
+                            templateDatabasePath,
+                            databasePath
+                        );
+                    }
                 }
             }
 
@@ -73,7 +199,7 @@ namespace RubexOps
             {
                 MessageBox.Show(
                     ex.Message,
-                    "Folder Error",
+                    "Database Initialization Error",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error
                 );
@@ -95,7 +221,7 @@ namespace RubexOps
                     DatabaseConfig defaultConfig =
                         new DatabaseConfig
                         {
-                            database_path = ""
+                            database_path = databasePath
                         };
 
 
@@ -122,7 +248,7 @@ namespace RubexOps
             {
                 MessageBox.Show(
                     ex.Message,
-                    "Config Error",
+                    "Config Initialization Error",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error
                 );
@@ -132,7 +258,7 @@ namespace RubexOps
 
 
         // =====================================================
-        // LOAD CURRENT DATABASE PATH
+        // LOAD DATABASE PATH
         // =====================================================
 
         private void LoadCurrentDatabasePath()
@@ -158,7 +284,7 @@ namespace RubexOps
 
 
 
-                DatabaseConfig config =
+                DatabaseConfig? config =
                     JsonSerializer.Deserialize<DatabaseConfig>(
                         json
                     );
@@ -176,7 +302,7 @@ namespace RubexOps
             {
                 MessageBox.Show(
                     ex.Message,
-                    "Settings Error",
+                    "Load Settings Error",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error
                 );
@@ -198,7 +324,7 @@ namespace RubexOps
                 OpenFileDialog dialog =
                     new OpenFileDialog
                     {
-                        Title = "Select Database File",
+                        Title = "Select Excel Database",
 
                         Filter =
                             "Excel Files (*.xlsx)|*.xlsx"
@@ -241,7 +367,7 @@ namespace RubexOps
         {
             try
             {
-                string databasePath =
+                string selectedPath =
                     DatabasePathBox.Text.Trim();
 
 
@@ -250,7 +376,7 @@ namespace RubexOps
                 // VALIDATION
                 // =============================================
 
-                if (string.IsNullOrWhiteSpace(databasePath))
+                if (string.IsNullOrWhiteSpace(selectedPath))
                 {
                     MessageBox.Show(
                         "Please select a database file.",
@@ -264,7 +390,7 @@ namespace RubexOps
 
 
 
-                if (!File.Exists(databasePath))
+                if (!File.Exists(selectedPath))
                 {
                     MessageBox.Show(
                         "Selected database file does not exist.",
@@ -275,6 +401,18 @@ namespace RubexOps
 
                     return;
                 }
+
+
+
+                // =============================================
+                // COPY DATABASE INTO APPLICATION
+                // =============================================
+
+                File.Copy(
+                    selectedPath,
+                    databasePath,
+                    true
+                );
 
 
 
@@ -291,7 +429,7 @@ namespace RubexOps
 
 
                 // =============================================
-                // SERIALIZE JSON
+                // SERIALIZE CONFIG
                 // =============================================
 
                 string json =
@@ -317,12 +455,21 @@ namespace RubexOps
 
 
                 // =============================================
-                // SUCCESS
+                // UPDATE UI
+                // =============================================
+
+                DatabasePathBox.Text =
+                    databasePath;
+
+
+
+                // =============================================
+                // SUCCESS MESSAGE
                 // =============================================
 
                 MessageBox.Show(
-                    "Database path saved successfully.\n\n" +
-                    "RubexOps will now remember this path permanently.",
+                    "Database imported successfully into RubexOps.\n\n" +
+                    "The database is now fully integrated with the application.",
                     "Success",
                     MessageBoxButton.OK,
                     MessageBoxImage.Information
@@ -333,7 +480,7 @@ namespace RubexOps
             {
                 MessageBox.Show(
                     "Permission denied while saving settings.\n\n" +
-                    "Try running the application as Administrator.",
+                    "Try running RubexOps as Administrator.",
                     "Permission Error",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error
@@ -355,7 +502,7 @@ namespace RubexOps
 
 
     // =====================================================
-    // CONFIG MODEL
+    // DATABASE CONFIG MODEL
     // =====================================================
 
     public class DatabaseConfig

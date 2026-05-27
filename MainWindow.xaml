@@ -9,7 +9,10 @@
         Height="900"
         Width="1500"
         WindowStartupLocation="CenterScreen"
-        Background="#F4F7F8">
+        Background="#F4F7F8"
+          Icon="Images/applogo.ico">
+      
+    
 
     <Grid>
 
@@ -36,15 +39,26 @@
                 <!-- LOGO -->
                 <StackPanel Margin="20">
 
-                    <TextBlock Text="RubexOps"
-                               FontSize="34"
-                               FontWeight="Bold"
-                               Foreground="White"/>
+                    <StackPanel Orientation="Horizontal">
+
+                        <Image Source="Images/applogo.ico" 
+               Width="40" 
+               Height="40" 
+               Stretch="Uniform" 
+               Margin="0,0,10,0" />
+                        <TextBlock Text="RubexOps"
+                   FontSize="34"
+                   FontWeight="Bold"
+                   Foreground="White"
+                   VerticalAlignment="Center"/>
+                    </StackPanel>
 
                     <TextBlock Text="Integrated Operations&#x0a;Management System"
-                               Foreground="#D7F2F3"
-                               FontSize="15"
-                               Margin="0,10,0,0"/>
+           Foreground="#D7F2F3"
+           FontSize="15"
+           Margin="0,10,0,0"
+           TextAlignment="Center" />
+
                 </StackPanel>
 
 
@@ -228,17 +242,12 @@
                     <StackPanel Orientation="Horizontal"
                                 VerticalAlignment="Center">
 
-                        <Border Width="70"
-                                Height="70"
+                        <Border Width="99"
+                                Height="95"
                                 CornerRadius="35"
                                 Background="#EAF7F7">
 
-                            <materialDesign:PackIcon Kind="OfficeBuilding"
-                                                     Width="35"
-                                                     Height="35"
-                                                     Foreground="#0B7A81"
-                                                     HorizontalAlignment="Center"
-                                                     VerticalAlignment="Center"/>
+                            <Image Source="Images/Rubex_logo.png" Stretch="Uniform" />
                         </Border>
 
                         <StackPanel Margin="18,0,0,0">
@@ -339,7 +348,7 @@
                                FontSize="13"/>
 
                     <TextBlock Grid.Column="1"
-                               Text="Developed by Vasudevan S Nair and Aadi R Santhosh | RubexOps v1.0.0"
+                               Text="RubexOps v1.0.0"
                                VerticalAlignment="Center"
                                Foreground="#0B7A81"
                                FontWeight="SemiBold"

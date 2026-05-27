@@ -13,14 +13,15 @@ warnings.filterwarnings("ignore")
 # =========================================================
 # CONFIG
 # =========================================================
+# =============================================
+# CONFIG PATH
+# =============================================
 
-CONFIG_PATH = os.path.join(
-    os.path.expanduser("~"),
-    "Documents",
-    "RubexOps",
+config_path = os.path.join(
+    BASE_DIR,
+    "Config",
     "database_config.json"
 )
-
 SHEET_NAME = "pcon"
 START_ROW = 5
 

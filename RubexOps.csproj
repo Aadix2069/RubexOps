@@ -13,6 +13,8 @@
     <None Remove="backend\create_purchase_contract.py" />
     <None Remove="backend\database_config.json" />
     <None Remove="backend\update_purchase_contract.py" />
+    <None Remove="Images\applogo.ico" />
+    <None Remove="Images\Rubex_logo.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -37,6 +39,12 @@
 
   <ItemGroup>
     <Resource Include="Assets\factory_dashboard.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\applogo.ico">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Rubex_logo.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>

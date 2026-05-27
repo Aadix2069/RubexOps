@@ -52,11 +52,13 @@ try:
     # =============================================
     # CONFIG PATH
     # =============================================
+# =============================================
+# CONFIG PATH
+# =============================================
 
     config_path = os.path.join(
-    os.path.expanduser("~"),
-    "Documents",
-    "RubexOps",
+    BASE_DIR,
+    "Config",
     "database_config.json"
 )
 

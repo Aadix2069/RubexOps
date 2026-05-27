@@ -5,186 +5,326 @@
       Background="#F4F7F8">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
+
+        <!-- ================================================= -->
+        <!-- MAIN CONTAINER -->
+        <!-- ================================================= -->
+
         <Grid Margin="35">
 
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-
             <!-- ================================================= -->
-            <!-- PAGE HEADER -->
+            <!-- WATERMARK -->
             <!-- ================================================= -->
 
-            <StackPanel Orientation="Horizontal">
+            <Image Source="Images/Rubex_logo.png"
+                   Width="500"
+                   Height="500"
+                   Opacity="0.15"
+                   Stretch="Uniform"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   IsHitTestVisible="False"
+                   Panel.ZIndex="0"/>
 
-                <Border Width="65"
-                        Height="65"
-                        CornerRadius="32.5"
-                        Background="#EAF7F7">
+            <!-- ================================================= -->
+            <!-- MAIN CONTENT -->
+            <!-- ================================================= -->
 
-                    <materialDesign:PackIcon Kind="TrendingUp"
-                                             Width="30"
-                                             Height="30"
-                                             Foreground="#0B7A81"
-                                             HorizontalAlignment="Center"
-                                             VerticalAlignment="Center"/>
-                </Border>
+            <Grid Panel.ZIndex="1">
 
-                <StackPanel Margin="18,0,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-                    <TextBlock Text="Sales"
-                               FontSize="42"
-                               FontWeight="Bold"
-                               Foreground="#1E2F35"/>
+                <!-- ================================================= -->
+                <!-- PAGE HEADER -->
+                <!-- ================================================= -->
 
-                    <Border Width="100"
-                            Height="4"
-                            Background="#F4A261"
-                            Margin="0,8,0,0"
-                            HorizontalAlignment="Left"/>
+                <StackPanel Orientation="Horizontal">
+
+                    <Border Width="65"
+                            Height="65"
+                            CornerRadius="32.5"
+                            Background="#AAFFFFFF"
+                            BorderBrush="#80FFFFFF"
+                            BorderThickness="1">
+
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="18"
+                                              ShadowDepth="0"
+                                              Opacity="0.12"/>
+                        </Border.Effect>
+
+                        <materialDesign:PackIcon Kind="TrendingUp"
+                                                 Width="30"
+                                                 Height="30"
+                                                 Foreground="#0B7A81"
+                                                 HorizontalAlignment="Center"
+                                                 VerticalAlignment="Center"/>
+                    </Border>
+
+                    <StackPanel Margin="18,0,0,0">
+
+                        <TextBlock Text="Sales"
+                                   FontSize="42"
+                                   FontWeight="Bold"
+                                   Foreground="#1E2F35"/>
+
+                        <Border Width="100"
+                                Height="4"
+                                Background="#F4A261"
+                                Margin="0,8,0,0"
+                                HorizontalAlignment="Left"/>
+                    </StackPanel>
                 </StackPanel>
-            </StackPanel>
 
-            <!-- ================================================= -->
-            <!-- CONTENT AREA -->
-            <!-- ================================================= -->
-
-            <Grid Grid.Row="1"
-                  Margin="0,40,0,0">
-
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="25"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
 
                 <!-- ================================================= -->
-                <!-- CONTRACT MANAGEMENT -->
+                <!-- CONTENT AREA -->
                 <!-- ================================================= -->
 
-                <Border Grid.Column="0"
-                        Background="White"
-                        CornerRadius="18"
-                        Padding="35"
-                        BorderBrush="#E4E7E8"
-                        BorderThickness="1">
+                <Grid Grid.Row="1"
+                      Margin="0,40,0,0">
 
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="25"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
 
-                        <StackPanel Orientation="Horizontal">
 
-                            <materialDesign:PackIcon Kind="FileDocumentEdit"
-                                                     Width="40"
-                                                     Height="40"
-                                                     Foreground="#0B7A81"
-                                                     Margin="0,0,18,0"/>
+                    <!-- ================================================= -->
+                    <!-- CONTRACT MANAGEMENT -->
+                    <!-- ================================================= -->
 
-                            <StackPanel>
-                                <TextBlock Text="Contract Management"
-                                           FontSize="30"
-                                           FontWeight="Bold"
-                                           Foreground="#0B7A81"/>
+                    <Border Grid.Column="0"
+                            CornerRadius="28"
+                            Padding="35"
+                            Background="#88FFFFFF"
+                            BorderBrush="#99FFFFFF"
+                            BorderThickness="1">
 
-                                <TextBlock Text="Manage sales contracts and renewals"
-                                           FontSize="16"
-                                           Margin="0,6,0,0"
-                                           Foreground="#777"/>
-                            </StackPanel>
-                        </StackPanel>
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="30"
+                                              ShadowDepth="0"
+                                              Opacity="0.16"/>
+                        </Border.Effect>
 
-                        <StackPanel Grid.Row="1"
-                                    Margin="0,40,0,0">
+                        <Grid>
 
-                            <Button Content="Create Contract"
-                                    Height="60"
-                                    FontSize="17"
-                                    Margin="0,0,0,18"
-                                    Background="#1B9AA0"
-                                    Foreground="White"
-                                    BorderThickness="0"
-                                    Cursor="Hand"
-                                    Click="CreateContract_Click"/>
+                            <!-- INNER GLASS LAYER -->
 
-                            <Button Content="View Contracts"
-                                    Height="60"
-                                    FontSize="17"
-                                    Background="#1B9AA0"
-                                    Foreground="White"
-                                    BorderThickness="0"
-                                    Cursor="Hand"
-                                    Click="ViewContracts_Click"/>
-                        </StackPanel>
-                    </Grid>
-                </Border>
+                            <Border CornerRadius="24"
+                                    Background="#30FFFFFF"
+                                    Margin="-16"/>
 
-                <!-- ================================================= -->
-                <!-- DATA MANAGEMENT -->
-                <!-- ================================================= -->
+                            <Grid>
 
-                <Border Grid.Column="2"
-                        Background="White"
-                        CornerRadius="18"
-                        Padding="35"
-                        BorderBrush="#E4E7E8"
-                        BorderThickness="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
 
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
+                                <!-- HEADER -->
 
-                        <StackPanel Orientation="Horizontal">
+                                <StackPanel Orientation="Horizontal">
 
-                            <materialDesign:PackIcon Kind="DatabaseEdit"
-                                                     Width="40"
-                                                     Height="40"
-                                                     Foreground="#0B7A81"
-                                                     Margin="0,0,18,0"/>
+                                    <Border Width="68"
+                                            Height="68"
+                                            CornerRadius="20"
+                                            Background="#55FFFFFF"
+                                            BorderBrush="#90FFFFFF"
+                                            BorderThickness="1"
+                                            Margin="0,0,18,0">
 
-                            <StackPanel>
-                                <TextBlock Text="Data Management"
-                                           FontSize="30"
-                                           FontWeight="Bold"
-                                           Foreground="#0B7A81"/>
+                                        <materialDesign:PackIcon Kind="FileDocumentEdit"
+                                                                 Width="34"
+                                                                 Height="34"
+                                                                 Foreground="#0B7A81"
+                                                                 HorizontalAlignment="Center"
+                                                                 VerticalAlignment="Center"/>
+                                    </Border>
 
-                                <TextBlock Text="Manage sales entries and records"
-                                           FontSize="16"
-                                           Margin="0,6,0,0"
-                                           Foreground="#777"/>
-                            </StackPanel>
-                        </StackPanel>
+                                    <StackPanel>
 
-                        <StackPanel Grid.Row="1"
-                                    Margin="0,40,0,0">
+                                        <TextBlock Text="Contract Management"
+                                                   FontSize="30"
+                                                   FontWeight="Bold"
+                                                   Foreground="#0B7A81"/>
 
-                            <Button Content="Enter Sales Data"
-                                    Height="60"
-                                    FontSize="17"
-                                    Margin="0,0,0,18"
-                                    Background="#1B9AA0"
-                                    Foreground="White"
-                                    BorderThickness="0"
-                                    Cursor="Hand"
-                                    Click="EnterSalesData_Click"/>
+                                        <TextBlock Text="Manage sales contracts and renewals"
+                                                   FontSize="16"
+                                                   Margin="0,6,0,0"
+                                                   Foreground="#6B7280"/>
+                                    </StackPanel>
+                                </StackPanel>
 
-                            <Button Content="View / Edit Sales Data"
-                                    Height="60"
-                                    FontSize="17"
-                                    Background="#1B9AA0"
-                                    Foreground="White"
-                                    BorderThickness="0"
-                                    Cursor="Hand"
-                                    Click="ViewSalesData_Click"/>
-                        </StackPanel>
-                    </Grid>
-                </Border>
+
+                                <!-- BUTTONS -->
+
+                                <StackPanel Grid.Row="1"
+                                            Margin="0,40,0,0">
+
+                                    <Button Content="Create Contract"
+                                            Height="60"
+                                            FontSize="17"
+                                            Margin="0,0,0,18"
+                                            Background="#1B9AA0"
+                                            Foreground="White"
+                                            BorderThickness="0"
+                                            Cursor="Hand"
+                                            Click="CreateContract_Click">
+
+                                        <Button.Effect>
+                                            <DropShadowEffect BlurRadius="14"
+                                                              ShadowDepth="0"
+                                                              Opacity="0.20"/>
+                                        </Button.Effect>
+                                    </Button>
+
+                                    <Button Content="View Contracts"
+                                            Height="60"
+                                            FontSize="17"
+                                            Background="#1B9AA0"
+                                            Foreground="White"
+                                            BorderThickness="0"
+                                            Cursor="Hand"
+                                            Click="ViewContracts_Click">
+
+                                        <Button.Effect>
+                                            <DropShadowEffect BlurRadius="14"
+                                                              ShadowDepth="0"
+                                                              Opacity="0.20"/>
+                                        </Button.Effect>
+                                    </Button>
+
+                                </StackPanel>
+
+                            </Grid>
+
+                        </Grid>
+                    </Border>
+
+
+                    <!-- ================================================= -->
+                    <!-- DATA MANAGEMENT -->
+                    <!-- ================================================= -->
+
+                    <Border Grid.Column="2"
+                            CornerRadius="28"
+                            Padding="35"
+                            Background="#88FFFFFF"
+                            BorderBrush="#99FFFFFF"
+                            BorderThickness="1">
+
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="30"
+                                              ShadowDepth="0"
+                                              Opacity="0.16"/>
+                        </Border.Effect>
+
+                        <Grid>
+
+                            <!-- INNER GLASS LAYER -->
+
+                            <Border CornerRadius="24"
+                                    Background="#30FFFFFF"
+                                    Margin="-16"/>
+
+                            <Grid>
+
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- HEADER -->
+
+                                <StackPanel Orientation="Horizontal">
+
+                                    <Border Width="68"
+                                            Height="68"
+                                            CornerRadius="20"
+                                            Background="#55FFFFFF"
+                                            BorderBrush="#90FFFFFF"
+                                            BorderThickness="1"
+                                            Margin="0,0,18,0">
+
+                                        <materialDesign:PackIcon Kind="DatabaseEdit"
+                                                                 Width="34"
+                                                                 Height="34"
+                                                                 Foreground="#0B7A81"
+                                                                 HorizontalAlignment="Center"
+                                                                 VerticalAlignment="Center"/>
+                                    </Border>
+
+                                    <StackPanel>
+
+                                        <TextBlock Text="Data Management"
+                                                   FontSize="30"
+                                                   FontWeight="Bold"
+                                                   Foreground="#0B7A81"/>
+
+                                        <TextBlock Text="Manage sales entries and records"
+                                                   FontSize="16"
+                                                   Margin="0,6,0,0"
+                                                   Foreground="#6B7280"/>
+                                    </StackPanel>
+                                </StackPanel>
+
+
+                                <!-- BUTTONS -->
+
+                                <StackPanel Grid.Row="1"
+                                            Margin="0,40,0,0">
+
+                                    <Button Content="Enter Sales Data"
+                                            Height="60"
+                                            FontSize="17"
+                                            Margin="0,0,0,18"
+                                            Background="#1B9AA0"
+                                            Foreground="White"
+                                            BorderThickness="0"
+                                            Cursor="Hand"
+                                            Click="EnterSalesData_Click">
+
+                                        <Button.Effect>
+                                            <DropShadowEffect BlurRadius="14"
+                                                              ShadowDepth="0"
+                                                              Opacity="0.20"/>
+                                        </Button.Effect>
+                                    </Button>
+
+                                    <Button Content="View / Edit Sales Data"
+                                            Height="60"
+                                            FontSize="17"
+                                            Background="#1B9AA0"
+                                            Foreground="White"
+                                            BorderThickness="0"
+                                            Cursor="Hand"
+                                            Click="ViewSalesData_Click">
+
+                                        <Button.Effect>
+                                            <DropShadowEffect BlurRadius="14"
+                                                              ShadowDepth="0"
+                                                              Opacity="0.20"/>
+                                        </Button.Effect>
+                                    </Button>
+
+                                </StackPanel>
+
+                            </Grid>
+
+                        </Grid>
+                    </Border>
+
+                </Grid>
+
             </Grid>
+
         </Grid>
+
     </ScrollViewer>
+
 </Page>

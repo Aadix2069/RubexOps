@@ -7,234 +7,317 @@
       mc:Ignorable="d"
       Background="#F5F7F8">
 
-    <Grid Margin="24">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
 
         <!-- ================================================= -->
-        <!-- PAGE STRUCTURE -->
+        <!-- MAIN CONTAINER -->
         <!-- ================================================= -->
 
-        <Grid.RowDefinitions>
+        <Grid Margin="24">
 
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="24"/>
-            <RowDefinition Height="*"/>
+            <!-- ================================================= -->
+            <!-- WATERMARK -->
+            <!-- ================================================= -->
 
-        </Grid.RowDefinitions>
-
-
-
-        <!-- ================================================= -->
-        <!-- HEADER -->
-        <!-- ================================================= -->
-
-        <Grid Grid.Row="0">
-
-            <Grid.ColumnDefinitions>
-
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-
-            </Grid.ColumnDefinitions>
+            <Image Source="Images/Rubex_logo.png"
+                   Width="500"
+                   Height="500"
+                   Opacity="0.15"
+                   Stretch="Uniform"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   IsHitTestVisible="False"
+                   Panel.ZIndex="0"/>
 
 
+            <!-- ================================================= -->
+            <!-- MAIN CONTENT -->
+            <!-- ================================================= -->
 
-            <!-- ICON -->
-
-            <Border Width="64"
-                    Height="64"
-                    CornerRadius="32"
-                    Background="#E7F6F7">
-
-                <materialDesign:PackIcon Kind="DatabaseCog"
-                                         Width="30"
-                                         Height="30"
-                                         Foreground="#0B8A8F"
-                                         HorizontalAlignment="Center"
-                                         VerticalAlignment="Center"/>
-            </Border>
-
-
-
-            <!-- TITLE -->
-
-            <StackPanel Grid.Column="1"
-                        Margin="18,0,0,0"
-                        VerticalAlignment="Center">
-
-                <TextBlock Text="Database Settings"
-                           FontSize="38"
-                           FontWeight="Bold"
-                           Foreground="#111827"/>
-
-                <Border Width="220"
-                        Height="4"
-                        Background="#F59E42"
-                        CornerRadius="2"
-                        Margin="0,8,0,0"
-                        HorizontalAlignment="Left"/>
-            </StackPanel>
-        </Grid>
-
-
-
-        <!-- ================================================= -->
-        <!-- MAIN CARD -->
-        <!-- ================================================= -->
-
-        <Border Grid.Row="2"
-                Background="White"
-                CornerRadius="20"
-                BorderBrush="#E5E7EB"
-                BorderThickness="1"
-                Padding="35">
-
-            <StackPanel>
+            <Grid Panel.ZIndex="1">
 
                 <!-- ================================================= -->
-                <!-- SECTION TITLE -->
+                <!-- PAGE STRUCTURE -->
                 <!-- ================================================= -->
 
-                <TextBlock Text="Select Master Database File"
-                           FontSize="26"
-                           FontWeight="Bold"
-                           Foreground="#0B8A8F"
-                           Margin="0,0,0,30"/>
+                <Grid.RowDefinitions>
+
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="24"/>
+                    <RowDefinition Height="*"/>
+
+                </Grid.RowDefinitions>
 
 
 
                 <!-- ================================================= -->
-                <!-- DATABASE PATH -->
+                <!-- HEADER -->
                 <!-- ================================================= -->
 
-                <TextBlock Text="Database File Path"
-                           FontSize="16"
-                           FontWeight="SemiBold"
-                           Foreground="#111827"
-                           Margin="0,0,0,12"/>
-
-
-
-                <Grid>
+                <Grid Grid.Row="0">
 
                     <Grid.ColumnDefinitions>
 
+                        <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="18"/>
-                        <ColumnDefinition Width="170"/>
 
                     </Grid.ColumnDefinitions>
 
 
 
-                    <!-- PATH BOX -->
+                    <!-- ICON -->
 
-                    <TextBox x:Name="DatabasePathBox"
-                             Grid.Column="0"
-                             Height="48"
-                             FontSize="15"
-                             Padding="14,5"
-                             VerticalContentAlignment="Center"
-                             Background="#F9FAFB"
-                             BorderBrush="#D1D5DB"
-                             BorderThickness="1.5"
-                             IsReadOnly="True"/>
+                    <Border Width="64"
+                            Height="64"
+                            CornerRadius="32"
+                            Background="#AAFFFFFF"
+                            BorderBrush="#80FFFFFF"
+                            BorderThickness="1">
+
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="18"
+                                              ShadowDepth="0"
+                                              Opacity="0.12"/>
+                        </Border.Effect>
+
+                        <materialDesign:PackIcon Kind="DatabaseCog"
+                                                 Width="30"
+                                                 Height="30"
+                                                 Foreground="#0B8A8F"
+                                                 HorizontalAlignment="Center"
+                                                 VerticalAlignment="Center"/>
+                    </Border>
 
 
 
-                    <!-- BROWSE BUTTON -->
+                    <!-- TITLE -->
 
-                    <Button Grid.Column="2"
-                            Height="48"
-                            Background="#0EA5A8"
-                            Foreground="White"
-                            FontSize="15"
-                            FontWeight="SemiBold"
-                            BorderThickness="0"
-                            Cursor="Hand"
-                            Click="BrowseDatabase_Click">
+                    <StackPanel Grid.Column="1"
+                                Margin="18,0,0,0"
+                                VerticalAlignment="Center">
 
-                        <StackPanel Orientation="Horizontal"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center">
+                        <TextBlock Text="Database Settings"
+                                   FontSize="38"
+                                   FontWeight="Bold"
+                                   Foreground="#111827"/>
 
-                            <materialDesign:PackIcon Kind="FolderSearch"
-                                                     Width="20"
-                                                     Height="20"
-                                                     Margin="0,0,8,0"/>
-
-                            <TextBlock Text="Browse"/>
-                        </StackPanel>
-                    </Button>
+                        <Border Width="220"
+                                Height="4"
+                                Background="#F59E42"
+                                CornerRadius="2"
+                                Margin="0,8,0,0"
+                                HorizontalAlignment="Left"/>
+                    </StackPanel>
                 </Grid>
 
 
 
                 <!-- ================================================= -->
-                <!-- INFO CARD -->
+                <!-- MAIN GLASS CARD -->
                 <!-- ================================================= -->
 
-                <Border Background="#EFF6FF"
-                        BorderBrush="#BFDBFE"
-                        BorderThickness="1"
-                        CornerRadius="14"
-                        Padding="18"
-                        Margin="0,30,0,0">
+                <Border Grid.Row="2"
+                        CornerRadius="30"
+                        Padding="35"
+                        Background="#88FFFFFF"
+                        BorderBrush="#99FFFFFF"
+                        BorderThickness="1">
 
-                    <StackPanel Orientation="Horizontal">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="35"
+                                          ShadowDepth="0"
+                                          Opacity="0.16"/>
+                    </Border.Effect>
 
-                        <materialDesign:PackIcon Kind="InformationOutline"
-                                                 Width="24"
-                                                 Height="24"
-                                                 Foreground="#2563EB"
-                                                 Margin="0,0,12,0"/>
+                    <Grid>
 
-                        <TextBlock Width="700"
-                                   TextWrapping="Wrap"
-                                   FontSize="14"
-                                   Foreground="#1E3A8A"
-                                   LineHeight="22">
+                        <!-- INNER GLASS LAYER -->
 
-                            Select the masterdata.xlsx database file used by the system.
-                            This path will automatically be used across all contract
-                            creation, editing, renewal, termination, and analytics modules.
-                        </TextBlock>
-                    </StackPanel>
+                        <Border CornerRadius="26"
+                                Background="#30FFFFFF"
+                                Margin="-16"/>
+
+                        <StackPanel>
+
+                            <!-- ================================================= -->
+                            <!-- SECTION TITLE -->
+                            <!-- ================================================= -->
+
+                            <TextBlock Text="Select Master Database File"
+                                       FontSize="26"
+                                       FontWeight="Bold"
+                                       Foreground="#0B8A8F"
+                                       Margin="0,0,0,30"/>
+
+
+
+                            <!-- ================================================= -->
+                            <!-- DATABASE PATH -->
+                            <!-- ================================================= -->
+
+                            <TextBlock Text="Database File Path"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Foreground="#111827"
+                                       Margin="0,0,0,12"/>
+
+
+
+                            <Grid>
+
+                                <Grid.ColumnDefinitions>
+
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="18"/>
+                                    <ColumnDefinition Width="170"/>
+
+                                </Grid.ColumnDefinitions>
+
+
+
+                                <!-- PATH BOX -->
+
+                                <Border Grid.Column="0"
+                                        Background="#70FFFFFF"
+                                        BorderBrush="#99FFFFFF"
+                                        BorderThickness="1"
+                                        CornerRadius="14">
+
+                                    <TextBox x:Name="DatabasePathBox"
+                                             Height="48"
+                                             FontSize="15"
+                                             Padding="14,5"
+                                             VerticalContentAlignment="Center"
+                                             Background="Transparent"
+                                             BorderThickness="0"
+                                             Foreground="#111827"
+                                             IsReadOnly="True"/>
+                                </Border>
+
+
+
+                                <!-- BROWSE BUTTON -->
+
+                                <Button Grid.Column="2"
+                                        Height="48"
+                                        Background="#0EA5A8"
+                                        Foreground="White"
+                                        FontSize="15"
+                                        FontWeight="SemiBold"
+                                        BorderThickness="0"
+                                        Cursor="Hand"
+                                        Click="BrowseDatabase_Click">
+
+                                    <Button.Effect>
+                                        <DropShadowEffect BlurRadius="14"
+                                                          ShadowDepth="0"
+                                                          Opacity="0.18"/>
+                                    </Button.Effect>
+
+                                    <StackPanel Orientation="Horizontal"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center">
+
+                                        <materialDesign:PackIcon Kind="FolderSearch"
+                                                                 Width="20"
+                                                                 Height="20"
+                                                                 Margin="0,0,8,0"/>
+
+                                        <TextBlock Text="Browse"/>
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
+
+
+
+                            <!-- ================================================= -->
+                            <!-- INFO CARD -->
+                            <!-- ================================================= -->
+
+                            <Border Background="#60EFF6FF"
+                                    BorderBrush="#90BFDBFE"
+                                    BorderThickness="1"
+                                    CornerRadius="18"
+                                    Padding="18"
+                                    Margin="0,30,0,0">
+
+                                <Border.Effect>
+                                    <DropShadowEffect BlurRadius="16"
+                                                      ShadowDepth="0"
+                                                      Opacity="0.08"/>
+                                </Border.Effect>
+
+                                <StackPanel Orientation="Horizontal">
+
+                                    <materialDesign:PackIcon Kind="InformationOutline"
+                                                             Width="24"
+                                                             Height="24"
+                                                             Foreground="#2563EB"
+                                                             Margin="0,0,12,0"/>
+
+                                    <TextBlock Width="700"
+                                               TextWrapping="Wrap"
+                                               FontSize="14"
+                                               Foreground="#1E3A8A"
+                                               LineHeight="22">
+
+                                        Select the masterdata.xlsx database file used by the system.
+                                        This path will automatically be used across all contract
+                                        creation, editing, renewal, termination, and analytics modules.
+                                    </TextBlock>
+                                </StackPanel>
+                            </Border>
+
+
+
+                            <!-- ================================================= -->
+                            <!-- SAVE BUTTON -->
+                            <!-- ================================================= -->
+
+                            <StackPanel Orientation="Horizontal"
+                                        HorizontalAlignment="Right"
+                                        Margin="0,40,0,0">
+
+                                <Button Width="200"
+                                        Height="52"
+                                        Background="#0EA5A8"
+                                        Foreground="White"
+                                        FontSize="16"
+                                        FontWeight="Bold"
+                                        BorderThickness="0"
+                                        Cursor="Hand"
+                                        Click="SaveSettings_Click">
+
+                                    <Button.Effect>
+                                        <DropShadowEffect BlurRadius="14"
+                                                          ShadowDepth="0"
+                                                          Opacity="0.18"/>
+                                    </Button.Effect>
+
+                                    <StackPanel Orientation="Horizontal"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center">
+
+                                        <materialDesign:PackIcon Kind="ContentSave"
+                                                                 Width="20"
+                                                                 Height="20"
+                                                                 Margin="0,0,10,0"/>
+
+                                        <TextBlock Text="Save Settings"/>
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+
+                        </StackPanel>
+
+                    </Grid>
+
                 </Border>
 
+            </Grid>
 
+        </Grid>
 
-                <!-- ================================================= -->
-                <!-- SAVE BUTTON -->
-                <!-- ================================================= -->
+    </ScrollViewer>
 
-                <StackPanel Orientation="Horizontal"
-                            HorizontalAlignment="Right"
-                            Margin="0,40,0,0">
-
-                    <Button Width="200"
-                            Height="52"
-                            Background="#0EA5A8"
-                            Foreground="White"
-                            FontSize="16"
-                            FontWeight="Bold"
-                            BorderThickness="0"
-                            Cursor="Hand"
-                            Click="SaveSettings_Click">
-
-                        <StackPanel Orientation="Horizontal"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center">
-
-                            <materialDesign:PackIcon Kind="ContentSave"
-                                                     Width="20"
-                                                     Height="20"
-                                                     Margin="0,0,10,0"/>
-
-                            <TextBlock Text="Save Settings"/>
-                        </StackPanel>
-                    </Button>
-                </StackPanel>
-            </StackPanel>
-        </Border>
-    </Grid>
 </Page>
