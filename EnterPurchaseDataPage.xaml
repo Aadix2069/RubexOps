@@ -13,6 +13,40 @@
             <Setter Property="SnapsToDevicePixels" Value="True"/>
         </Style>
 
+        <!-- Locked / auto-filled field style -->
+        <Style x:Key="LockedFieldStyle" TargetType="TextBox">
+            <Setter Property="Height" Value="50"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="Padding" Value="14,5"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="IsReadOnly" Value="True"/>
+            <Setter Property="Background" Value="#E8ECEF"/>
+            <Setter Property="BorderBrush" Value="#C9CDD2"/>
+            <Setter Property="BorderThickness" Value="1.2"/>
+            <Setter Property="Foreground" Value="#6B7280"/>
+            <Setter Property="Cursor" Value="Arrow"/>
+        </Style>
+
+        <!-- Normal editable field style -->
+        <Style x:Key="InputFieldStyle" TargetType="TextBox">
+            <Setter Property="Height" Value="50"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="Padding" Value="14,5"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Background" Value="#66FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#99FFFFFF"/>
+            <Setter Property="BorderThickness" Value="1.2"/>
+        </Style>
+
+        <!-- Red star style -->
+        <Style x:Key="RequiredStarStyle" TargetType="TextBlock">
+            <Setter Property="Text" Value=" *"/>
+            <Setter Property="Foreground" Value="#DC2626"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
     </Page.Resources>
 
 
@@ -28,9 +62,9 @@
         <!-- ================================================= -->
 
         <Image Source="Images/Rubex_logo.png"
-               Width="500"
-               Height="500"
-               Opacity="0.2"
+               Width="550"
+               Height="550"
+               Opacity="0.3"
                Stretch="Uniform"
                HorizontalAlignment="Center"
                VerticalAlignment="Center"
@@ -46,10 +80,6 @@
         <Grid x:Name="MainGrid"
               Margin="24"
               Panel.ZIndex="1">
-
-            <!-- ================================================= -->
-            <!-- PAGE STRUCTURE -->
-            <!-- ================================================= -->
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -69,10 +99,6 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-
-
-
-                <!-- ICON -->
 
                 <Border Width="68"
                         Height="68"
@@ -94,10 +120,6 @@
                                              HorizontalAlignment="Center"
                                              VerticalAlignment="Center"/>
                 </Border>
-
-
-
-                <!-- TITLE -->
 
                 <StackPanel Grid.Column="1"
                             Margin="18,0,0,0"
@@ -144,14 +166,14 @@
 
 
                         <!-- ================================================= -->
-                        <!-- VENDOR SELECTION -->
+                        <!-- SECTION: VENDOR DETAILS                           -->
                         <!-- ================================================= -->
 
-                        <TextBlock Text="Vendor Selection"
+                        <TextBlock Text="Vendor Details"
                                    FontSize="26"
                                    FontWeight="Bold"
                                    Foreground="#0B8A8F"
-                                   Margin="0,0,0,28"/>
+                                   Margin="0,0,0,18"/>
 
                         <Border Background="#55FFFFFF"
                                 CornerRadius="18"
@@ -159,161 +181,260 @@
                                 BorderThickness="1"
                                 Padding="24">
 
-                            <Grid>
+                            <StackPanel>
 
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="220"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
+                                <!-- ─── SEARCH BOX ─── -->
 
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="78"/>
-                                    <RowDefinition Height="78"/>
-                                    <RowDefinition Height="78"/>
-                                    <RowDefinition Height="78"/>
-                                </Grid.RowDefinitions>
+                                <Grid Margin="0,0,0,18">
 
-                                <TextBlock Text="Search Vendor"
-                                           Grid.Row="0"
-                                           FontSize="16"
-                                           FontWeight="SemiBold"
-                                           VerticalAlignment="Center"
-                                           Foreground="#111827"/>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="220"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
 
-                                <TextBlock Text="Vendor Name"
-                                           Grid.Row="1"
-                                           FontSize="16"
-                                           FontWeight="SemiBold"
-                                           VerticalAlignment="Center"
-                                           Foreground="#111827"/>
+                                    <!-- Label -->
+                                    <StackPanel Orientation="Horizontal"
+                                                VerticalAlignment="Center">
+                                        <TextBlock Text="Search Contract"
+                                                   FontSize="16"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="#111827"/>
+                                    </StackPanel>
 
-                                <TextBlock Text="Vendor ID"
-                                           Grid.Row="2"
-                                           FontSize="16"
-                                           FontWeight="SemiBold"
-                                           VerticalAlignment="Center"
-                                           Foreground="#111827"/>
+                                    <!-- Search input + popup -->
+                                    <Grid Grid.Column="1">
 
-                                <TextBlock Text="Item Code"
-                                           Grid.Row="3"
-                                           FontSize="16"
-                                           FontWeight="SemiBold"
-                                           VerticalAlignment="Center"
-                                           Foreground="#111827"/>
+                                        <TextBox x:Name="VendorSearchBox"
+                                                 Height="50"
+                                                 FontSize="15"
+                                                 Padding="14,5"
+                                                 VerticalContentAlignment="Center"
+                                                 Background="#66FFFFFF"
+                                                 BorderBrush="#99FFFFFF"
+                                                 BorderThickness="1.2"
+                                                 TextChanged="VendorSearchBox_TextChanged"
+                                                 Tag="Search using Vendor Name or ID"/>
 
+                                        <!-- Placeholder simulation -->
+                                        <TextBlock x:Name="SearchPlaceholder"
+                                                   Text="Search using Vendor Name or ID"
+                                                   FontSize="14"
+                                                   Foreground="#9CA3AF"
+                                                   Margin="16,0,0,0"
+                                                   VerticalAlignment="Center"
+                                                   IsHitTestVisible="False"/>
 
+                                        <Popup x:Name="VendorSuggestionPopup"
+                                               PlacementTarget="{Binding ElementName=VendorSearchBox}"
+                                               Placement="Bottom"
+                                               StaysOpen="False"
+                                               AllowsTransparency="True"
+                                               Width="{Binding ActualWidth, ElementName=VendorSearchBox}">
 
-                                <!-- SEARCH -->
+                                            <Border Background="#FDFDFD"
+                                                    BorderBrush="#D1D5DB"
+                                                    BorderThickness="1"
+                                                    CornerRadius="10"
+                                                    MaxHeight="260">
 
-                                <Grid Grid.Row="0"
-                                      Grid.Column="1">
+                                                <Border.Effect>
+                                                    <DropShadowEffect BlurRadius="16"
+                                                                      ShadowDepth="0"
+                                                                      Opacity="0.14"/>
+                                                </Border.Effect>
 
-                                    <TextBox x:Name="VendorSearchBox"
-                                             Height="50"
-                                             FontSize="15"
-                                             Padding="14,5"
-                                             VerticalContentAlignment="Center"
-                                             Background="#66FFFFFF"
-                                             BorderBrush="#99FFFFFF"
-                                             BorderThickness="1.2"
-                                             TextChanged="VendorSearchBox_TextChanged"/>
+                                                <ListBox x:Name="VendorSuggestionList"
+                                                         BorderThickness="0"
+                                                         Background="Transparent"
+                                                         SelectionChanged="VendorSuggestionList_SelectionChanged">
 
-                                    <Popup x:Name="VendorSuggestionPopup"
-                                           PlacementTarget="{Binding ElementName=VendorSearchBox}"
-                                           Placement="Bottom"
-                                           StaysOpen="False"
-                                           AllowsTransparency="True"
-                                           Width="{Binding ActualWidth, ElementName=VendorSearchBox}">
+                                                    <ListBox.ItemContainerStyle>
+                                                        <Style TargetType="ListBoxItem">
+                                                            <Setter Property="Padding" Value="0"/>
+                                                            <Setter Property="Background" Value="Transparent"/>
+                                                            <Style.Triggers>
+                                                                <Trigger Property="IsMouseOver" Value="True">
+                                                                    <Setter Property="Background" Value="#F0FDFE"/>
+                                                                </Trigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </ListBox.ItemContainerStyle>
 
-                                        <Border Background="#FDFDFD"
-                                                BorderBrush="#D1D5DB"
-                                                BorderThickness="1"
-                                                CornerRadius="10"
-                                                MaxHeight="220">
+                                                    <ListBox.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <StackPanel Margin="14,10">
+                                                                <TextBlock Text="{Binding VendorName}"
+                                                                           FontSize="15"
+                                                                           FontWeight="SemiBold"
+                                                                           Foreground="#111827"/>
+                                                                <StackPanel Orientation="Horizontal"
+                                                                            Margin="0,3,0,0">
+                                                                    <TextBlock Text="ID: "
+                                                                               FontSize="13"
+                                                                               Foreground="#6B7280"/>
+                                                                    <TextBlock Text="{Binding VendorID}"
+                                                                               FontSize="13"
+                                                                               Foreground="#6B7280"/>
+                                                                    <TextBlock Text="  •  "
+                                                                               FontSize="13"
+                                                                               Foreground="#9CA3AF"/>
+                                                                    <TextBlock Text="{Binding ItemCode}"
+                                                                               FontSize="13"
+                                                                               Foreground="#0B8A8F"/>
+                                                                </StackPanel>
+                                                            </StackPanel>
+                                                        </DataTemplate>
+                                                    </ListBox.ItemTemplate>
 
-                                            <ListBox x:Name="VendorSuggestionList"
-                                                     BorderThickness="0"
-                                                     Background="Transparent"
-                                                     SelectionChanged="VendorSuggestionList_SelectionChanged">
+                                                </ListBox>
 
-                                                <ListBox.ItemTemplate>
-                                                    <DataTemplate>
-                                                        <StackPanel Margin="10,8">
-                                                            <TextBlock Text="{Binding VendorName}"
-                                                                       FontSize="15"
-                                                                       FontWeight="SemiBold"
-                                                                       Foreground="#111827"/>
-                                                            <TextBlock Text="{Binding VendorID}"
-                                                                       FontSize="13"
-                                                                       Foreground="#6B7280"
-                                                                       Margin="0,3,0,0"/>
-                                                        </StackPanel>
-                                                    </DataTemplate>
-                                                </ListBox.ItemTemplate>
+                                            </Border>
 
-                                            </ListBox>
+                                        </Popup>
 
-                                        </Border>
-
-                                    </Popup>
+                                    </Grid>
 
                                 </Grid>
 
+                                <!-- ─── DIVIDER ─── -->
+                                <Border Height="1"
+                                        Background="#E5E7EB"
+                                        Margin="0,0,0,18"/>
 
+                                <!-- ─── AUTO-FILL FIELDS GRID ─── -->
 
-                                <!-- INPUTS -->
+                                <Grid>
 
-                                <TextBox x:Name="VendorNameBox"
-                                         Grid.Row="1"
-                                         Grid.Column="1"
-                                         Height="50"
-                                         FontSize="15"
-                                         Padding="14,5"
-                                         VerticalContentAlignment="Center"
-                                         IsReadOnly="True"
-                                         Background="#66FFFFFF"
-                                         BorderBrush="#99FFFFFF"
-                                         BorderThickness="1.2"/>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="220"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
 
-                                <TextBox x:Name="VendorIDBox"
-                                         Grid.Row="2"
-                                         Grid.Column="1"
-                                         Height="50"
-                                         FontSize="15"
-                                         Padding="14,5"
-                                         VerticalContentAlignment="Center"
-                                         Background="#66FFFFFF"
-                                         BorderBrush="#99FFFFFF"
-                                         BorderThickness="1.2"/>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="72"/>
+                                        <RowDefinition Height="72"/>
+                                        <RowDefinition Height="72"/>
+                                        <RowDefinition Height="72"/>
+                                    </Grid.RowDefinitions>
 
-                                <TextBox x:Name="ItemCodeBox"
-                                         Grid.Row="3"
-                                         Grid.Column="1"
-                                         Height="50"
-                                         FontSize="15"
-                                         Padding="14,5"
-                                         VerticalContentAlignment="Center"
-                                         Text="NRFC"
-                                         IsReadOnly="True"
-                                         Background="#55FFFFFF"
-                                         BorderBrush="#99FFFFFF"
-                                         BorderThickness="1.2"/>
+                                    <!-- Labels -->
+                                    <TextBlock Text="Vendor Name"
+                                               Grid.Row="0"
+                                               FontSize="16"
+                                               FontWeight="SemiBold"
+                                               VerticalAlignment="Center"
+                                               Foreground="#111827"/>
 
-                            </Grid>
+                                    <TextBlock Text="Vendor ID"
+                                               Grid.Row="1"
+                                               FontSize="16"
+                                               FontWeight="SemiBold"
+                                               VerticalAlignment="Center"
+                                               Foreground="#111827"/>
+
+                                    <TextBlock Text="Item Code"
+                                               Grid.Row="2"
+                                               FontSize="16"
+                                               FontWeight="SemiBold"
+                                               VerticalAlignment="Center"
+                                               Foreground="#111827"/>
+
+                                    <TextBlock Text="Base Rate (per kg)"
+                                               Grid.Row="3"
+                                               FontSize="16"
+                                               FontWeight="SemiBold"
+                                               VerticalAlignment="Center"
+                                               Foreground="#111827"/>
+
+                                    <!-- Locked fields with lock icon -->
+                                    <Grid Grid.Row="0" Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBox x:Name="VendorNameBox"
+                                                 Style="{StaticResource LockedFieldStyle}"/>
+                                        <materialDesign:PackIcon Kind="LockOutline"
+                                                                 Width="16" Height="16"
+                                                                 Foreground="#9CA3AF"
+                                                                 HorizontalAlignment="Right"
+                                                                 VerticalAlignment="Center"
+                                                                 Margin="0,0,12,0"
+                                                                 IsHitTestVisible="False"/>
+                                    </Grid>
+
+                                    <Grid Grid.Row="1" Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBox x:Name="VendorIDBox"
+                                                 Style="{StaticResource LockedFieldStyle}"/>
+                                        <materialDesign:PackIcon Kind="LockOutline"
+                                                                 Width="16" Height="16"
+                                                                 Foreground="#9CA3AF"
+                                                                 HorizontalAlignment="Right"
+                                                                 VerticalAlignment="Center"
+                                                                 Margin="0,0,12,0"
+                                                                 IsHitTestVisible="False"/>
+                                    </Grid>
+
+                                    <Grid Grid.Row="2" Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBox x:Name="ItemCodeBox"
+                                                 Style="{StaticResource LockedFieldStyle}"/>
+                                        <materialDesign:PackIcon Kind="LockOutline"
+                                                                 Width="16" Height="16"
+                                                                 Foreground="#9CA3AF"
+                                                                 HorizontalAlignment="Right"
+                                                                 VerticalAlignment="Center"
+                                                                 Margin="0,0,12,0"
+                                                                 IsHitTestVisible="False"/>
+                                    </Grid>
+
+                                    <Grid Grid.Row="3" Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBox x:Name="BaseRateBox"
+                                                 Style="{StaticResource LockedFieldStyle}"/>
+                                        <materialDesign:PackIcon Kind="LockOutline"
+                                                                 Width="16" Height="16"
+                                                                 Foreground="#9CA3AF"
+                                                                 HorizontalAlignment="Right"
+                                                                 VerticalAlignment="Center"
+                                                                 Margin="0,0,12,0"
+                                                                 IsHitTestVisible="False"/>
+                                    </Grid>
+
+                                </Grid>
+
+                                <!-- ─── CONTRACT PERIOD BADGE ─── -->
+                                <Border x:Name="ContractPeriodBadge"
+                                        Background="#F0FDFE"
+                                        BorderBrush="#A5F3FC"
+                                        BorderThickness="1"
+                                        CornerRadius="10"
+                                        Padding="16,10"
+                                        Margin="0,14,0,0"
+                                        Visibility="Collapsed">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="CalendarCheck"
+                                                                 Width="18" Height="18"
+                                                                 Foreground="#0B8A8F"
+                                                                 VerticalAlignment="Center"
+                                                                 Margin="0,0,10,0"/>
+                                        <TextBlock x:Name="ContractPeriodText"
+                                                   FontSize="14"
+                                                   Foreground="#0B8A8F"
+                                                   FontWeight="SemiBold"
+                                                   VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+
+                            </StackPanel>
 
                         </Border>
 
 
 
                         <!-- ================================================= -->
-                        <!-- PURCHASE DETAILS -->
+                        <!-- SECTION: PURCHASE ENTRY                           -->
                         <!-- ================================================= -->
 
-                        <TextBlock Text="Purchase Details"
+                        <TextBlock Text="Purchase Entry"
                                    FontSize="26"
                                    FontWeight="Bold"
                                    Foreground="#0B8A8F"
-                                   Margin="0,42,0,28"/>
+                                   Margin="0,42,0,18"/>
 
                         <Border Background="#55FFFFFF"
                                 CornerRadius="18"
@@ -334,65 +455,82 @@
                                     <RowDefinition Height="78"/>
                                 </Grid.RowDefinitions>
 
-                                <TextBlock Text="Invoice Number"
-                                           Grid.Row="0"
-                                           FontSize="16"
-                                           FontWeight="SemiBold"
-                                           VerticalAlignment="Center"
-                                           Foreground="#111827"/>
+                                <!-- Invoice Number * -->
+                                <StackPanel Grid.Row="0"
+                                            Orientation="Horizontal"
+                                            VerticalAlignment="Center">
+                                    <TextBlock Text="Invoice Number"
+                                               FontSize="16"
+                                               FontWeight="SemiBold"
+                                               Foreground="#111827"
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock Style="{StaticResource RequiredStarStyle}"/>
+                                </StackPanel>
 
-                                <TextBlock Text="Purchase Order"
-                                           Grid.Row="1"
-                                           FontSize="16"
-                                           FontWeight="SemiBold"
-                                           VerticalAlignment="Center"
-                                           Foreground="#111827"/>
+                                <!-- Purchase Order * -->
+                                <StackPanel Grid.Row="1"
+                                            Orientation="Horizontal"
+                                            VerticalAlignment="Center">
+                                    <TextBlock Text="Purchase Order"
+                                               FontSize="16"
+                                               FontWeight="SemiBold"
+                                               Foreground="#111827"
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock Style="{StaticResource RequiredStarStyle}"/>
+                                </StackPanel>
 
-                                <TextBlock Text="Delivery"
-                                           Grid.Row="2"
-                                           FontSize="16"
-                                           FontWeight="SemiBold"
-                                           VerticalAlignment="Center"
-                                           Foreground="#111827"/>
+                                <!-- Delivery (optional) -->
+                                <StackPanel Grid.Row="2"
+                                            Orientation="Horizontal"
+                                            VerticalAlignment="Center">
+                                    <TextBlock Text="Delivery"
+                                               FontSize="16"
+                                               FontWeight="SemiBold"
+                                               Foreground="#111827"
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock Text=" (optional)"
+                                               FontSize="13"
+                                               Foreground="#9CA3AF"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
 
+                                <!-- Invoice Number input -->
                                 <TextBox x:Name="InvoiceNumberBox"
                                          Grid.Row="0"
                                          Grid.Column="1"
-                                         Height="50"
-                                         FontSize="15"
-                                         Padding="14,5"
-                                         VerticalContentAlignment="Center"
-                                         Background="#66FFFFFF"
-                                         BorderBrush="#99FFFFFF"
-                                         BorderThickness="1.2"/>
+                                         Style="{StaticResource InputFieldStyle}"
+                                         VerticalAlignment="Center"/>
 
+                                <!-- Purchase Order Date -->
                                 <Border Grid.Row="1"
                                         Grid.Column="1"
                                         Background="#66FFFFFF"
                                         BorderBrush="#99FFFFFF"
                                         BorderThickness="1.2"
-                                        CornerRadius="12">
-
+                                        CornerRadius="12"
+                                        VerticalAlignment="Center"
+                                        Height="50">
                                     <DatePicker x:Name="PurchaseOrderDatePicker"
-                                                Height="54"
-                                                FontSize="16"
-                                                Padding="12,0"
+                                                FontSize="15"
+                                                Padding="10,0"
                                                 VerticalContentAlignment="Center"
                                                 Background="Transparent"
-                                                BorderThickness="0"/>
+                                                BorderThickness="0"
+                                                SelectedDateChanged="PurchaseOrderDatePicker_SelectedDateChanged"/>
                                 </Border>
 
+                                <!-- Delivery Date -->
                                 <Border Grid.Row="2"
                                         Grid.Column="1"
                                         Background="#66FFFFFF"
                                         BorderBrush="#99FFFFFF"
                                         BorderThickness="1.2"
-                                        CornerRadius="12">
-
+                                        CornerRadius="12"
+                                        VerticalAlignment="Center"
+                                        Height="50">
                                     <DatePicker x:Name="DeliveryDatePicker"
-                                                Height="54"
-                                                FontSize="16"
-                                                Padding="12,0"
+                                                FontSize="15"
+                                                Padding="10,0"
                                                 VerticalContentAlignment="Center"
                                                 Background="Transparent"
                                                 BorderThickness="0"/>
@@ -405,14 +543,14 @@
 
 
                         <!-- ================================================= -->
-                        <!-- WEIGHT DETAILS -->
+                        <!-- SECTION: WEIGHT DETAILS                           -->
                         <!-- ================================================= -->
 
                         <TextBlock Text="Weight Details"
                                    FontSize="26"
                                    FontWeight="Bold"
                                    Foreground="#0B8A8F"
-                                   Margin="0,42,0,28"/>
+                                   Margin="0,42,0,18"/>
 
                         <Border Background="#55FFFFFF"
                                 CornerRadius="18"
@@ -435,95 +573,195 @@
                                     <RowDefinition Height="78"/>
                                 </Grid.RowDefinitions>
 
-                                <TextBlock Text="Invoice Weight"
-                                           Grid.Row="0"
-                                           FontSize="16"
-                                           FontWeight="SemiBold"
-                                           VerticalAlignment="Center"
-                                           Foreground="#111827"/>
+                                <!-- Invoice Weight (optional) -->
+                                <StackPanel Grid.Row="0"
+                                            Orientation="Horizontal"
+                                            VerticalAlignment="Center">
+                                    <TextBlock Text="Invoice Weight"
+                                               FontSize="16"
+                                               FontWeight="SemiBold"
+                                               Foreground="#111827"
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock Text=" (optional)"
+                                               FontSize="13"
+                                               Foreground="#9CA3AF"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
 
-                                <TextBlock Text="Before Unloading"
-                                           Grid.Row="1"
-                                           FontSize="16"
-                                           FontWeight="SemiBold"
-                                           VerticalAlignment="Center"
-                                           Foreground="#111827"/>
+                                <!-- Before Unloading * -->
+                                <StackPanel Grid.Row="1"
+                                            Orientation="Horizontal"
+                                            VerticalAlignment="Center">
+                                    <TextBlock Text="Before Unloading"
+                                               FontSize="16"
+                                               FontWeight="SemiBold"
+                                               Foreground="#111827"
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock Style="{StaticResource RequiredStarStyle}"/>
+                                </StackPanel>
 
-                                <TextBlock Text="Carrier Weight"
-                                           Grid.Row="2"
-                                           FontSize="16"
-                                           FontWeight="SemiBold"
-                                           VerticalAlignment="Center"
-                                           Foreground="#111827"/>
+                                <!-- Carrier Weight * -->
+                                <StackPanel Grid.Row="2"
+                                            Orientation="Horizontal"
+                                            VerticalAlignment="Center">
+                                    <TextBlock Text="Carrier Weight"
+                                               FontSize="16"
+                                               FontWeight="SemiBold"
+                                               Foreground="#111827"
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock Style="{StaticResource RequiredStarStyle}"/>
+                                </StackPanel>
 
-                                <TextBlock Text="No. of Bags"
-                                           Grid.Row="3"
-                                           FontSize="16"
-                                           FontWeight="SemiBold"
-                                           VerticalAlignment="Center"
-                                           Foreground="#111827"/>
+                                <!-- No. of Bags (optional) -->
+                                <StackPanel Grid.Row="3"
+                                            Orientation="Horizontal"
+                                            VerticalAlignment="Center">
+                                    <TextBlock Text="No. of Bags"
+                                               FontSize="16"
+                                               FontWeight="SemiBold"
+                                               Foreground="#111827"
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock Text=" (optional)"
+                                               FontSize="13"
+                                               Foreground="#9CA3AF"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
 
-                                <TextBlock Text="Calculated DRC (%)"
-                                           Grid.Row="4"
-                                           FontSize="16"
-                                           FontWeight="SemiBold"
-                                           VerticalAlignment="Center"
-                                           Foreground="#111827"/>
+                                <!-- Calculated DRC * -->
+                                <StackPanel Grid.Row="4"
+                                            Orientation="Horizontal"
+                                            VerticalAlignment="Center">
+                                    <TextBlock Text="Calculated DRC (%)"
+                                               FontSize="16"
+                                               FontWeight="SemiBold"
+                                               Foreground="#111827"
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock Style="{StaticResource RequiredStarStyle}"/>
+                                </StackPanel>
 
                                 <TextBox x:Name="InvoiceWeightBox"
                                          Grid.Row="0"
                                          Grid.Column="1"
-                                         Height="50"
-                                         FontSize="15"
-                                         Padding="14,5"
-                                         VerticalContentAlignment="Center"
-                                         Background="#66FFFFFF"
-                                         BorderBrush="#99FFFFFF"
-                                         BorderThickness="1.2"/>
+                                         Style="{StaticResource InputFieldStyle}"
+                                         VerticalAlignment="Center"/>
 
                                 <TextBox x:Name="BeforeUnloadingBox"
                                          Grid.Row="1"
                                          Grid.Column="1"
-                                         Height="50"
-                                         FontSize="15"
-                                         Padding="14,5"
-                                         VerticalContentAlignment="Center"
-                                         Background="#66FFFFFF"
-                                         BorderBrush="#99FFFFFF"
-                                         BorderThickness="1.2"/>
+                                         Style="{StaticResource InputFieldStyle}"
+                                         VerticalAlignment="Center"/>
 
                                 <TextBox x:Name="CarrierWeightBox"
                                          Grid.Row="2"
                                          Grid.Column="1"
-                                         Height="50"
-                                         FontSize="15"
-                                         Padding="14,5"
-                                         VerticalContentAlignment="Center"
-                                         Background="#66FFFFFF"
-                                         BorderBrush="#99FFFFFF"
-                                         BorderThickness="1.2"/>
+                                         Style="{StaticResource InputFieldStyle}"
+                                         VerticalAlignment="Center"/>
 
                                 <TextBox x:Name="NoOfBagsBox"
                                          Grid.Row="3"
                                          Grid.Column="1"
-                                         Height="50"
-                                         FontSize="15"
-                                         Padding="14,5"
-                                         VerticalContentAlignment="Center"
-                                         Background="#66FFFFFF"
-                                         BorderBrush="#99FFFFFF"
-                                         BorderThickness="1.2"/>
+                                         Style="{StaticResource InputFieldStyle}"
+                                         VerticalAlignment="Center"/>
 
                                 <TextBox x:Name="CalculatedDrcBox"
                                          Grid.Row="4"
                                          Grid.Column="1"
-                                         Height="50"
-                                         FontSize="15"
-                                         Padding="14,5"
-                                         VerticalContentAlignment="Center"
-                                         Background="#66FFFFFF"
-                                         BorderBrush="#99FFFFFF"
-                                         BorderThickness="1.2"/>
+                                         Style="{StaticResource InputFieldStyle}"
+                                         VerticalAlignment="Center"/>
+
+                            </Grid>
+
+                        </Border>
+
+
+
+                        <!-- ================================================= -->
+                        <!-- SECTION: RATES & CHARGES                          -->
+                        <!-- ================================================= -->
+
+                        <TextBlock Text="Rates &amp; Charges"
+                                   FontSize="26"
+                                   FontWeight="Bold"
+                                   Foreground="#0B8A8F"
+                                   Margin="0,42,0,18"/>
+
+                        <Border Background="#55FFFFFF"
+                                CornerRadius="18"
+                                BorderBrush="#88FFFFFF"
+                                BorderThickness="1"
+                                Padding="24">
+
+                            <Grid>
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="220"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="78"/>
+                                    <RowDefinition Height="78"/>
+                                    <RowDefinition Height="78"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- GST * -->
+                                <StackPanel Grid.Row="0"
+                                            Orientation="Horizontal"
+                                            VerticalAlignment="Center">
+                                    <TextBlock Text="GST (%)"
+                                               FontSize="16"
+                                               FontWeight="SemiBold"
+                                               Foreground="#111827"
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock Style="{StaticResource RequiredStarStyle}"/>
+                                </StackPanel>
+
+                                <!-- TDS * -->
+                                <StackPanel Grid.Row="1"
+                                            Orientation="Horizontal"
+                                            VerticalAlignment="Center">
+                                    <TextBlock Text="TDS 194Q (%)"
+                                               FontSize="16"
+                                               FontWeight="SemiBold"
+                                               Foreground="#111827"
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock Style="{StaticResource RequiredStarStyle}"/>
+                                </StackPanel>
+
+                                <!-- Unloading Charge (optional) -->
+                                <StackPanel Grid.Row="2"
+                                            Orientation="Horizontal"
+                                            VerticalAlignment="Center">
+                                    <TextBlock Text="Unloading Charge"
+                                               FontSize="16"
+                                               FontWeight="SemiBold"
+                                               Foreground="#111827"
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock Text=" (optional)"
+                                               FontSize="13"
+                                               Foreground="#9CA3AF"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+
+                                <TextBox x:Name="GstBox"
+                                         Grid.Row="0"
+                                         Grid.Column="1"
+                                         Style="{StaticResource InputFieldStyle}"
+                                         Text="5"
+                                         VerticalAlignment="Center"/>
+
+                                <TextBox x:Name="TdsBox"
+                                         Grid.Row="1"
+                                         Grid.Column="1"
+                                         Style="{StaticResource InputFieldStyle}"
+                                         Text="0.1"
+                                         VerticalAlignment="Center"/>
+
+                                <TextBox x:Name="UnloadingChargeBox"
+                                         Grid.Row="2"
+                                         Grid.Column="1"
+                                         Style="{StaticResource InputFieldStyle}"
+                                         VerticalAlignment="Center"/>
 
                             </Grid>
 
@@ -548,7 +786,8 @@
                                     FontSize="15"
                                     FontWeight="SemiBold"
                                     BorderThickness="0"
-                                    Cursor="Hand">
+                                    Cursor="Hand"
+                                    Click="ClearForm_Click">
 
                                 <Button.Effect>
                                     <DropShadowEffect BlurRadius="10"
@@ -557,8 +796,6 @@
                                 </Button.Effect>
 
                             </Button>
-
-
 
                             <Button x:Name="SavePurchaseButton"
                                     Content="Save Purchase"
