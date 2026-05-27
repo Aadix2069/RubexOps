@@ -47,19 +47,20 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
+
+
             <!-- ================================================= -->
             <!-- HEADER -->
             <!-- ================================================= -->
 
             <Grid Grid.Row="0">
+
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Orientation="Horizontal">
-
-                    <!-- GLASS ICON -->
 
                     <Border Width="68"
                             Height="68"
@@ -95,13 +96,18 @@
                                    FontSize="15"
                                    Foreground="#6B7280"/>
                     </StackPanel>
+
                 </StackPanel>
+
+
+
+                <!-- RIGHT SIDE -->
 
                 <StackPanel Grid.Column="1"
                             Orientation="Horizontal"
                             HorizontalAlignment="Right">
 
-                    <!-- GLASS BUTTON -->
+                    <!-- RENEW BUTTON -->
 
                     <Button Width="190"
                             Height="54"
@@ -133,9 +139,12 @@
                                        FontWeight="Bold"
                                        VerticalAlignment="Center"/>
                         </StackPanel>
+
                     </Button>
 
-                    <!-- GLASS STATS CARD -->
+
+
+                    <!-- STATS CARD -->
 
                     <Border Padding="18,12"
                             CornerRadius="18"
@@ -150,6 +159,7 @@
                         </Border.Effect>
 
                         <StackPanel>
+
                             <TextBlock Text="Visible Contracts"
                                        FontSize="12"
                                        Foreground="#6B7280"/>
@@ -158,10 +168,16 @@
                                        FontSize="26"
                                        FontWeight="Bold"
                                        Foreground="#111827"/>
+
                         </StackPanel>
+
                     </Border>
+
                 </StackPanel>
+
             </Grid>
+
+
 
             <!-- ================================================= -->
             <!-- STATUS LEGEND -->
@@ -185,70 +201,90 @@
 
                     <StackPanel Orientation="Horizontal"
                                 Margin="0,0,22,0">
+
                         <Ellipse Width="12"
                                  Height="12"
                                  Fill="#10B981"
                                  VerticalAlignment="Center"/>
+
                         <TextBlock Text="Active"
                                    Margin="8,0,0,0"
                                    VerticalAlignment="Center"
                                    FontWeight="SemiBold"/>
+
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal"
                                 Margin="0,0,22,0">
+
                         <Ellipse Width="12"
                                  Height="12"
                                  Fill="#3B82F6"
                                  VerticalAlignment="Center"/>
+
                         <TextBlock Text="Upcoming"
                                    Margin="8,0,0,0"
                                    VerticalAlignment="Center"
                                    FontWeight="SemiBold"/>
+
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal"
                                 Margin="0,0,22,0">
+
                         <Ellipse Width="12"
                                  Height="12"
                                  Fill="#8B5CF6"
                                  VerticalAlignment="Center"/>
+
                         <TextBlock Text="Completed"
                                    Margin="8,0,0,0"
                                    VerticalAlignment="Center"
                                    FontWeight="SemiBold"/>
+
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal"
                                 Margin="0,0,22,0">
+
                         <Ellipse Width="12"
                                  Height="12"
                                  Fill="#EF4444"
                                  VerticalAlignment="Center"/>
+
                         <TextBlock Text="Violated"
                                    Margin="8,0,0,0"
                                    VerticalAlignment="Center"
                                    FontWeight="SemiBold"/>
+
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal">
+
                         <Ellipse Width="12"
                                  Height="12"
                                  Fill="#F59E0B"
                                  VerticalAlignment="Center"/>
+
                         <TextBlock Text="Expired"
                                    Margin="8,0,0,0"
                                    VerticalAlignment="Center"
                                    FontWeight="SemiBold"/>
+
                     </StackPanel>
+
                 </WrapPanel>
+
             </Border>
+
+
 
             <!-- ================================================= -->
             <!-- SEARCH + FILTER + SORT -->
             <!-- ================================================= -->
 
             <Grid Grid.Row="4">
+
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="3*"/>
                     <ColumnDefinition Width="18"/>
@@ -256,6 +292,8 @@
                     <ColumnDefinition Width="18"/>
                     <ColumnDefinition Width="1.5*"/>
                 </Grid.ColumnDefinitions>
+
+
 
                 <!-- SEARCH -->
 
@@ -293,21 +331,32 @@
                                    IsHitTestVisible="False">
 
                             <TextBlock.Style>
+
                                 <Style TargetType="TextBlock">
+
                                     <Setter Property="Visibility"
                                             Value="Collapsed"/>
+
                                     <Style.Triggers>
+
                                         <DataTrigger Binding="{Binding Text, ElementName=SearchBox}"
                                                      Value="">
+
                                             <Setter Property="Visibility"
                                                     Value="Visible"/>
+
                                         </DataTrigger>
+
                                     </Style.Triggers>
+
                                 </Style>
+
                             </TextBlock.Style>
+
                         </TextBlock>
 
                     </Grid>
+
                 </Border>
 
 
@@ -337,6 +386,7 @@
                             <ComboBoxItem Content="Completed"/>
                             <ComboBoxItem Content="Violated"/>
                             <ComboBoxItem Content="Expired"/>
+
                         </ComboBox>
 
                         <materialDesign:PackIcon Kind="FilterVariant"
@@ -347,7 +397,9 @@
                                                  VerticalAlignment="Center"
                                                  Margin="14,0,0,0"
                                                  IsHitTestVisible="False"/>
+
                     </Grid>
+
                 </Border>
 
 
@@ -377,6 +429,7 @@
                             <ComboBoxItem Content="Quantity Descending"/>
                             <ComboBoxItem Content="Base Rate Ascending"/>
                             <ComboBoxItem Content="Base Rate Descending"/>
+
                         </ComboBox>
 
                         <materialDesign:PackIcon Kind="Sort"
@@ -387,9 +440,14 @@
                                                  VerticalAlignment="Center"
                                                  Margin="14,0,0,0"
                                                  IsHitTestVisible="False"/>
+
                     </Grid>
+
                 </Border>
+
             </Grid>
+
+
 
             <!-- ================================================= -->
             <!-- CONTRACT CARDS -->
@@ -401,16 +459,21 @@
                 <ItemsControl x:Name="ContractsItemsControl">
 
                     <ItemsControl.ItemsPanel>
+
                         <ItemsPanelTemplate>
                             <WrapPanel Orientation="Horizontal"/>
                         </ItemsPanelTemplate>
+
                     </ItemsControl.ItemsPanel>
 
+
+
                     <!-- ================================================= -->
-                    <!-- GLASS CONTRACT CARD -->
+                    <!-- CONTRACT CARD TEMPLATE -->
                     <!-- ================================================= -->
 
                     <ItemsControl.ItemTemplate>
+
                         <DataTemplate>
 
                             <Border Width="430"
@@ -430,19 +493,339 @@
 
                                 <Grid>
 
-                                    <!-- INNER LIQUID LAYER -->
+                                    <!-- INNER GLASS -->
 
                                     <Border CornerRadius="22"
                                             Background="#20FFFFFF"
                                             Margin="-8"/>
 
-                                    <!-- YOUR EXISTING CARD CONTENT REMAINS SAME -->
+                                    <StackPanel>
+
+                                        <!-- ================================================= -->
+                                        <!-- HEADER -->
+                                        <!-- ================================================= -->
+
+                                        <Grid Margin="0,0,0,18">
+
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <StackPanel>
+
+                                                <TextBlock Text="{Binding vendor_name}"
+                                                           FontSize="24"
+                                                           FontWeight="Bold"
+                                                           Foreground="#111827"/>
+
+                                                <TextBlock Text="{Binding vendor_id}"
+                                                           Margin="0,5,0,0"
+                                                           FontSize="14"
+                                                           Foreground="#6B7280"/>
+
+                                            </StackPanel>
+
+
+
+                                            <!-- STATUS -->
+
+                                            <Border Grid.Column="1"
+                                                    Padding="12,6"
+                                                    CornerRadius="12"
+                                                    Background="{Binding StatusBackground}"
+                                                    VerticalAlignment="Top">
+
+                                                <TextBlock Text="{Binding DisplayStatus}"
+                                                           Foreground="White"
+                                                           FontWeight="Bold"
+                                                           FontSize="13"/>
+
+                                            </Border>
+
+                                        </Grid>
+
+
+
+                                        <!-- ================================================= -->
+                                        <!-- DETAILS -->
+                                        <!-- ================================================= -->
+
+                                        <Grid Margin="0,0,0,18">
+
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+
+
+
+                                            <!-- LEFT -->
+
+                                            <StackPanel Grid.Row="0"
+                                                        Grid.Column="0"
+                                                        Margin="0,0,14,12">
+
+                                                <TextBlock Text="Item Code"
+                                                           FontSize="12"
+                                                           Foreground="#6B7280"/>
+
+                                                <TextBlock Text="{Binding item_code}"
+                                                           FontSize="16"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="#111827"/>
+
+                                            </StackPanel>
+
+
+
+                                            <StackPanel Grid.Row="1"
+                                                        Grid.Column="0"
+                                                        Margin="0,0,14,12">
+
+                                                <TextBlock Text="Base Price"
+                                                           FontSize="12"
+                                                           Foreground="#6B7280"/>
+
+                                                <TextBlock Text="{Binding BasePriceDisplay}"
+                                                           FontSize="16"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="#111827"/>
+
+                                            </StackPanel>
+
+
+
+                                            <StackPanel Grid.Row="2"
+                                                        Grid.Column="0"
+                                                        Margin="0,0,14,12">
+
+                                                <TextBlock Text="Agreed Quantity"
+                                                           FontSize="12"
+                                                           Foreground="#6B7280"/>
+
+                                                <TextBlock Text="{Binding AgreedQtyDisplay}"
+                                                           FontSize="16"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="#111827"/>
+
+                                            </StackPanel>
+
+
+
+                                            <StackPanel Grid.Row="3"
+                                                        Grid.Column="0">
+
+                                                <TextBlock Text="Remaining Quantity"
+                                                           FontSize="12"
+                                                           Foreground="#6B7280"/>
+
+                                                <TextBlock Text="{Binding RemainingQtyDisplay}"
+                                                           FontSize="16"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="#111827"/>
+
+                                            </StackPanel>
+
+
+
+                                            <!-- RIGHT -->
+
+                                            <StackPanel Grid.Row="0"
+                                                        Grid.Column="1"
+                                                        Margin="0,0,0,12">
+
+                                                <TextBlock Text="Start Date"
+                                                           FontSize="12"
+                                                           Foreground="#6B7280"/>
+
+                                                <TextBlock Text="{Binding start_date}"
+                                                           FontSize="16"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="#111827"/>
+
+                                            </StackPanel>
+
+
+
+                                            <StackPanel Grid.Row="1"
+                                                        Grid.Column="1"
+                                                        Margin="0,0,0,12">
+
+                                                <TextBlock Text="End Date"
+                                                           FontSize="12"
+                                                           Foreground="#6B7280"/>
+
+                                                <TextBlock Text="{Binding end_date}"
+                                                           FontSize="16"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="#111827"/>
+
+                                            </StackPanel>
+
+
+
+                                            <StackPanel Grid.Row="2"
+                                                        Grid.Column="1"
+                                                        Margin="0,0,0,12">
+
+                                                <TextBlock Text="Completion"
+                                                           FontSize="12"
+                                                           Foreground="#6B7280"/>
+
+                                                <TextBlock Text="{Binding CompletionDisplay}"
+                                                           FontSize="16"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="#111827"/>
+
+                                            </StackPanel>
+
+
+
+                                            <StackPanel Grid.Row="3"
+                                                        Grid.Column="1">
+
+                                                <TextBlock Text="Days Remaining"
+                                                           FontSize="12"
+                                                           Foreground="#6B7280"/>
+
+                                                <TextBlock Text="{Binding DaysRemainingDisplay}"
+                                                           FontSize="16"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="#111827"/>
+
+                                            </StackPanel>
+
+                                        </Grid>
+
+
+
+                                        <!-- ================================================= -->
+                                        <!-- BREACH PANEL -->
+                                        <!-- ================================================= -->
+
+                                        <Border Background="#FFF5F5"
+                                                CornerRadius="16"
+                                                Padding="14"
+                                                Margin="0,0,0,18"
+                                                Visibility="{Binding BreachPanelVisibility}">
+
+                                            <StackPanel>
+
+                                                <TextBlock Text="Breach Detected"
+                                                           FontWeight="Bold"
+                                                           FontSize="15"
+                                                           Foreground="#DC2626"/>
+
+                                                <TextBlock Text="{Binding breach_responsibility}"
+                                                           Margin="0,6,0,0"
+                                                           FontSize="14"
+                                                           Foreground="#7F1D1D"/>
+
+                                            </StackPanel>
+
+                                        </Border>
+
+
+
+                                        <!-- ================================================= -->
+                                        <!-- BUTTONS -->
+                                        <!-- ================================================= -->
+
+                                        <Grid Margin="0,8,0,0">
+
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="12"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+
+
+                                            <!-- EDIT -->
+
+                                            <Button Grid.Column="0"
+                                                    Height="46"
+                                                    Background="#0EA5A8"
+                                                    Foreground="White"
+                                                    BorderThickness="0"
+                                                    Cursor="Hand"
+                                                    ToolTip="{Binding EditToolTip}"
+                                                    Click="EditButton_Click">
+
+                                                <Button.Effect>
+                                                    <DropShadowEffect BlurRadius="10"
+                                                                      ShadowDepth="0"
+                                                                      Opacity="0.14"/>
+                                                </Button.Effect>
+
+                                                <StackPanel Orientation="Horizontal"
+                                                            HorizontalAlignment="Center">
+
+                                                    <materialDesign:PackIcon Kind="Pencil"
+                                                                             Width="18"
+                                                                             Height="18"
+                                                                             Margin="0,0,8,0"
+                                                                             Foreground="White"/>
+
+                                                    <TextBlock Text="Edit Contract"
+                                                               FontWeight="Bold"/>
+
+                                                </StackPanel>
+
+                                            </Button>
+
+
+
+                                            <!-- RENEW -->
+
+                                            <Button Grid.Column="2"
+                                                    Height="46"
+                                                    Background="#F59E0B"
+                                                    Foreground="White"
+                                                    BorderThickness="0"
+                                                    Cursor="Hand"
+                                                    Click="RenewContract_Click">
+
+                                                <Button.Effect>
+                                                    <DropShadowEffect BlurRadius="10"
+                                                                      ShadowDepth="0"
+                                                                      Opacity="0.14"/>
+                                                </Button.Effect>
+
+                                                <StackPanel Orientation="Horizontal"
+                                                            HorizontalAlignment="Center">
+
+                                                    <materialDesign:PackIcon Kind="Refresh"
+                                                                             Width="18"
+                                                                             Height="18"
+                                                                             Margin="0,0,8,0"
+                                                                             Foreground="White"/>
+
+                                                    <TextBlock Text="Renew"
+                                                               FontWeight="Bold"/>
+
+                                                </StackPanel>
+
+                                            </Button>
+
+                                        </Grid>
+
+                                    </StackPanel>
 
                                 </Grid>
 
                             </Border>
 
                         </DataTemplate>
+
                     </ItemsControl.ItemTemplate>
 
                 </ItemsControl>
@@ -454,3 +837,4 @@
     </Grid>
 
 </Page>
+    

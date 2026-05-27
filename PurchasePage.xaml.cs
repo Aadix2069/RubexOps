@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Navigation;
 
 namespace RubexOps
@@ -63,25 +64,23 @@ namespace RubexOps
 
 
         // =====================================================
-        // SHOW LOADING
+        // SET LOADING CURSOR
         // =====================================================
 
-        private void ShowLoading()
+        private void StartLoadingCursor()
         {
-            LoadingOverlay.Visibility =
-                Visibility.Visible;
+            Mouse.OverrideCursor = Cursors.Wait;
         }
 
 
 
         // =====================================================
-        // HIDE LOADING
+        // RESET CURSOR
         // =====================================================
 
-        private void HideLoading()
+        private void StopLoadingCursor()
         {
-            LoadingOverlay.Visibility =
-                Visibility.Collapsed;
+            Mouse.OverrideCursor = null;
         }
 
 
@@ -96,11 +95,11 @@ namespace RubexOps
         {
             try
             {
-                ShowLoading();
+                StartLoadingCursor();
 
 
 
-                await Task.Delay(400);
+                await Task.Delay(120);
 
 
 
@@ -121,7 +120,7 @@ namespace RubexOps
 
             finally
             {
-                HideLoading();
+                StopLoadingCursor();
             }
         }
 
@@ -137,11 +136,11 @@ namespace RubexOps
         {
             try
             {
-                ShowLoading();
+                StartLoadingCursor();
 
 
 
-                await Task.Delay(400);
+                await Task.Delay(120);
 
 
 
@@ -162,30 +161,90 @@ namespace RubexOps
 
             finally
             {
-                HideLoading();
+                StopLoadingCursor();
             }
         }
 
 
 
         // =====================================================
-        // RENEW CONTRACT
+        // ENTER PURCHASE DATA
         // =====================================================
-        private void EnterPurchaseData_Click(
-    object sender,
-    RoutedEventArgs e)
-        {
-            NavigationService?.Navigate(
-                new EnterPurchaseDataPage());
-        }
 
-        private void ViewEditPurchaseData_Click(
+        private async void EnterPurchaseData_Click(
             object sender,
             RoutedEventArgs e)
         {
-            NavigationService?.Navigate(
-                new ViewEditPurchaseDataPage());
+            try
+            {
+                StartLoadingCursor();
+
+
+
+                await Task.Delay(120);
+
+
+
+                NavigationService?.Navigate(
+                    new EnterPurchaseDataPage()
+                );
+            }
+
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    ex.Message,
+                    "Navigation Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error
+                );
+            }
+
+            finally
+            {
+                StopLoadingCursor();
+            }
         }
 
+
+
+        // =====================================================
+        // VIEW / EDIT PURCHASE DATA
+        // =====================================================
+
+        private async void ViewEditPurchaseData_Click(
+            object sender,
+            RoutedEventArgs e)
+        {
+            try
+            {
+                StartLoadingCursor();
+
+
+
+                await Task.Delay(120);
+
+
+
+                NavigationService?.Navigate(
+                    new ViewEditPurchaseDataPage()
+                );
+            }
+
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    ex.Message,
+                    "Navigation Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error
+                );
+            }
+
+            finally
+            {
+                StopLoadingCursor();
+            }
+        }
     }
 }

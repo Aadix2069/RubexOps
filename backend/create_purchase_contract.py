@@ -2,6 +2,7 @@ import sys
 import os
 import json
 import warnings
+from pathlib import Path
 from openpyxl import load_workbook
 from datetime import datetime
 
@@ -32,35 +33,33 @@ def fail(message):
 try:
 
     # =============================================
-    # GET BASE DIRECTORY
-    # =============================================
-
-    if getattr(sys, 'frozen', False):
-
-        BASE_DIR = os.path.dirname(
-            sys.executable
-        )
-
-    else:
-
-        BASE_DIR = os.path.dirname(
-            os.path.abspath(__file__)
-        )
-
-
-
-    # =============================================
     # CONFIG PATH
     # =============================================
-# =============================================
-# CONFIG PATH
-# =============================================
 
-    config_path = os.path.join(
-    BASE_DIR,
-    "Config",
-    "database_config.json"
-)
+    CONFIG_PATH = (
+        Path.home()
+        / "Documents"
+        / "RubexOps"
+        / "database_config.json"
+    )
+
+
+
+    # =============================================
+    # SHEET NAMES
+    # =============================================
+
+    PURCHASE_SHEET_NAME = "purchase"
+
+    PRODUCTION_SHEET_NAME = "production"
+
+
+
+    # =============================================
+    # DEFAULT START ROW
+    # =============================================
+
+    START_ROW = 5
 
 
 
@@ -68,9 +67,11 @@ try:
     # CHECK CONFIG EXISTS
     # =============================================
 
-    if not os.path.exists(config_path):
+    if not CONFIG_PATH.exists():
 
-        fail("database_config.json not found.")
+        fail(
+            "database_config.json not found."
+        )
 
 
 
@@ -78,7 +79,7 @@ try:
     # READ CONFIG
     # =============================================
 
-    with open(config_path, "r") as file:
+    with open(CONFIG_PATH, "r") as file:
 
         config = json.load(file)
 
@@ -86,7 +87,9 @@ try:
 
 except json.JSONDecodeError:
 
-    fail("Invalid JSON inside database_config.json.")
+    fail(
+        "Invalid JSON inside database_config.json."
+    )
 
 except Exception as ex:
 
@@ -98,9 +101,11 @@ except Exception as ex:
 # DATABASE PATH
 # =========================================================
 
-DATABASE_PATH = config.get(
-    "database_path",
-    ""
+DATABASE_PATH = str(
+    config.get(
+        "database_path",
+        ""
+    )
 ).strip()
 
 
@@ -379,7 +384,7 @@ sheet = workbook[SHEET_NAME]
 # DUPLICATE VENDOR ID VALIDATION
 # =========================================================
 
-for row in range(5, sheet.max_row + 1):
+for row in range(START_ROW, sheet.max_row + 1):
 
     existing_vendor_id = sheet[f"C{row}"].value
 
@@ -442,7 +447,7 @@ for row in range(5, sheet.max_row + 1):
 # FIND NEXT EMPTY ROW
 # =========================================================
 
-next_row = 5
+next_row = START_ROW
 
 
 
