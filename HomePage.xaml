@@ -4,45 +4,28 @@
       xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
       Background="#F4F7F8">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled">
 
-        <!-- ================================================= -->
-        <!-- MAIN CONTAINER -->
-        <!-- ================================================= -->
-
-        <Grid Margin="35">
-
-            <!-- ================================================= -->
-            <!-- WATERMARK -->
-            <!-- ================================================= -->
+        <Grid Margin="28">
 
             <Image Source="Images/Rubex_logo.png"
-                   Width="1100"
-                   Height="1100"
-                   Opacity="0.25"
+                   Width="1000"
+                   Height="1000"
+                   Opacity="0.12"
                    Stretch="Uniform"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center"
                    IsHitTestVisible="False"
                    Panel.ZIndex="0"/>
 
-            <!-- ================================================= -->
-            <!-- MAIN CONTENT -->
-            <!-- ================================================= -->
-
             <StackPanel Panel.ZIndex="1">
-
-                <!-- ================================================= -->
-                <!-- PAGE HEADER -->
-                <!-- ================================================= -->
 
                 <StackPanel Orientation="Horizontal">
 
-                    <!-- ICON -->
-
-                    <Border Width="65"
-                            Height="65"
-                            CornerRadius="32.5"
+                    <Border Width="54"
+                            Height="54"
+                            CornerRadius="27"
                             Background="#AAFFFFFF"
                             BorderBrush="#80FFFFFF"
                             BorderThickness="1">
@@ -54,39 +37,35 @@
                         </Border.Effect>
 
                         <materialDesign:PackIcon Kind="Home"
-                                                 Width="30"
-                                                 Height="30"
+                                                 Width="26"
+                                                 Height="26"
                                                  Foreground="#0B7A81"
                                                  HorizontalAlignment="Center"
                                                  VerticalAlignment="Center"/>
                     </Border>
 
-
-                    <!-- TITLE -->
-
-                    <StackPanel Margin="18,0,0,0">
+                    <StackPanel Margin="18,0,0,0" VerticalAlignment="Center">
 
                         <TextBlock Text="Home"
-                                   FontSize="42"
+                                   FontSize="32"
                                    FontWeight="Bold"
                                    Foreground="#1E2F35"/>
 
-                        <Border Width="118"
+                        <Border Width="80"
                                 Height="4"
                                 Background="#F4A261"
-                                Margin="0,8,0,0"
+                                Margin="0,6,0,0"
+                                CornerRadius="2"
                                 HorizontalAlignment="Left"/>
                     </StackPanel>
+
                 </StackPanel>
 
 
-                <!-- ================================================= -->
-                <!-- MAIN WELCOME CARD -->
-                <!-- ================================================= -->
 
-                <Border Margin="0,35,0,0"
-                        Padding="35"
-                        CornerRadius="30"
+                <Border Margin="0,26,0,0"
+                        Padding="24"
+                        CornerRadius="28"
                         Background="#88FFFFFF"
                         BorderBrush="#99FFFFFF"
                         BorderThickness="1">
@@ -94,291 +73,457 @@
                     <Border.Effect>
                         <DropShadowEffect BlurRadius="35"
                                           ShadowDepth="0"
-                                          Opacity="0.16"/>
+                                          Opacity="0.12"/>
                     </Border.Effect>
 
                     <Grid>
 
-                        <!-- INNER GLASS LAYER -->
-
-                        <Border CornerRadius="26"
-                                Background="#30FFFFFF"
-                                Margin="-16"/>
+                        <Border CornerRadius="24"
+                                Background="#25FFFFFF"
+                                Margin="-12"/>
 
                         <Grid>
 
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="380"/>
+                                <ColumnDefinition Width="3.2*"/>
+                                <ColumnDefinition Width="24"/>
+                                <ColumnDefinition Width="1.1*"/>
                             </Grid.ColumnDefinitions>
 
+                            <StackPanel Grid.Column="0">
 
-                            <!-- ================================================= -->
-                            <!-- LEFT CONTENT -->
-                            <!-- ================================================= -->
+                                <Grid Margin="0,0,0,22">
 
-                            <StackPanel Margin="0,0,35,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
 
-                                <TextBlock Text="Welcome to RubexOps"
-                                           FontSize="34"
-                                           FontWeight="Bold"
-                                           Foreground="#0B7A81"/>
+                                    <StackPanel VerticalAlignment="Center">
 
-                                <TextBlock Text="RubexOps is an integrated desktop operations management system designed to streamline the complete workflow of rubber procurement, production, and sales within a manufacturing environment. The application centralizes contract management, purchase tracking, sales monitoring, and daily production operations into a single user-friendly platform, replacing complex manual Excel workflows with a structured and validated software system. Built with a modern desktop interface, the software enables users to create, renew, edit, and monitor purchase and sales contracts, record transactional entries, track production batches, and maintain full traceability from raw material procurement to finished product sales."
-                                           FontSize="18"
-                                           Margin="0,25,0,0"
-                                           Foreground="#4B5563"
-                                           TextWrapping="Wrap"
-                                           LineHeight="32"/>
+                                        <TextBlock FontSize="28"
+                                                   FontWeight="Bold">
+                                            <Run Text="Welcome to " Foreground="#1E293B"/>
+                                            <Run Text="RubexOps" Foreground="#0B9AA0"/>
+                                        </TextBlock>
 
-                                <TextBlock Text="The system also incorporates intelligent validation and error-prevention mechanisms to ensure operational accuracy — such as preventing transactions outside contract periods, restricting overconsumption of inventory, validating production balances, and maintaining data integrity across all modules. By combining automation, centralized data handling, batch-level traceability, and analytical readiness, the application serves as a lightweight ERP-style operational platform tailored specifically for rubber manufacturing and trading operations."
-                                           FontSize="18"
-                                           Margin="0,20,0,0"
-                                           Foreground="#4B5563"
-                                           TextWrapping="Wrap"
-                                           LineHeight="32"/>
+                                        <TextBlock Text="Your operations. Unified. Organized. Optimized."
+                                                   Margin="0,6,0,0"
+                                                   FontSize="14"
+                                                   Foreground="#667085"/>
+
+                                    </StackPanel>
 
 
-                                <!-- ================================================= -->
-                                <!-- FEATURE ROW -->
-                                <!-- ================================================= -->
 
-                                <WrapPanel Margin="0,40,0,0">
-
-
-                                    <!-- FEATURE 1 -->
-
-                                    <Border Width="240"
-                                            Background="#70FFFFFF"
-                                            BorderBrush="#99FFFFFF"
+                                    <Border Grid.Column="1"
+                                            Height="42"
+                                            Padding="6"
+                                            CornerRadius="21"
+                                            Background="#F8FAFB"
+                                            BorderBrush="#D9E2E7"
                                             BorderThickness="1"
-                                            CornerRadius="18"
-                                            Padding="18"
-                                            Margin="0,0,18,18">
+                                            VerticalAlignment="Center">
+
+                                        <StackPanel Orientation="Horizontal">
+
+                                            <TextBlock Text="View Units"
+                                                       VerticalAlignment="Center"
+                                                       Margin="8,0,12,0"
+                                                       FontSize="13"
+                                                       Foreground="#667085"/>
+
+                                            <Border x:Name="TonnesToggle"
+                                                    Width="80"
+                                                    Height="28"
+                                                    CornerRadius="14"
+                                                    Background="#0B9AA0"
+                                                    Cursor="Hand"
+                                                    MouseLeftButtonDown="TonnesToggle_MouseLeftButtonDown">
+
+                                                <TextBlock Text="Tonnes"
+                                                           Foreground="White"
+                                                           FontSize="13"
+                                                           FontWeight="SemiBold"
+                                                           HorizontalAlignment="Center"
+                                                           VerticalAlignment="Center"/>
+                                            </Border>
+
+                                            <Border x:Name="KgsToggle"
+                                                    Width="60"
+                                                    Height="28"
+                                                    CornerRadius="14"
+                                                    Background="Transparent"
+                                                    Margin="6,0,0,0"
+                                                    Cursor="Hand"
+                                                    MouseLeftButtonDown="KgsToggle_MouseLeftButtonDown">
+
+                                                <TextBlock Text="Kgs"
+                                                           Foreground="#667085"
+                                                           FontSize="13"
+                                                           FontWeight="SemiBold"
+                                                           HorizontalAlignment="Center"
+                                                           VerticalAlignment="Center"/>
+                                            </Border>
+
+                                        </StackPanel>
+
+                                    </Border>
+
+                                </Grid>
+
+
+
+                                <Grid Margin="0,0,0,18">
+
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="18"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Border Grid.Column="0"
+                                            Background="#95FFFFFF"
+                                            BorderBrush="#DDE5EA"
+                                            BorderThickness="1"
+                                            CornerRadius="20"
+                                            Padding="20">
 
                                         <Border.Effect>
-                                            <DropShadowEffect BlurRadius="18"
-                                                              ShadowDepth="0"
-                                                              Opacity="0.10"/>
+                                            <DropShadowEffect BlurRadius="18" ShadowDepth="0" Opacity="0.08"/>
                                         </Border.Effect>
 
-                                        <StackPanel>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
 
-                                            <materialDesign:PackIcon Kind="ClipboardCheck"
-                                                                     Width="40"
-                                                                     Height="40"
-                                                                     Foreground="#0B7A81"/>
+                                            <Border Width="72"
+                                                    Height="72"
+                                                    CornerRadius="36"
+                                                    Background="#E7F8F6">
 
-                                            <TextBlock Text="Integrated Operations"
-                                                       FontSize="18"
-                                                       FontWeight="SemiBold"
-                                                       Margin="0,15,0,0"
-                                                       Foreground="#1E2F35"/>
+                                                <materialDesign:PackIcon Kind="Cart"
+                                                                         Width="36"
+                                                                         Height="36"
+                                                                         Foreground="#0B9AA0"
+                                                                         HorizontalAlignment="Center"
+                                                                         VerticalAlignment="Center"/>
+                                            </Border>
 
-                                            <TextBlock Text="Manage procurement, sales, and production in one centralized system."
-                                                       FontSize="14"
-                                                       Margin="0,10,0,0"
-                                                       Foreground="#666"
-                                                       TextWrapping="Wrap"/>
-                                        </StackPanel>
+                                            <StackPanel Grid.Column="1"
+                                                        Margin="18,0,0,0"
+                                                        VerticalAlignment="Center">
+
+                                                <TextBlock Text="NRFC Available"
+                                                           FontSize="14"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="#1E293B"/>
+
+                                                <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+
+                                                    <TextBlock x:Name="NRFCValueText"
+                                                               Text="128.40"
+                                                               FontSize="34"
+                                                               FontWeight="Bold"
+                                                               Foreground="#0F172A"
+                                                               VerticalAlignment="Bottom"/>
+
+                                                    <TextBlock x:Name="NRFCUnitText"
+                                                               Text="Tonnes"
+                                                               Margin="8,0,0,5"
+                                                               FontSize="14"
+                                                               FontWeight="SemiBold"
+                                                               Foreground="#0B9AA0"
+                                                               VerticalAlignment="Bottom"/>
+                                                </StackPanel>
+
+                                                <TextBlock Text="▲ 4.2% from last week"
+                                                           Margin="0,6,0,0"
+                                                           FontSize="12"
+                                                           Foreground="#10B981"/>
+
+                                            </StackPanel>
+                                        </Grid>
                                     </Border>
 
 
-                                    <!-- FEATURE 2 -->
 
-                                    <Border Width="240"
-                                            Background="#70FFFFFF"
-                                            BorderBrush="#99FFFFFF"
+                                    <Border Grid.Column="2"
+                                            Background="#95FFFFFF"
+                                            BorderBrush="#DDE5EA"
                                             BorderThickness="1"
-                                            CornerRadius="18"
-                                            Padding="18"
-                                            Margin="0,0,18,18">
+                                            CornerRadius="20"
+                                            Padding="20">
 
                                         <Border.Effect>
-                                            <DropShadowEffect BlurRadius="18"
-                                                              ShadowDepth="0"
-                                                              Opacity="0.10"/>
+                                            <DropShadowEffect BlurRadius="18" ShadowDepth="0" Opacity="0.08"/>
                                         </Border.Effect>
 
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <Border Width="72"
+                                                    Height="72"
+                                                    CornerRadius="36"
+                                                    Background="#EDF3FF">
+
+                                                <materialDesign:PackIcon Kind="CubeOutline"
+                                                                         Width="36"
+                                                                         Height="36"
+                                                                         Foreground="#2563EB"
+                                                                         HorizontalAlignment="Center"
+                                                                         VerticalAlignment="Center"/>
+                                            </Border>
+
+                                            <StackPanel Grid.Column="1"
+                                                        Margin="18,0,0,0"
+                                                        VerticalAlignment="Center">
+
+                                                <TextBlock Text="ISNR20 Available"
+                                                           FontSize="14"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="#1E293B"/>
+
+                                                <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+
+                                                    <TextBlock x:Name="ISNRValueText"
+                                                               Text="84.60"
+                                                               FontSize="34"
+                                                               FontWeight="Bold"
+                                                               Foreground="#0F172A"
+                                                               VerticalAlignment="Bottom"/>
+
+                                                    <TextBlock x:Name="ISNRUnitText"
+                                                               Text="Tonnes"
+                                                               Margin="8,0,0,5"
+                                                               FontSize="14"
+                                                               FontWeight="SemiBold"
+                                                               Foreground="#2563EB"
+                                                               VerticalAlignment="Bottom"/>
+                                                </StackPanel>
+
+                                                <TextBlock Text="▼ 2.1% from last week"
+                                                           Margin="0,6,0,0"
+                                                           FontSize="12"
+                                                           Foreground="#EF4444"/>
+
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+
+                                </Grid>
+
+
+
+                                <UniformGrid Columns="4" Margin="0,0,0,20">
+
+                                    <Border Margin="0,0,12,0" Padding="16" CornerRadius="18" Background="#95FFFFFF" BorderBrush="#DDE5EA" BorderThickness="1">
                                         <StackPanel>
-
-                                            <materialDesign:PackIcon Kind="ShieldCheck"
-                                                                     Width="40"
-                                                                     Height="40"
-                                                                     Foreground="#0B7A81"/>
-
-                                            <TextBlock Text="Data Accuracy &amp; Control"
-                                                       FontSize="18"
-                                                       FontWeight="SemiBold"
-                                                       Margin="0,15,0,0"
-                                                       Foreground="#1E2F35"/>
-
-                                            <TextBlock Text="Reduce operational errors with validations and approval workflows."
-                                                       FontSize="14"
-                                                       Margin="0,10,0,0"
-                                                       Foreground="#666"
-                                                       TextWrapping="Wrap"/>
+                                            <materialDesign:PackIcon Kind="FileDocumentCheck" Width="28" Height="28" Foreground="#0B9AA0"/>
+                                            <TextBlock Text="42" Margin="0,8,0,0" FontSize="24" FontWeight="Bold" Foreground="#111827"/>
+                                            <TextBlock Text="Active Contracts" Margin="0,4,0,0" FontSize="13" Foreground="#4B5563"/>
+                                            <TextBlock Text="6 expiring soon" Margin="0,6,0,0" FontSize="12" Foreground="#F97316" FontWeight="SemiBold"/>
                                         </StackPanel>
                                     </Border>
 
-
-                                    <!-- FEATURE 3 -->
-
-                                    <Border Width="240"
-                                            Background="#70FFFFFF"
-                                            BorderBrush="#99FFFFFF"
-                                            BorderThickness="1"
-                                            CornerRadius="18"
-                                            Padding="18"
-                                            Margin="0,0,18,18">
-
-                                        <Border.Effect>
-                                            <DropShadowEffect BlurRadius="18"
-                                                              ShadowDepth="0"
-                                                              Opacity="0.10"/>
-                                        </Border.Effect>
-
+                                    <Border Margin="0,0,12,0" Padding="16" CornerRadius="18" Background="#95FFFFFF" BorderBrush="#DDE5EA" BorderThickness="1">
                                         <StackPanel>
-
-                                            <materialDesign:PackIcon Kind="ChartBar"
-                                                                     Width="40"
-                                                                     Height="40"
-                                                                     Foreground="#0B7A81"/>
-
-                                            <TextBlock Text="Reports &amp; Insights"
-                                                       FontSize="18"
-                                                       FontWeight="SemiBold"
-                                                       Margin="0,15,0,0"
-                                                       Foreground="#1E2F35"/>
-
-                                            <TextBlock Text="Generate powerful reports and insights for smarter business decisions."
-                                                       FontSize="14"
-                                                       Margin="0,10,0,0"
-                                                       Foreground="#666"
-                                                       TextWrapping="Wrap"/>
+                                            <materialDesign:PackIcon Kind="AlertCircle" Width="28" Height="28" Foreground="#EF4444"/>
+                                            <TextBlock Text="3" Margin="0,8,0,0" FontSize="24" FontWeight="Bold" Foreground="#111827"/>
+                                            <TextBlock Text="Violations" Margin="0,4,0,0" FontSize="13" Foreground="#4B5563"/>
+                                            <TextBlock Text="Needs attention" Margin="0,6,0,0" FontSize="12" Foreground="#EF4444" FontWeight="SemiBold"/>
                                         </StackPanel>
                                     </Border>
 
-
-                                    <!-- FEATURE 4 -->
-
-                                    <Border Width="240"
-                                            Background="#70FFFFFF"
-                                            BorderBrush="#99FFFFFF"
-                                            BorderThickness="1"
-                                            CornerRadius="18"
-                                            Padding="18"
-                                            Margin="0,0,18,18">
-
-                                        <Border.Effect>
-                                            <DropShadowEffect BlurRadius="18"
-                                                              ShadowDepth="0"
-                                                              Opacity="0.10"/>
-                                        </Border.Effect>
-
+                                    <Border Margin="0,0,12,0" Padding="16" CornerRadius="18" Background="#95FFFFFF" BorderBrush="#DDE5EA" BorderThickness="1">
                                         <StackPanel>
-
-                                            <materialDesign:PackIcon Kind="MonitorDashboard"
-                                                                     Width="40"
-                                                                     Height="40"
-                                                                     Foreground="#0B7A81"/>
-
-                                            <TextBlock Text="User Friendly Interface"
-                                                       FontSize="18"
-                                                       FontWeight="SemiBold"
-                                                       Margin="0,15,0,0"
-                                                       Foreground="#1E2F35"/>
-
-                                            <TextBlock Text="Navigate operations easily with a clean interface designed for efficient workflow management."
-                                                       FontSize="14"
-                                                       Margin="0,10,0,0"
-                                                       Foreground="#666"
-                                                       TextWrapping="Wrap"/>
+                                            <materialDesign:PackIcon Kind="Factory" Width="28" Height="28" Foreground="#7C3AED"/>
+                                            <TextBlock Text="12.40" Margin="0,8,0,0" FontSize="24" FontWeight="Bold" Foreground="#111827"/>
+                                            <TextBlock Text="Today's Production" Margin="0,4,0,0" FontSize="13" Foreground="#4B5563"/>
+                                            <TextBlock Text="Tonnes" Margin="0,6,0,0" FontSize="12" Foreground="#7C3AED" FontWeight="SemiBold"/>
                                         </StackPanel>
                                     </Border>
 
-                                </WrapPanel>
+                                    <Border Padding="16" CornerRadius="18" Background="#95FFFFFF" BorderBrush="#DDE5EA" BorderThickness="1">
+                                        <StackPanel>
+                                            <materialDesign:PackIcon Kind="TruckDelivery" Width="28" Height="28" Foreground="#F97316"/>
+                                            <TextBlock Text="18" Margin="0,8,0,0" FontSize="24" FontWeight="Bold" Foreground="#111827"/>
+                                            <TextBlock Text="Pending Deliveries" Margin="0,4,0,0" FontSize="13" Foreground="#4B5563"/>
+                                            <TextBlock Text="Open Orders" Margin="0,6,0,0" FontSize="12" Foreground="#F97316" FontWeight="SemiBold"/>
+                                        </StackPanel>
+                                    </Border>
+
+                                </UniformGrid>
 
 
-                                <!-- ================================================= -->
-                                <!-- QUOTE BAR -->
-                                <!-- ================================================= -->
 
-                                <Border Background="#70FFFFFF"
-                                        BorderBrush="#99FFFFFF"
+                                <Border Background="#95FFFFFF"
+                                        BorderBrush="#DDE5EA"
                                         BorderThickness="1"
-                                        CornerRadius="18"
-                                        Padding="18"
-                                        Margin="0,25,0,0">
+                                        CornerRadius="22"
+                                        Padding="24"
+                                        Margin="0,0,0,20">
 
                                     <Border.Effect>
-                                        <DropShadowEffect BlurRadius="16"
-                                                          ShadowDepth="0"
-                                                          Opacity="0.08"/>
+                                        <DropShadowEffect BlurRadius="20" ShadowDepth="0" Opacity="0.08"/>
                                     </Border.Effect>
 
-                                    <StackPanel Orientation="Horizontal">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="200"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
 
-                                        <materialDesign:PackIcon Kind="StarCircle"
-                                                                 Width="28"
-                                                                 Height="28"
-                                                                 Foreground="#0B7A81"
-                                                                 Margin="0,0,15,0"/>
+                                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                            <Image Source="Images/applogo.ico" Width="120" Height="120" Stretch="Uniform"/>
+                                            <TextBlock Text="RUBEXOPS"
+                                                       FontSize="20"
+                                                       FontWeight="Bold"
+                                                       Margin="0,10,0,0"
+                                                       Foreground="#0B7A81"
+                                                       HorizontalAlignment="Center"/>
+                                        </StackPanel>
 
-                                        <TextBlock Text="Our mission is to simplify operations, improve productivity and work efficiency."
-                                                   FontSize="15"
-                                                   VerticalAlignment="Center"
-                                                   Foreground="#0B7A81"
-                                                   FontWeight="SemiBold"
-                                                   TextWrapping="Wrap"/>
+                                        <StackPanel Grid.Column="1" Margin="24,0,0,0" VerticalAlignment="Center">
+
+                                            <TextBlock Text="Integrated. Intelligent. In Control."
+                                                       FontSize="24"
+                                                       FontWeight="Bold"
+                                                       Foreground="#111827"/>
+
+                                            <Border Width="60"
+                                                    Height="4"
+                                                    Background="#0B9AA0"
+                                                    CornerRadius="2"
+                                                    Margin="0,12,0,16"
+                                                    HorizontalAlignment="Left"/>
+
+                                            <TextBlock Text="RubexOps brings all your rubber procurement, production, inventory and sales operations into one intelligent platform."
+                                                       FontSize="14"
+                                                       Foreground="#4B5563"
+                                                       TextWrapping="Wrap"
+                                                       LineHeight="24"/>
+
+                                            <TextBlock Text="Streamline workflows, reduce operational errors and monitor live business performance through a modern ERP-style environment."
+                                                       FontSize="14"
+                                                       Margin="0,10,0,0"
+                                                       Foreground="#4B5563"
+                                                       TextWrapping="Wrap"
+                                                       LineHeight="24"/>
+
+                                            <UniformGrid Columns="4" Margin="0,22,0,0">
+
+                                                <StackPanel HorizontalAlignment="Center">
+                                                    <materialDesign:PackIcon Kind="SourceBranch" Width="28" Height="28" Foreground="#0B9AA0" HorizontalAlignment="Center"/>
+                                                    <TextBlock Text="Unified&#10;Operations" Margin="0,8,0,0" FontWeight="SemiBold" Foreground="#334155" FontSize="13" TextAlignment="Center"/>
+                                                </StackPanel>
+
+                                                <StackPanel HorizontalAlignment="Center">
+                                                    <materialDesign:PackIcon Kind="ChartBar" Width="28" Height="28" Foreground="#0B9AA0" HorizontalAlignment="Center"/>
+                                                    <TextBlock Text="Smart&#10;Insights" Margin="0,8,0,0" FontWeight="SemiBold" Foreground="#334155" FontSize="13" TextAlignment="Center"/>
+                                                </StackPanel>
+
+                                                <StackPanel HorizontalAlignment="Center">
+                                                    <materialDesign:PackIcon Kind="ShieldCheck" Width="28" Height="28" Foreground="#0B9AA0" HorizontalAlignment="Center"/>
+                                                    <TextBlock Text="Operational&#10;Control" Margin="0,8,0,0" FontWeight="SemiBold" Foreground="#334155" FontSize="13" TextAlignment="Center"/>
+                                                </StackPanel>
+
+                                                <StackPanel HorizontalAlignment="Center">
+                                                    <materialDesign:PackIcon Kind="BullseyeArrow" Width="28" Height="28" Foreground="#0B9AA0" HorizontalAlignment="Center"/>
+                                                    <TextBlock Text="Performance&#10;Driven" Margin="0,8,0,0" FontWeight="SemiBold" Foreground="#334155" FontSize="13" TextAlignment="Center"/>
+                                                </StackPanel>
+
+                                            </UniformGrid>
+
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+
+
+
+                                <Border Background="#95FFFFFF"
+                                        BorderBrush="#DDE5EA"
+                                        BorderThickness="1"
+                                        CornerRadius="22"
+                                        Padding="22">
+
+                                    <Border.Effect>
+                                        <DropShadowEffect BlurRadius="18" ShadowDepth="0" Opacity="0.08"/>
+                                    </Border.Effect>
+
+                                    <StackPanel>
+
+                                        <StackPanel Orientation="Horizontal">
+                                            <materialDesign:PackIcon Kind="ChartTimelineVariant" Width="26" Height="26" Foreground="#0B9AA0"/>
+                                            <TextBlock Text="At a Glance" Margin="12,0,0,0" VerticalAlignment="Center" FontSize="20" FontWeight="Bold" Foreground="#1E293B"/>
+                                        </StackPanel>
+
+                                        <UniformGrid Columns="4" Margin="0,22,0,0">
+
+                                            <StackPanel>
+                                                <materialDesign:PackIcon Kind="Cart" Width="28" Height="28" Foreground="#0B9AA0"/>
+                                                <TextBlock Text="Total Purchase" Margin="0,10,0,0" FontSize="13" Foreground="#667085"/>
+                                                <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                                                    <TextBlock Text="256.80" FontSize="24" FontWeight="Bold" Foreground="#111827" VerticalAlignment="Bottom"/>
+                                                    <TextBlock Text="Tonnes" Margin="6,0,0,3" FontSize="13" FontWeight="SemiBold" Foreground="#0B9AA0" VerticalAlignment="Bottom"/>
+                                                </StackPanel>
+                                            </StackPanel>
+
+                                            <StackPanel>
+                                                <materialDesign:PackIcon Kind="Finance" Width="28" Height="28" Foreground="#0B9AA0"/>
+                                                <TextBlock Text="Total Sales" Margin="0,10,0,0" FontSize="13" Foreground="#667085"/>
+                                                <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                                                    <TextBlock Text="198.60" FontSize="24" FontWeight="Bold" Foreground="#111827" VerticalAlignment="Bottom"/>
+                                                    <TextBlock Text="Tonnes" Margin="6,0,0,3" FontSize="13" FontWeight="SemiBold" Foreground="#0B9AA0" VerticalAlignment="Bottom"/>
+                                                </StackPanel>
+                                            </StackPanel>
+
+                                            <StackPanel>
+                                                <materialDesign:PackIcon Kind="ChartPie" Width="28" Height="28" Foreground="#0B9AA0"/>
+                                                <TextBlock Text="Avg. Contract Completion" Margin="0,10,0,0" FontSize="13" Foreground="#667085"/>
+                                                <TextBlock Text="68%" Margin="0,6,0,0" FontSize="24" FontWeight="Bold" Foreground="#0B9AA0"/>
+                                            </StackPanel>
+
+                                            <StackPanel>
+                                                <materialDesign:PackIcon Kind="TruckFast" Width="28" Height="28" Foreground="#0B9AA0"/>
+                                                <TextBlock Text="On-Time Delivery Rate" Margin="0,10,0,0" FontSize="13" Foreground="#667085"/>
+                                                <TextBlock Text="92%" Margin="0,6,0,0" FontSize="24" FontWeight="Bold" Foreground="#0B9AA0"/>
+                                            </StackPanel>
+
+                                        </UniformGrid>
                                     </StackPanel>
                                 </Border>
 
                             </StackPanel>
 
 
-                            <!-- ================================================= -->
-                            <!-- RIGHT IMAGE PANEL -->
-                            <!-- ================================================= -->
 
-                            <Border Grid.Column="1"
-                                    Background="#70FFFFFF"
-                                    BorderBrush="#99FFFFFF"
-                                    BorderThickness="1"
+                            <Border Grid.Column="2"
                                     CornerRadius="24"
-                                    ClipToBounds="True">
+                                    ClipToBounds="True"
+                                    Background="#90FFFFFF"
+                                    BorderBrush="#DDE5EA"
+                                    BorderThickness="1">
 
                                 <Border.Effect>
-                                    <DropShadowEffect BlurRadius="24"
-                                                      ShadowDepth="0"
-                                                      Opacity="0.14"/>
+                                    <DropShadowEffect BlurRadius="22" ShadowDepth="0" Opacity="0.10"/>
                                 </Border.Effect>
 
                                 <Grid>
-
-                                    <!-- IMAGE -->
-
-                                    <Image Source="/Assets/factory_dashboard.png"
-                                           Stretch="UniformToFill"/>
-
-                                    <!-- GLASS OVERLAY -->
-
-                                    <Border Background="#18FFFFFF"/>
-
+                                    <Image Source="/Assets/factory_dashboard.png" Stretch="UniformToFill"/>
+                                    <Border Background="#08FFFFFF"/>
                                 </Grid>
-
                             </Border>
 
                         </Grid>
-
                     </Grid>
-
                 </Border>
-
             </StackPanel>
-
         </Grid>
-
     </ScrollViewer>
-
 </Page>
