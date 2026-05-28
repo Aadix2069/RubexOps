@@ -26,20 +26,13 @@ namespace RubexOps
             public string EndDate { get; set; } = "";
         }
 
-
-
         // =====================================================
         // FIELDS
         // =====================================================
 
-        private readonly List<ContractOption> contractOptions =
-            new List<ContractOption>();
-
+        private readonly List<ContractOption> contractOptions = new List<ContractOption>();
         private ContractOption? selectedContract = null;
-
         private bool isSelectingVendor;
-
-
 
         // =====================================================
         // CONSTRUCTOR
@@ -49,23 +42,39 @@ namespace RubexOps
         {
             InitializeComponent();
             Loaded += EnterPurchaseDataPage_Loaded;
+
+            // Global Enter key listener for form submission
+            this.PreviewKeyDown += EnterPurchaseDataPage_PreviewKeyDown;
         }
-
-
 
         // =====================================================
         // PAGE LOAD
         // =====================================================
 
-        private async void EnterPurchaseDataPage_Loaded(
-            object sender,
-            RoutedEventArgs e)
+        private async void EnterPurchaseDataPage_Loaded(object sender, RoutedEventArgs e)
         {
             await LoadActiveContracts();
             UpdateSearchPlaceholder();
         }
 
+        // =====================================================
+        // ENTER KEY SUBMIT LOGIC
+        // =====================================================
 
+        private void EnterPurchaseDataPage_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                // Prevent duplicate firing and default ding sound
+                e.Handled = true;
+
+                // Submit form pretending the Save button was clicked
+                if (SavePurchaseButton.IsEnabled)
+                {
+                    SavePurchase_Click(SavePurchaseButton, new RoutedEventArgs());
+                }
+            }
+        }
 
         // =====================================================
         // LOAD ACTIVE CONTRACTS
@@ -84,11 +93,8 @@ namespace RubexOps
                 if (!File.Exists(pythonScript))
                 {
                     MessageBox.Show(
-                        "Vendor suggestion backend file not found.\n\n" +
-                        pythonScript,
-                        "File Error",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Error);
+                        "Vendor suggestion backend file not found.\n\n" + pythonScript,
+                        "File Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
@@ -97,10 +103,7 @@ namespace RubexOps
                 List<ContractOption>? contracts =
                     JsonSerializer.Deserialize<List<ContractOption>>(
                         output,
-                        new JsonSerializerOptions
-                        {
-                            PropertyNameCaseInsensitive = true
-                        });
+                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
                 contractOptions.Clear();
 
@@ -109,15 +112,9 @@ namespace RubexOps
             }
             catch (Exception ex)
             {
-                MessageBox.Show(
-                    ex.Message,
-                    "Contract Load Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                MessageBox.Show(ex.Message, "Contract Load Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
-
 
         // =====================================================
         // SEARCH PLACEHOLDER VISIBILITY
@@ -133,15 +130,11 @@ namespace RubexOps
                     : Visibility.Collapsed;
         }
 
-
-
         // =====================================================
         // VENDOR SEARCH
         // =====================================================
 
-        private void VendorSearchBox_TextChanged(
-            object sender,
-            TextChangedEventArgs e)
+        private void VendorSearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             UpdateSearchPlaceholder();
 
@@ -160,41 +153,28 @@ namespace RubexOps
                 return;
             }
 
-            List<ContractOption> matches =
-                contractOptions.FindAll(c =>
-                    c.VendorName.IndexOf(
-                        searchText,
-                        StringComparison.OrdinalIgnoreCase) >= 0 ||
-                    c.VendorID.IndexOf(
-                        searchText,
-                        StringComparison.OrdinalIgnoreCase) >= 0);
+            // Safely search against Name and ID case-insensitively
+            List<ContractOption> matches = contractOptions.FindAll(c =>
+                (c.VendorName ?? "").IndexOf(searchText, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                (c.VendorID ?? "").IndexOf(searchText, StringComparison.OrdinalIgnoreCase) >= 0);
 
             VendorSuggestionList.ItemsSource = matches;
             VendorSuggestionPopup.IsOpen = matches.Count > 0;
         }
 
-
-
         // =====================================================
         // SELECT CONTRACT FROM DROPDOWN
         // =====================================================
 
-        private void VendorSuggestionList_SelectionChanged(
-            object sender,
-            SelectionChangedEventArgs e)
+        private void VendorSuggestionList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            ContractOption? contract =
-                VendorSuggestionList.SelectedItem as ContractOption;
-
-            if (contract == null)
+            if (VendorSuggestionList.SelectedItem is not ContractOption contract)
                 return;
 
             isSelectingVendor = true;
-
             selectedContract = contract;
 
-            VendorSearchBox.Text =
-                $"{contract.VendorName}  —  {contract.VendorID}";
+            VendorSearchBox.Text = $"{contract.VendorName}  —  {contract.VendorID}";
 
             // Auto-fill locked fields
             VendorNameBox.Text = contract.VendorName;
@@ -206,21 +186,21 @@ namespace RubexOps
             if (!string.IsNullOrWhiteSpace(contract.StartDate) &&
                 !string.IsNullOrWhiteSpace(contract.EndDate))
             {
-                ContractPeriodText.Text =
-                    $"Contract Period:  {contract.StartDate}  →  {contract.EndDate}";
+                ContractPeriodText.Text = $"Contract Period:  {contract.StartDate}  →  {contract.EndDate}";
                 ContractPeriodBadge.Visibility = Visibility.Visible;
             }
 
             VendorSuggestionPopup.IsOpen = false;
+
+            // Clear selection to ensure SelectionChanged fires if they click the same item again
+            VendorSuggestionList.SelectedItem = null;
+
             isSelectingVendor = false;
 
             // Move focus to first input field
             InvoiceNumberBox.Focus();
-
             UpdateSearchPlaceholder();
         }
-
-
 
         // =====================================================
         // CLEAR AUTO-FILL (when user clears search)
@@ -238,70 +218,41 @@ namespace RubexOps
             ContractPeriodBadge.Visibility = Visibility.Collapsed;
         }
 
-
-
         // =====================================================
         // PURCHASE ORDER DATE CHANGED — contract range hint
         // =====================================================
 
-        private void PurchaseOrderDatePicker_SelectedDateChanged(
-            object sender,
-            SelectionChangedEventArgs e)
+        private void PurchaseOrderDatePicker_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
-            // Live warning: if a contract is selected and date is outside range
-            if (selectedContract == null)
+            if (selectedContract == null || PurchaseOrderDatePicker.SelectedDate == null)
                 return;
 
-            if (PurchaseOrderDatePicker.SelectedDate == null)
-                return;
-
-            if (!TryParseContractDates(
-                    selectedContract,
-                    out DateTime contractStart,
-                    out DateTime contractEnd))
+            if (!TryParseContractDates(selectedContract, out DateTime contractStart, out DateTime contractEnd))
                 return;
 
             DateTime poDate = PurchaseOrderDatePicker.SelectedDate.Value;
 
             if (poDate < contractStart || poDate > contractEnd)
             {
-                ContractPeriodBadge.Background =
-                    new System.Windows.Media.SolidColorBrush(
-                        System.Windows.Media.Color.FromRgb(254, 242, 242));
-                ContractPeriodBadge.BorderBrush =
-                    new System.Windows.Media.SolidColorBrush(
-                        System.Windows.Media.Color.FromRgb(252, 165, 165));
-                ContractPeriodText.Foreground =
-                    new System.Windows.Media.SolidColorBrush(
-                        System.Windows.Media.Color.FromRgb(185, 28, 28));
-                ContractPeriodText.Text =
-                    $"⚠  Date outside contract period:  {selectedContract.StartDate}  →  {selectedContract.EndDate}";
+                ContractPeriodBadge.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(254, 242, 242));
+                ContractPeriodBadge.BorderBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(252, 165, 165));
+                ContractPeriodText.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(185, 28, 28));
+                ContractPeriodText.Text = $"⚠  Date outside contract period:  {selectedContract.StartDate}  →  {selectedContract.EndDate}";
             }
             else
             {
-                ContractPeriodBadge.Background =
-                    new System.Windows.Media.SolidColorBrush(
-                        System.Windows.Media.Color.FromRgb(240, 253, 254));
-                ContractPeriodBadge.BorderBrush =
-                    new System.Windows.Media.SolidColorBrush(
-                        System.Windows.Media.Color.FromRgb(165, 243, 252));
-                ContractPeriodText.Foreground =
-                    new System.Windows.Media.SolidColorBrush(
-                        System.Windows.Media.Color.FromRgb(11, 138, 143));
-                ContractPeriodText.Text =
-                    $"Contract Period:  {selectedContract.StartDate}  →  {selectedContract.EndDate}";
+                ContractPeriodBadge.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(240, 253, 254));
+                ContractPeriodBadge.BorderBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(165, 243, 252));
+                ContractPeriodText.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(11, 138, 143));
+                ContractPeriodText.Text = $"Contract Period:  {selectedContract.StartDate}  →  {selectedContract.EndDate}";
             }
         }
-
-
 
         // =====================================================
         // SAVE PURCHASE
         // =====================================================
 
-        private async void SavePurchase_Click(
-            object sender,
-            RoutedEventArgs e)
+        private async void SavePurchase_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -318,86 +269,40 @@ namespace RubexOps
                 if (!ValidateForm())
                     return;
 
-                // ── Collect values ──
+                string vendorID = VendorIDBox.Text.Trim();
+                string invoiceNumber = InvoiceNumberBox.Text.Trim();
+                string purchaseOrderDate = PurchaseOrderDatePicker.SelectedDate?.ToString("dd-MM-yyyy") ?? "";
+                string deliveryDate = DeliveryDatePicker.SelectedDate?.ToString("dd-MM-yyyy") ?? "";
+                string invoiceWeight = string.IsNullOrWhiteSpace(InvoiceWeightBox.Text) ? "" : decimal.Parse(InvoiceWeightBox.Text.Trim()).ToString();
+                string beforeUnloading = decimal.Parse(BeforeUnloadingBox.Text.Trim()).ToString();
+                string carrierWeight = decimal.Parse(CarrierWeightBox.Text.Trim()).ToString();
+                string noOfBags = string.IsNullOrWhiteSpace(NoOfBagsBox.Text) ? "" : int.Parse(NoOfBagsBox.Text.Trim()).ToString();
+                string calculatedDrc = decimal.Parse(CalculatedDrcBox.Text.Trim().Replace("%", "")).ToString();
+                string gst = decimal.Parse(GstBox.Text.Trim()).ToString();
+                string tds = decimal.Parse(TdsBox.Text.Trim()).ToString();
+                string unloadingCharge = string.IsNullOrWhiteSpace(UnloadingChargeBox.Text) ? "" : decimal.Parse(UnloadingChargeBox.Text.Trim()).ToString();
 
-                string vendorID =
-                    VendorIDBox.Text.Trim();
+                string SafeArg(string val) => string.IsNullOrWhiteSpace(val) ? "\"\"" : $"\"{val}\"";
 
-                string invoiceNumber =
-                    InvoiceNumberBox.Text.Trim();
-
-                string purchaseOrderDate =
-                    PurchaseOrderDatePicker.SelectedDate?
-                    .ToString("dd-MM-yyyy") ?? "";
-
-                string deliveryDate =
-                    DeliveryDatePicker.SelectedDate?
-                    .ToString("dd-MM-yyyy") ?? "";
-
-                string invoiceWeight =
-                    string.IsNullOrWhiteSpace(InvoiceWeightBox.Text)
-                        ? ""
-                        : decimal.Parse(InvoiceWeightBox.Text.Trim())
-                          .ToString();
-
-                string beforeUnloading =
-                    decimal.Parse(BeforeUnloadingBox.Text.Trim()).ToString();
-
-                string carrierWeight =
-                    decimal.Parse(CarrierWeightBox.Text.Trim()).ToString();
-
-                string noOfBags =
-                    string.IsNullOrWhiteSpace(NoOfBagsBox.Text)
-                        ? ""
-                        : int.Parse(NoOfBagsBox.Text.Trim()).ToString();
-
-                string calculatedDrc =
-                    decimal.Parse(
-                        CalculatedDrcBox.Text.Trim().Replace("%", ""))
-                    .ToString();
-
-                string gst =
-                    decimal.Parse(GstBox.Text.Trim()).ToString();
-
-                string tds =
-                    decimal.Parse(TdsBox.Text.Trim()).ToString();
-
-                string unloadingCharge =
-                    string.IsNullOrWhiteSpace(UnloadingChargeBox.Text)
-                        ? ""
-                        : decimal.Parse(UnloadingChargeBox.Text.Trim())
-                          .ToString();
-
-                // ── Build arguments ──
-                // Order must match create_purchase_data.py expected args
-                // We pass vendor_id only (NOT vendor_name, item_code, base_rate)
                 string arguments =
-                    $"\"{vendorID}\" " +
-                    $"\"{invoiceNumber}\" " +
-                    $"\"{purchaseOrderDate}\" " +
-                    $"\"{deliveryDate}\" " +
-                    $"\"{invoiceWeight}\" " +
-                    $"\"{beforeUnloading}\" " +
-                    $"\"{carrierWeight}\" " +
-                    $"\"{noOfBags}\" " +
-                    $"\"{calculatedDrc}\" " +
-                    $"\"{gst}\" " +
-                    $"\"{tds}\" " +
-                    $"\"{unloadingCharge}\"";
+                    $"{SafeArg(vendorID)} " +
+                    $"{SafeArg(invoiceNumber)} " +
+                    $"{SafeArg(purchaseOrderDate)} " +
+                    $"{SafeArg(deliveryDate)} " +
+                    $"{SafeArg(invoiceWeight)} " +
+                    $"{SafeArg(beforeUnloading)} " +
+                    $"{SafeArg(carrierWeight)} " +
+                    $"{SafeArg(noOfBags)} " +
+                    $"{SafeArg(calculatedDrc)} " +
+                    $"{SafeArg(gst)} " +
+                    $"{SafeArg(tds)} " +
+                    $"{SafeArg(unloadingCharge)}";
 
-                string pythonScript = Path.Combine(
-                    AppDomain.CurrentDomain.BaseDirectory,
-                    "backend",
-                    "create_purchase_data.py"
-                );
+                string pythonScript = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "backend", "create_purchase_data.py");
 
                 if (!File.Exists(pythonScript))
                 {
-                    MessageBox.Show(
-                        "Backend Python file not found.\n\n" + pythonScript,
-                        "File Error",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Error);
+                    MessageBox.Show("Backend Python file not found.\n\n" + pythonScript, "File Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
@@ -405,29 +310,16 @@ namespace RubexOps
 
                 if (output.Contains("ERROR"))
                 {
-                    MessageBox.Show(
-                        output,
-                        "Backend Error",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Error);
+                    MessageBox.Show(output, "Backend Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
-                MessageBox.Show(
-                    output,
-                    "Success",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information);
-
+                MessageBox.Show(output, "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                 ClearForm();
             }
             catch (Exception ex)
             {
-                MessageBox.Show(
-                    ex.Message,
-                    "Application Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                MessageBox.Show(ex.Message, "Application Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -435,15 +327,13 @@ namespace RubexOps
                 MainGrid.IsEnabled = true;
                 MainGrid.Opacity = 1;
 
-                if (sender is Button button)
+                if (SavePurchaseButton != null)
                 {
-                    button.IsEnabled = true;
-                    button.Content = "Save Purchase";
+                    SavePurchaseButton.IsEnabled = true;
+                    SavePurchaseButton.Content = "Save Purchase";
                 }
             }
         }
-
-
 
         // =====================================================
         // VALIDATION
@@ -451,421 +341,181 @@ namespace RubexOps
 
         private bool ValidateForm()
         {
-            // ── 1. Contract must be selected ──
-            if (selectedContract == null ||
-                string.IsNullOrWhiteSpace(VendorIDBox.Text))
+            if (selectedContract == null || string.IsNullOrWhiteSpace(VendorIDBox.Text))
             {
-                MessageBox.Show(
-                    "Please search and select an active contract before saving.",
-                    "No Contract Selected",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-                VendorSearchBox.Focus();
-                return false;
+                MessageBox.Show("Please search and select an active contract before saving.", "No Contract Selected", MessageBoxButton.OK, MessageBoxImage.Warning);
+                VendorSearchBox.Focus(); return false;
             }
 
-            // ── 2. Re-verify contract is still ACTIVE ──
-            // (Python will do the authoritative check; this is a fast client-side guard)
-            if (string.IsNullOrWhiteSpace(VendorIDBox.Text))
-            {
-                MessageBox.Show(
-                    "Vendor ID is missing. Please reselect the contract.",
-                    "Validation Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-                VendorSearchBox.Focus();
-                return false;
-            }
-
-            // ── 3. Invoice Number ──
             if (string.IsNullOrWhiteSpace(InvoiceNumberBox.Text))
             {
-                MessageBox.Show(
-                    "Invoice Number is required.",
-                    "Validation Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-                InvoiceNumberBox.Focus();
-                return false;
+                MessageBox.Show("Invoice Number is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                InvoiceNumberBox.Focus(); return false;
             }
 
-            // ── 4. Purchase Order Date ──
             if (PurchaseOrderDatePicker.SelectedDate == null)
             {
-                MessageBox.Show(
-                    "Purchase Order Date is required.",
-                    "Validation Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-                PurchaseOrderDatePicker.Focus();
-                return false;
+                MessageBox.Show("Purchase Order Date is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                PurchaseOrderDatePicker.Focus(); return false;
             }
 
-            // ── 5. Purchase Order Date must be within contract period ──
-            if (TryParseContractDates(
-                    selectedContract,
-                    out DateTime contractStart,
-                    out DateTime contractEnd))
+            if (TryParseContractDates(selectedContract, out DateTime contractStart, out DateTime contractEnd))
             {
                 DateTime poDate = PurchaseOrderDatePicker.SelectedDate.Value;
-
                 if (poDate < contractStart || poDate > contractEnd)
                 {
-                    MessageBox.Show(
-                        $"Purchase Order Date ({poDate:dd-MM-yyyy}) is outside " +
-                        $"the selected contract period.\n\n" +
-                        $"Contract valid from {selectedContract.StartDate} " +
-                        $"to {selectedContract.EndDate}.",
-                        "Contract Date Mismatch",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Warning);
-                    PurchaseOrderDatePicker.Focus();
-                    return false;
+                    MessageBox.Show($"Purchase Order Date ({poDate:dd-MM-yyyy}) is outside the contract period.", "Contract Date Mismatch", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    PurchaseOrderDatePicker.Focus(); return false;
                 }
             }
 
-            // ── 6. Delivery Date (optional) must not be before PO Date ──
-            if (DeliveryDatePicker.SelectedDate != null)
+            if (DeliveryDatePicker.SelectedDate != null && DeliveryDatePicker.SelectedDate < PurchaseOrderDatePicker.SelectedDate)
             {
-                if (DeliveryDatePicker.SelectedDate <
-                    PurchaseOrderDatePicker.SelectedDate)
-                {
-                    MessageBox.Show(
-                        "Delivery Date cannot be before the Purchase Order Date.",
-                        "Date Validation",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Warning);
-                    DeliveryDatePicker.Focus();
-                    return false;
-                }
+                MessageBox.Show("Delivery Date cannot be before the Purchase Order Date.", "Date Validation", MessageBoxButton.OK, MessageBoxImage.Warning);
+                DeliveryDatePicker.Focus(); return false;
             }
 
-            // ── 7. Before Unloading (required) ──
-            if (!ValidatePositiveDecimal(
-                    BeforeUnloadingBox, "Before Unloading", required: true))
-                return false;
+            if (!ValidatePositiveDecimal(BeforeUnloadingBox, "Before Unloading", required: true)) return false;
+            if (!ValidatePositiveDecimal(CarrierWeightBox, "Carrier Weight", required: true)) return false;
 
-            // ── 8. Carrier Weight (required) ──
-            if (!ValidatePositiveDecimal(
-                    CarrierWeightBox, "Carrier Weight", required: true))
-                return false;
+            // CARRIER WEIGHT VALIDATION RULE
+            decimal beforeUnloading = decimal.Parse(BeforeUnloadingBox.Text.Trim());
+            decimal carrierWeight = decimal.Parse(CarrierWeightBox.Text.Trim());
 
-            // ── 9. Invoice Weight (optional) ──
-            if (!string.IsNullOrWhiteSpace(InvoiceWeightBox.Text))
+            if (carrierWeight >= beforeUnloading)
             {
-                if (!ValidatePositiveDecimal(
-                        InvoiceWeightBox, "Invoice Weight", required: false))
-                    return false;
+                MessageBox.Show("Carrier Weight must be strictly less than Before Unloading weight.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                CarrierWeightBox.Focus(); return false;
             }
 
-            // ── 10. No. of Bags (optional) ──
+            if (!string.IsNullOrWhiteSpace(InvoiceWeightBox.Text) && !ValidatePositiveDecimal(InvoiceWeightBox, "Invoice Weight", required: false)) return false;
+
             if (!string.IsNullOrWhiteSpace(NoOfBagsBox.Text))
             {
-                if (!int.TryParse(NoOfBagsBox.Text.Trim(), out int bags))
+                if (!int.TryParse(NoOfBagsBox.Text.Trim(), out int bags) || bags < 0)
                 {
-                    MessageBox.Show(
-                        "No. of Bags must be a whole number.",
-                        "Validation Error",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Warning);
-                    NoOfBagsBox.Focus();
-                    return false;
-                }
-
-                if (bags < 0)
-                {
-                    MessageBox.Show(
-                        "No. of Bags cannot be negative.",
-                        "Validation Error",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Warning);
-                    NoOfBagsBox.Focus();
-                    return false;
+                    MessageBox.Show("No. of Bags must be a valid non-negative whole number.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    NoOfBagsBox.Focus(); return false;
                 }
             }
 
-            // ── 11. Calculated DRC (required) ──
-            if (string.IsNullOrWhiteSpace(CalculatedDrcBox.Text))
+            if (string.IsNullOrWhiteSpace(CalculatedDrcBox.Text) || !decimal.TryParse(CalculatedDrcBox.Text.Trim().Replace("%", ""), out decimal drc) || drc < 0 || drc > 100)
             {
-                MessageBox.Show(
-                    "Calculated DRC (%) is required.",
-                    "Validation Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-                CalculatedDrcBox.Focus();
-                return false;
+                MessageBox.Show("Calculated DRC must be a valid percentage between 0 and 100.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                CalculatedDrcBox.Focus(); return false;
             }
 
-            string drcText = CalculatedDrcBox.Text.Trim().Replace("%", "");
-
-            if (!decimal.TryParse(drcText, out decimal drc))
+            if (string.IsNullOrWhiteSpace(GstBox.Text) || !decimal.TryParse(GstBox.Text.Trim(), out decimal gst) || gst < 0 || gst > 100)
             {
-                MessageBox.Show(
-                    "Calculated DRC must be a valid number.",
-                    "Validation Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-                CalculatedDrcBox.Focus();
-                return false;
+                MessageBox.Show("GST (%) must be a valid non-negative percentage.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                GstBox.Focus(); return false;
             }
 
-            if (drc < 0 || drc > 100)
+            if (string.IsNullOrWhiteSpace(TdsBox.Text) || !decimal.TryParse(TdsBox.Text.Trim(), out decimal tds) || tds < 0 || tds > 100)
             {
-                MessageBox.Show(
-                    "Calculated DRC must be between 0 and 100.",
-                    "Validation Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-                CalculatedDrcBox.Focus();
-                return false;
+                MessageBox.Show("TDS 194Q (%) must be a valid percentage between 0 and 100.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                TdsBox.Focus(); return false;
             }
 
-            // ── 12. GST (required) ──
-            if (string.IsNullOrWhiteSpace(GstBox.Text))
-            {
-                MessageBox.Show(
-                    "GST (%) is required.",
-                    "Validation Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-                GstBox.Focus();
-                return false;
-            }
-
-            if (!decimal.TryParse(GstBox.Text.Trim(), out decimal gst) || gst < 0)
-            {
-                MessageBox.Show(
-                    "GST (%) must be a valid non-negative number.",
-                    "Validation Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-                GstBox.Focus();
-                return false;
-            }
-
-            // ── 13. TDS (required) ──
-            if (string.IsNullOrWhiteSpace(TdsBox.Text))
-            {
-                MessageBox.Show(
-                    "TDS 194Q (%) is required.",
-                    "Validation Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-                TdsBox.Focus();
-                return false;
-            }
-
-            if (!decimal.TryParse(TdsBox.Text.Trim(), out decimal tds) ||
-                tds < 0 || tds > 100)
-            {
-                MessageBox.Show(
-                    "TDS 194Q (%) must be a valid number between 0 and 100.",
-                    "Validation Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-                TdsBox.Focus();
-                return false;
-            }
-
-            // ── 14. Unloading Charge (optional) ──
-            if (!string.IsNullOrWhiteSpace(UnloadingChargeBox.Text))
-            {
-                if (!ValidatePositiveDecimal(
-                        UnloadingChargeBox, "Unloading Charge", required: false))
-                    return false;
-            }
+            if (!string.IsNullOrWhiteSpace(UnloadingChargeBox.Text) && !ValidatePositiveDecimal(UnloadingChargeBox, "Unloading Charge", required: false)) return false;
 
             return true;
         }
-
-
 
         // =====================================================
         // DECIMAL VALIDATION HELPER
         // =====================================================
 
-        private bool ValidatePositiveDecimal(
-            TextBox textBox,
-            string fieldName,
-            bool required)
+        private bool ValidatePositiveDecimal(TextBox textBox, string fieldName, bool required)
         {
             string text = textBox.Text.Trim();
-
             if (string.IsNullOrWhiteSpace(text))
             {
-                if (required)
-                {
-                    MessageBox.Show(
-                        $"{fieldName} is required.",
-                        "Validation Error",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Warning);
-                    textBox.Focus();
-                    return false;
-                }
-
+                if (required) { MessageBox.Show($"{fieldName} is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning); textBox.Focus(); return false; }
                 return true;
             }
 
-            if (!decimal.TryParse(text, out decimal value))
+            if (!decimal.TryParse(text, out decimal value) || value < 0)
             {
-                MessageBox.Show(
-                    $"{fieldName} must be a valid number.",
-                    "Validation Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-                textBox.Focus();
-                return false;
+                MessageBox.Show($"{fieldName} must be a valid non-negative number.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                textBox.Focus(); return false;
             }
-
-            if (value < 0)
-            {
-                MessageBox.Show(
-                    $"{fieldName} cannot be negative.",
-                    "Validation Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-                textBox.Focus();
-                return false;
-            }
-
             return true;
         }
-
-
 
         // =====================================================
         // CONTRACT DATE PARSING HELPER
         // =====================================================
 
-        private bool TryParseContractDates(
-            ContractOption? contract,
-            out DateTime start,
-            out DateTime end)
+        private bool TryParseContractDates(ContractOption? contract, out DateTime start, out DateTime end)
         {
-            start = DateTime.MinValue;
-            end = DateTime.MaxValue;
-
-            if (contract == null)
-                return false;
-
-            if (string.IsNullOrWhiteSpace(contract.StartDate) ||
-                string.IsNullOrWhiteSpace(contract.EndDate))
-                return false;
-
-            bool startOk = DateTime.TryParseExact(
-                contract.StartDate,
-                new[] { "dd-MM-yyyy", "yyyy-MM-dd", "dd/MM/yyyy" },
-                System.Globalization.CultureInfo.InvariantCulture,
-                System.Globalization.DateTimeStyles.None,
-                out start);
-
-            bool endOk = DateTime.TryParseExact(
-                contract.EndDate,
-                new[] { "dd-MM-yyyy", "yyyy-MM-dd", "dd/MM/yyyy" },
-                System.Globalization.CultureInfo.InvariantCulture,
-                System.Globalization.DateTimeStyles.None,
-                out end);
-
+            start = DateTime.MinValue; end = DateTime.MaxValue;
+            if (contract == null || string.IsNullOrWhiteSpace(contract.StartDate) || string.IsNullOrWhiteSpace(contract.EndDate)) return false;
+            bool startOk = DateTime.TryParseExact(contract.StartDate, new[] { "dd-MM-yyyy", "yyyy-MM-dd", "dd/MM/yyyy" }, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out start);
+            bool endOk = DateTime.TryParseExact(contract.EndDate, new[] { "dd-MM-yyyy", "yyyy-MM-dd", "dd/MM/yyyy" }, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out end);
             return startOk && endOk;
         }
-
-
 
         // =====================================================
         // PYTHON RUNNER
         // =====================================================
 
-        private async Task<string> RunPythonScript(
-            string pythonScript,
-            string arguments)
+        private async Task<string> RunPythonScript(string pythonScript, string arguments)
         {
             string pythonExe = "python";
-
-            ProcessStartInfo start =
-                new ProcessStartInfo
-                {
-                    FileName = pythonExe,
-                    Arguments = $"\"{pythonScript}\" {arguments}",
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    CreateNoWindow = true,
-                    WorkingDirectory = Path.Combine(
-                        AppDomain.CurrentDomain.BaseDirectory,
-                        "backend")
-                };
+            ProcessStartInfo start = new ProcessStartInfo
+            {
+                FileName = pythonExe,
+                Arguments = $"\"{pythonScript}\" {arguments}",
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true,
+                WorkingDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "backend")
+            };
 
             string output = "";
             string error = "";
 
             await Task.Run(() =>
             {
-                using Process process =
-                    Process.Start(start)
-                    ?? throw new Exception(
-                        "Failed to start backend process.");
-
+                using Process process = Process.Start(start) ?? throw new Exception("Failed to start backend process.");
                 output = process.StandardOutput.ReadToEnd();
                 error = process.StandardError.ReadToEnd();
-
                 process.WaitForExit();
             });
 
-            if (!string.IsNullOrWhiteSpace(error))
-                throw new Exception(error);
-
+            if (!string.IsNullOrWhiteSpace(error)) throw new Exception(error);
             return output.Trim();
         }
 
-
-
         // =====================================================
-        // CLEAR FORM (button handler)
+        // CLEAR FORM
         // =====================================================
 
-        private void ClearForm_Click(
-            object sender,
-            RoutedEventArgs e)
+        private void ClearForm_Click(object sender, RoutedEventArgs e)
         {
             ClearForm();
         }
 
-
-
-        // =====================================================
-        // CLEAR FORM METHOD
-        // =====================================================
-
         private void ClearForm()
         {
             isSelectingVendor = false;
-
             VendorSearchBox.Clear();
-
             ClearAutoFill();
-
             InvoiceNumberBox.Clear();
-
             PurchaseOrderDatePicker.SelectedDate = null;
             DeliveryDatePicker.SelectedDate = null;
-
             InvoiceWeightBox.Clear();
             BeforeUnloadingBox.Clear();
             CarrierWeightBox.Clear();
             NoOfBagsBox.Clear();
             CalculatedDrcBox.Clear();
-
-            // Preserve defaults for GST and TDS
             GstBox.Text = "5";
             TdsBox.Text = "0.1";
-
             UnloadingChargeBox.Clear();
-
             VendorSuggestionPopup.IsOpen = false;
-
             UpdateSearchPlaceholder();
-
             VendorSearchBox.Focus();
         }
     }

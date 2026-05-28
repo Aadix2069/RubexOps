@@ -288,9 +288,9 @@ namespace RubexOps
 
                 return query.Where(row =>
                     TryParseDate(
-                        row.DeliveryDate,
-                        out DateTime deliveryDate) &&
-                    deliveryDate.Date == selectedDate);
+                        row.PurchaseOrderDate,
+                        out DateTime poDate) &&
+                    poDate.Date == selectedDate);
             }
 
             if (mode == "DateRange")
@@ -320,10 +320,10 @@ namespace RubexOps
 
                 return query.Where(row =>
                     TryParseDate(
-                        row.DeliveryDate,
-                        out DateTime deliveryDate) &&
-                    deliveryDate.Date >= fromDate &&
-                    deliveryDate.Date <= toDate);
+                        row.PurchaseOrderDate,
+                        out DateTime poDate) &&
+                    poDate.Date >= fromDate &&
+                    poDate.Date <= toDate);
             }
 
             return query;
@@ -346,7 +346,7 @@ namespace RubexOps
                 case "NameDesc":
                     return query
                         .OrderByDescending(row => row.VendorName)
-                        .ThenByDescending(row => row.DeliveryDate);
+                        .ThenByDescending(row => row.PurchaseOrderDate);
 
                 case "NetPayableAsc":
                     return query
@@ -372,7 +372,7 @@ namespace RubexOps
                 default:
                     return query
                         .OrderBy(row => row.VendorName)
-                        .ThenBy(row => row.DeliveryDate);
+                        .ThenBy(row => row.PurchaseOrderDate);
             }
         }
 
