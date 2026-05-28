@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
@@ -357,39 +356,22 @@ namespace RubexOps
             {
                 "Name Descending" =>
                     contracts
-                        .OrderBy(c => c.IsExpiredStatus)
-                        .ThenBy(c => c.StatusPriority)
-                        .ThenByDescending(c => c.vendor_name),
+                        .OrderByDescending(c => c.vendor_name ?? string.Empty, StringComparer.OrdinalIgnoreCase)
+                        .ThenByDescending(c => c.vendor_id ?? string.Empty, StringComparer.OrdinalIgnoreCase),
 
-                "Quantity Ascending" =>
+                "Agreed Qty Ascending" =>
                     contracts
-                        .OrderBy(c => c.IsExpiredStatus)
-                        .ThenBy(c => c.StatusPriority)
-                        .ThenBy(c => c.agreed_qty ?? 0),
+                        .OrderBy(c => c.agreed_qty ?? 0)
+                        .ThenBy(c => c.vendor_name ?? string.Empty, StringComparer.OrdinalIgnoreCase),
 
-                "Quantity Descending" =>
+                "Agreed Qty Descending" =>
                     contracts
-                        .OrderBy(c => c.IsExpiredStatus)
-                        .ThenBy(c => c.StatusPriority)
-                        .ThenByDescending(c => c.agreed_qty ?? 0),
-
-                "Base Rate Ascending" =>
-                    contracts
-                        .OrderBy(c => c.IsExpiredStatus)
-                        .ThenBy(c => c.StatusPriority)
-                        .ThenBy(c => c.base_price ?? 0),
-
-                "Base Rate Descending" =>
-                    contracts
-                        .OrderBy(c => c.IsExpiredStatus)
-                        .ThenBy(c => c.StatusPriority)
-                        .ThenByDescending(c => c.base_price ?? 0),
+                        .OrderByDescending(c => c.agreed_qty ?? 0)
+                        .ThenBy(c => c.vendor_name ?? string.Empty, StringComparer.OrdinalIgnoreCase),
 
                 _ =>
                     contracts
-                        .OrderBy(c => c.IsExpiredStatus)
-                        .ThenBy(c => c.StatusPriority)
-                        .ThenBy(c => c.vendor_name)
+                        .OrderBy(c => c.vendor_name ?? string.Empty, StringComparer.OrdinalIgnoreCase)
                         .ThenByDescending(c => c.StartDateSort)
             };
         }
@@ -401,8 +383,8 @@ namespace RubexOps
         // =====================================================
 
         private void RenewContract_Click(
-    object sender,
-    RoutedEventArgs e)
+            object sender,
+            RoutedEventArgs e)
         {
             try
             {
@@ -683,6 +665,14 @@ namespace RubexOps
 
         public string DeliveredQtyDisplay =>
             FormatNumber(delivered_qty);
+
+        public string PurchasedQtySoFarDisplay =>
+            FormatNumber(delivered_qty);
+
+        public string DeliveriesSoFarDisplay =>
+            string.IsNullOrWhiteSpace(deliveries_so_far)
+                ? "0"
+                : deliveries_so_far;
 
         public string RemainingQtyDisplay =>
             FormatNumber(remaining_qty);

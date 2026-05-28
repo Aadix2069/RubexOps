@@ -123,7 +123,8 @@
                       Panel.ZIndex="1">
 
             <Grid x:Name="MainGrid"
-                  Margin="24">
+                  Margin="24"
+                  PreviewKeyDown="MainGrid_PreviewKeyDown">
 
                 <!-- ================================================= -->
                 <!-- PAGE STRUCTURE -->
@@ -257,21 +258,25 @@
 
                             <!-- LABELS -->
 
-                            <TextBlock Text="Vendor Name"
-                                       Grid.Row="0"
+                            <TextBlock Grid.Row="0"
                                        Grid.Column="0"
+                                       VerticalAlignment="Center"
                                        FontSize="16"
                                        FontWeight="SemiBold"
-                                       VerticalAlignment="Center"
-                                       Foreground="#111827"/>
+                                       Foreground="#111827">
+                                <Run Text="Vendor Name"/>
+                                <Run Text=" *" Foreground="#DC2626"/>
+                            </TextBlock>
 
-                            <TextBlock Text="Vendor ID"
-                                       Grid.Row="1"
+                            <TextBlock Grid.Row="1"
                                        Grid.Column="0"
+                                       VerticalAlignment="Center"
                                        FontSize="16"
                                        FontWeight="SemiBold"
-                                       VerticalAlignment="Center"
-                                       Foreground="#111827"/>
+                                       Foreground="#111827">
+                                <Run Text="Vendor ID"/>
+                                <Run Text=" *" Foreground="#DC2626"/>
+                            </TextBlock>
 
                             <TextBlock Text="Item Code"
                                        Grid.Row="2"
@@ -281,37 +286,45 @@
                                        VerticalAlignment="Center"
                                        Foreground="#111827"/>
 
-                            <TextBlock Text="Start Date"
-                                       Grid.Row="3"
+                            <TextBlock Grid.Row="3"
                                        Grid.Column="0"
+                                       VerticalAlignment="Center"
                                        FontSize="16"
                                        FontWeight="SemiBold"
-                                       VerticalAlignment="Center"
-                                       Foreground="#111827"/>
+                                       Foreground="#111827">
+                                <Run Text="Start Date"/>
+                                <Run Text=" *" Foreground="#DC2626"/>
+                            </TextBlock>
 
-                            <TextBlock Text="End Date"
-                                       Grid.Row="4"
+                            <TextBlock Grid.Row="4"
                                        Grid.Column="0"
+                                       VerticalAlignment="Center"
                                        FontSize="16"
                                        FontWeight="SemiBold"
-                                       VerticalAlignment="Center"
-                                       Foreground="#111827"/>
+                                       Foreground="#111827">
+                                <Run Text="End Date"/>
+                                <Run Text=" *" Foreground="#DC2626"/>
+                            </TextBlock>
 
-                            <TextBlock Text="Base Price"
-                                       Grid.Row="5"
+                            <TextBlock Grid.Row="5"
                                        Grid.Column="0"
+                                       VerticalAlignment="Center"
                                        FontSize="16"
                                        FontWeight="SemiBold"
-                                       VerticalAlignment="Center"
-                                       Foreground="#111827"/>
+                                       Foreground="#111827">
+                                <Run Text="Base Price"/>
+                                <Run Text=" *" Foreground="#DC2626"/>
+                            </TextBlock>
 
-                            <TextBlock Text="Agreed Quantity"
-                                       Grid.Row="6"
+                            <TextBlock Grid.Row="6"
                                        Grid.Column="0"
+                                       VerticalAlignment="Center"
                                        FontSize="16"
                                        FontWeight="SemiBold"
-                                       VerticalAlignment="Center"
-                                       Foreground="#111827"/>
+                                       Foreground="#111827">
+                                <Run Text="Agreed Quantity"/>
+                                <Run Text=" *" Foreground="#DC2626"/>
+                            </TextBlock>
 
 
 
@@ -335,25 +348,15 @@
                                      IsReadOnly="True"
                                      Background="#EEF2F4"/>
 
-
-
-                            <!-- START DATE -->
-
                             <DatePicker x:Name="StartDatePicker"
                                         Grid.Row="3"
                                         Grid.Column="2"
                                         Style="{StaticResource ModernDatePickerStyle}"/>
 
-
-
-                            <!-- END DATE -->
-
                             <DatePicker x:Name="EndDatePicker"
                                         Grid.Row="4"
                                         Grid.Column="2"
                                         Style="{StaticResource ModernDatePickerStyle}"/>
-
-
 
                             <TextBox x:Name="BasePriceBox"
                                      Grid.Row="5"
@@ -373,7 +376,7 @@
                         <!-- BREACH LOGIC -->
                         <!-- ================================================= -->
 
-                        <TextBlock Text="Breach Logic"
+                        <TextBlock Text="Breach Logic (Optional)"
                                    FontSize="26"
                                    FontWeight="Bold"
                                    Foreground="#0B8A8F"
@@ -480,6 +483,7 @@
                                     FontWeight="Bold"
                                     BorderThickness="0"
                                     Cursor="Hand"
+                                    IsDefault="True"
                                     Click="CreateContract_Click">
 
                                 <Button.Effect>

@@ -23,6 +23,21 @@ namespace RubexOps
 
 
         // =====================================================
+        // ENTER KEY SUBMIT
+        // =====================================================
+
+        private void MainGrid_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                e.Handled = true;
+                CreateContract_Click(CreateContractButton, new RoutedEventArgs());
+            }
+        }
+
+
+
+        // =====================================================
         // CREATE CONTRACT
         // =====================================================
 
@@ -30,17 +45,17 @@ namespace RubexOps
             object sender,
             RoutedEventArgs e)
         {
+            Button? clickedButton = sender as Button;
+            object? originalContent = clickedButton?.Content;
+
             try
             {
                 // =============================================
                 // MINIMAL LOADING EFFECT
                 // =============================================
 
-                Mouse.OverrideCursor =
-                    Cursors.Wait;
-
+                Mouse.OverrideCursor = Cursors.Wait;
                 MainGrid.IsEnabled = false;
-
                 MainGrid.Opacity = 0.75;
 
 
@@ -49,11 +64,10 @@ namespace RubexOps
                 // DISABLE BUTTON
                 // =============================================
 
-                if (sender is Button button)
+                if (clickedButton != null)
                 {
-                    button.IsEnabled = false;
-
-                    button.Content = "Creating...";
+                    clickedButton.IsEnabled = false;
+                    clickedButton.Content = "Creating...";
                 }
 
 
@@ -62,8 +76,7 @@ namespace RubexOps
                 // REQUIRED FIELD VALIDATION
                 // =============================================
 
-                if (string.IsNullOrWhiteSpace(
-                        VendorNameBox.Text))
+                if (string.IsNullOrWhiteSpace(VendorNameBox.Text))
                 {
                     MessageBox.Show(
                         "Vendor Name is required.",
@@ -72,14 +85,10 @@ namespace RubexOps
                         MessageBoxImage.Warning);
 
                     VendorNameBox.Focus();
-
                     return;
                 }
 
-
-
-                if (string.IsNullOrWhiteSpace(
-                        VendorIDBox.Text))
+                if (string.IsNullOrWhiteSpace(VendorIDBox.Text))
                 {
                     MessageBox.Show(
                         "Vendor ID is required.",
@@ -88,11 +97,8 @@ namespace RubexOps
                         MessageBoxImage.Warning);
 
                     VendorIDBox.Focus();
-
                     return;
                 }
-
-
 
                 if (StartDatePicker.SelectedDate == null)
                 {
@@ -103,11 +109,8 @@ namespace RubexOps
                         MessageBoxImage.Warning);
 
                     StartDatePicker.Focus();
-
                     return;
                 }
-
-
 
                 if (EndDatePicker.SelectedDate == null)
                 {
@@ -118,14 +121,10 @@ namespace RubexOps
                         MessageBoxImage.Warning);
 
                     EndDatePicker.Focus();
-
                     return;
                 }
 
-
-
-                if (string.IsNullOrWhiteSpace(
-                        BasePriceBox.Text))
+                if (string.IsNullOrWhiteSpace(BasePriceBox.Text))
                 {
                     MessageBox.Show(
                         "Base Price is required.",
@@ -134,14 +133,10 @@ namespace RubexOps
                         MessageBoxImage.Warning);
 
                     BasePriceBox.Focus();
-
                     return;
                 }
 
-
-
-                if (string.IsNullOrWhiteSpace(
-                        AgreedQuantityBox.Text))
+                if (string.IsNullOrWhiteSpace(AgreedQuantityBox.Text))
                 {
                     MessageBox.Show(
                         "Agreed Quantity is required.",
@@ -150,7 +145,6 @@ namespace RubexOps
                         MessageBoxImage.Warning);
 
                     AgreedQuantityBox.Focus();
-
                     return;
                 }
 
@@ -160,20 +154,28 @@ namespace RubexOps
                 // TRIM VALUES
                 // =============================================
 
-                string vendorName =
-                    VendorNameBox.Text.Trim();
+                string vendorName = VendorNameBox.Text.Trim();
+                string vendorID = VendorIDBox.Text.Trim();
+                string itemCode = ItemCodeBox.Text.Trim();
 
-                string vendorID =
-                    VendorIDBox.Text.Trim();
+                string penaltyRateText = PenaltyRateBox.Text.Trim();
+                string remedyDaysText = RemedyDaysBox.Text.Trim();
 
-                string itemCode =
-                    ItemCodeBox.Text.Trim();
 
-                string penaltyRateText =
-                    PenaltyRateBox.Text.Trim();
 
-                string remedyDaysText =
-                    RemedyDaysBox.Text.Trim();
+                // =============================================
+                // OPTIONAL VALUES DEFAULT TO ZERO
+                // =============================================
+
+                if (string.IsNullOrWhiteSpace(penaltyRateText))
+                {
+                    penaltyRateText = "0";
+                }
+
+                if (string.IsNullOrWhiteSpace(remedyDaysText))
+                {
+                    remedyDaysText = "0";
+                }
 
 
 
@@ -181,8 +183,7 @@ namespace RubexOps
                 // DATE VALIDATION
                 // =============================================
 
-                if (StartDatePicker.SelectedDate >
-                    EndDatePicker.SelectedDate)
+                if (StartDatePicker.SelectedDate > EndDatePicker.SelectedDate)
                 {
                     MessageBox.Show(
                         "End Date must be after Start Date.",
@@ -199,9 +200,7 @@ namespace RubexOps
                 // BASE PRICE VALIDATION
                 // =============================================
 
-                if (!decimal.TryParse(
-                        BasePriceBox.Text,
-                        out decimal basePrice))
+                if (!decimal.TryParse(BasePriceBox.Text, out decimal basePrice))
                 {
                     MessageBox.Show(
                         "Base Price must be a valid number.",
@@ -210,11 +209,8 @@ namespace RubexOps
                         MessageBoxImage.Warning);
 
                     BasePriceBox.Focus();
-
                     return;
                 }
-
-
 
                 if (basePrice <= 0)
                 {
@@ -225,7 +221,6 @@ namespace RubexOps
                         MessageBoxImage.Warning);
 
                     BasePriceBox.Focus();
-
                     return;
                 }
 
@@ -235,9 +230,7 @@ namespace RubexOps
                 // AGREED QUANTITY VALIDATION
                 // =============================================
 
-                if (!int.TryParse(
-                        AgreedQuantityBox.Text,
-                        out int agreedQuantity))
+                if (!int.TryParse(AgreedQuantityBox.Text, out int agreedQuantity))
                 {
                     MessageBox.Show(
                         "Agreed Quantity must be a whole number.",
@@ -246,11 +239,8 @@ namespace RubexOps
                         MessageBoxImage.Warning);
 
                     AgreedQuantityBox.Focus();
-
                     return;
                 }
-
-
 
                 if (agreedQuantity <= 0)
                 {
@@ -261,7 +251,6 @@ namespace RubexOps
                         MessageBoxImage.Warning);
 
                     AgreedQuantityBox.Focus();
-
                     return;
                 }
 
@@ -271,44 +260,30 @@ namespace RubexOps
                 // PENALTY RATE VALIDATION
                 // =============================================
 
-                if (!string.IsNullOrWhiteSpace(
-                        penaltyRateText))
+                penaltyRateText = penaltyRateText.Replace("%", "");
+
+                if (!double.TryParse(penaltyRateText, out double penaltyRate))
                 {
-                    penaltyRateText =
-                        penaltyRateText.Replace("%", "");
+                    MessageBox.Show(
+                        "Penalty Rate must be numeric.",
+                        "Validation Error",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
 
+                    PenaltyRateBox.Focus();
+                    return;
+                }
 
+                if (penaltyRate < 0 || penaltyRate > 100)
+                {
+                    MessageBox.Show(
+                        "Penalty Rate must be between 0 and 100.",
+                        "Validation Error",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
 
-                    if (!double.TryParse(
-                            penaltyRateText,
-                            out double penaltyRate))
-                    {
-                        MessageBox.Show(
-                            "Penalty Rate must be numeric.",
-                            "Validation Error",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Warning);
-
-                        PenaltyRateBox.Focus();
-
-                        return;
-                    }
-
-
-
-                    if (penaltyRate < 0 ||
-                        penaltyRate > 100)
-                    {
-                        MessageBox.Show(
-                            "Penalty Rate must be between 0 and 100.",
-                            "Validation Error",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Warning);
-
-                        PenaltyRateBox.Focus();
-
-                        return;
-                    }
+                    PenaltyRateBox.Focus();
+                    return;
                 }
 
 
@@ -317,38 +292,28 @@ namespace RubexOps
                 // REMEDY DAYS VALIDATION
                 // =============================================
 
-                if (!string.IsNullOrWhiteSpace(
-                        remedyDaysText))
+                if (!int.TryParse(remedyDaysText, out int remedyDays))
                 {
-                    if (!int.TryParse(
-                            remedyDaysText,
-                            out int remedyDays))
-                    {
-                        MessageBox.Show(
-                            "Remedy Days must be a whole number.",
-                            "Validation Error",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Warning);
+                    MessageBox.Show(
+                        "Remedy Days must be a whole number.",
+                        "Validation Error",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
 
-                        RemedyDaysBox.Focus();
+                    RemedyDaysBox.Focus();
+                    return;
+                }
 
-                        return;
-                    }
+                if (remedyDays < 0)
+                {
+                    MessageBox.Show(
+                        "Remedy Days cannot be negative.",
+                        "Validation Error",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
 
-
-
-                    if (remedyDays < 0)
-                    {
-                        MessageBox.Show(
-                            "Remedy Days cannot be negative.",
-                            "Validation Error",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Warning);
-
-                        RemedyDaysBox.Focus();
-
-                        return;
-                    }
+                    RemedyDaysBox.Focus();
+                    return;
                 }
 
 
@@ -455,10 +420,7 @@ namespace RubexOps
                 // =============================================
 
                 string output = "";
-
                 string error = "";
-
-
 
                 await Task.Run(() =>
                 {
@@ -492,8 +454,6 @@ namespace RubexOps
 
                     return;
                 }
-
-
 
                 if (output.Contains("ERROR"))
                 {
@@ -547,17 +507,12 @@ namespace RubexOps
                 Mouse.OverrideCursor = null;
 
                 MainGrid.IsEnabled = true;
-
                 MainGrid.Opacity = 1;
 
-
-
-                if (sender is Button button)
+                if (clickedButton != null)
                 {
-                    button.IsEnabled = true;
-
-                    button.Content =
-                        "Create Contract";
+                    clickedButton.IsEnabled = true;
+                    clickedButton.Content = originalContent ?? "Create Contract";
                 }
             }
         }
@@ -584,23 +539,14 @@ namespace RubexOps
         private void ClearForm()
         {
             VendorNameBox.Clear();
-
             VendorIDBox.Clear();
-
             ItemCodeBox.Text = "NRFC";
-
             StartDatePicker.SelectedDate = null;
-
             EndDatePicker.SelectedDate = null;
-
             BasePriceBox.Clear();
-
             AgreedQuantityBox.Clear();
-
             PenaltyRateBox.Clear();
-
             RemedyDaysBox.Clear();
-
             VendorNameBox.Focus();
         }
     }

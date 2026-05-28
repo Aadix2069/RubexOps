@@ -9,10 +9,123 @@
         Height="900"
         Width="1500"
         WindowStartupLocation="CenterScreen"
+        WindowState="Maximized"
+        ResizeMode="CanResize"
         Background="#F4F7F8"
-          Icon="Images/applogo.ico">
-      
-    
+        Icon="Images/applogo.ico">
+
+    <Window.Resources>
+
+        <!-- ================================================= -->
+        <!-- NORMAL NAVIGATION BUTTON -->
+        <!-- ================================================= -->
+
+        <Style x:Key="NavButtonStyle"
+               TargetType="Button">
+
+            <Setter Property="Height"
+                    Value="55"/>
+
+            <Setter Property="Margin"
+                    Value="0,0,0,15"/>
+
+            <Setter Property="Background"
+                    Value="#1B9AA0"/>
+
+            <Setter Property="Foreground"
+                    Value="White"/>
+
+            <Setter Property="FontSize"
+                    Value="16"/>
+
+            <Setter Property="BorderThickness"
+                    Value="0"/>
+
+            <Setter Property="Cursor"
+                    Value="Hand"/>
+
+        </Style>
+
+
+
+        <!-- ================================================= -->
+        <!-- ACTIVE NAVIGATION BUTTON -->
+        <!-- ================================================= -->
+
+        <Style x:Key="ActiveNavButtonStyle"
+               TargetType="Button"
+               BasedOn="{StaticResource NavButtonStyle}">
+
+            <!-- LIGHT BLUE HIGHLIGHT -->
+            <Setter Property="Background"
+                    Value="#B7D9EF"/>
+
+            <!-- DARK TEXT -->
+            <Setter Property="Foreground"
+                    Value="#0B7A81"/>
+
+            <!-- SLIGHT GLOW -->
+            <Setter Property="Effect">
+
+                <Setter.Value>
+
+                    <DropShadowEffect BlurRadius="18"
+                                      ShadowDepth="0"
+                                      Opacity="0.18"/>
+
+                </Setter.Value>
+
+            </Setter>
+
+        </Style>
+
+
+
+        <!-- ================================================= -->
+        <!-- BOTTOM BUTTON STYLE -->
+        <!-- ================================================= -->
+
+        <Style x:Key="BottomNavButtonStyle"
+               TargetType="Button">
+
+            <Setter Property="Height"
+                    Value="45"/>
+
+            <Setter Property="Background"
+                    Value="Transparent"/>
+
+            <Setter Property="Foreground"
+                    Value="White"/>
+
+            <Setter Property="BorderThickness"
+                    Value="0"/>
+
+            <Setter Property="Cursor"
+                    Value="Hand"/>
+
+        </Style>
+
+
+
+        <!-- ================================================= -->
+        <!-- ACTIVE BOTTOM BUTTON -->
+        <!-- ================================================= -->
+
+        <Style x:Key="ActiveBottomNavButtonStyle"
+               TargetType="Button"
+               BasedOn="{StaticResource BottomNavButtonStyle}">
+
+            <Setter Property="Background"
+                    Value="#B7D9EF"/>
+
+            <Setter Property="Foreground"
+                    Value="#0B7A81"/>
+
+        </Style>
+
+    </Window.Resources>
+
+
 
     <Grid>
 
@@ -41,23 +154,24 @@
 
                     <StackPanel Orientation="Horizontal">
 
-                        <Image Source="Images/applogo.ico" 
-               Width="40" 
-               Height="40" 
-               Stretch="Uniform" 
-               Margin="0,0,10,0" />
+                        <Image Source="Images/applogo.ico"
+                               Width="40"
+                               Height="40"
+                               Stretch="Uniform"
+                               Margin="0,0,10,0" />
+
                         <TextBlock Text="RubexOps"
-                   FontSize="34"
-                   FontWeight="Bold"
-                   Foreground="White"
-                   VerticalAlignment="Center"/>
+                                   FontSize="34"
+                                   FontWeight="Bold"
+                                   Foreground="White"
+                                   VerticalAlignment="Center"/>
                     </StackPanel>
 
                     <TextBlock Text="Integrated Operations&#x0a;Management System"
-           Foreground="#D7F2F3"
-           FontSize="15"
-           Margin="0,10,0,0"
-           TextAlignment="Center" />
+                               Foreground="#D7F2F3"
+                               FontSize="15"
+                               Margin="0,10,0,0"
+                               TextAlignment="Center" />
 
                 </StackPanel>
 
@@ -67,13 +181,8 @@
                             Margin="15,40,15,0">
 
                     <!-- HOME -->
-                    <Button Height="55"
-                            Margin="0,0,0,15"
-                            Background="#1B9AA0"
-                            Foreground="White"
-                            FontSize="16"
-                            BorderThickness="0"
-                            Cursor="Hand"
+                    <Button x:Name="HomeButton"
+                            Style="{StaticResource NavButtonStyle}"
                             Click="HomeButton_Click">
 
                         <StackPanel Orientation="Horizontal">
@@ -90,13 +199,8 @@
 
 
                     <!-- PURCHASE -->
-                    <Button Height="55"
-                            Margin="0,0,0,15"
-                            Background="#1B9AA0"
-                            Foreground="White"
-                            FontSize="16"
-                            BorderThickness="0"
-                            Cursor="Hand"
+                    <Button x:Name="PurchaseButton"
+                            Style="{StaticResource NavButtonStyle}"
                             Click="PurchaseButton_Click">
 
                         <StackPanel Orientation="Horizontal">
@@ -113,13 +217,8 @@
 
 
                     <!-- SALES -->
-                    <Button Height="55"
-                            Margin="0,0,0,15"
-                            Background="#1B9AA0"
-                            Foreground="White"
-                            FontSize="16"
-                            BorderThickness="0"
-                            Cursor="Hand"
+                    <Button x:Name="SalesButton"
+                            Style="{StaticResource NavButtonStyle}"
                             Click="SalesButton_Click">
 
                         <StackPanel Orientation="Horizontal">
@@ -136,13 +235,8 @@
 
 
                     <!-- PRODUCTION -->
-                    <Button Height="55"
-                            Margin="0,0,0,15"
-                            Background="#1B9AA0"
-                            Foreground="White"
-                            FontSize="16"
-                            BorderThickness="0"
-                            Cursor="Hand"
+                    <Button x:Name="ProductionButton"
+                            Style="{StaticResource NavButtonStyle}"
                             Click="ProductionButton_Click">
 
                         <StackPanel Orientation="Horizontal">
@@ -169,47 +263,42 @@
 
 
                     <!-- SETTINGS -->
-                    <Button Height="45"
-        Margin="0,0,0,10"
-        Background="Transparent"
-        Foreground="White"
-        BorderThickness="0"
-        Cursor="Hand"
-        Click="SettingsButton_Click">
+                    <Button x:Name="SettingsButton"
+                            Style="{StaticResource BottomNavButtonStyle}"
+                            Click="SettingsButton_Click">
 
                         <StackPanel Orientation="Horizontal">
 
                             <materialDesign:PackIcon Kind="Cog"
-                                 Width="20"
-                                 Height="20"
-                                 Margin="10,0,15,0"/>
+                                                     Width="20"
+                                                     Height="20"
+                                                     Margin="10,0,15,0"/>
 
                             <TextBlock Text="Settings"
-                   VerticalAlignment="Center"
-                   FontSize="14"/>
+                                       VerticalAlignment="Center"
+                                       FontSize="14"/>
                         </StackPanel>
                     </Button>
 
 
                     <!-- ABOUT -->
-                    <Button Height="45"
-        Background="Transparent"
-        Foreground="White"
-        BorderThickness="0"
-        Cursor="Hand"
-        Click="AboutButton_Click">
+                    <Button x:Name="AboutButton"
+                            Style="{StaticResource BottomNavButtonStyle}"
+                            Click="AboutButton_Click">
 
                         <StackPanel Orientation="Horizontal">
 
                             <materialDesign:PackIcon Kind="Information"
-                                 Width="20"
-                                 Height="20"
-                                 Margin="10,0,15,0"/>
+                                                     Width="20"
+                                                     Height="20"
+                                                     Margin="10,0,15,0"/>
 
                             <TextBlock Text="About"
-                   VerticalAlignment="Center" FontSize="14"/>
+                                       VerticalAlignment="Center"
+                                       FontSize="14"/>
                         </StackPanel>
                     </Button>
+
                 </StackPanel>
             </Grid>
         </Border>
@@ -247,7 +336,8 @@
                                 CornerRadius="35"
                                 Background="#EAF7F7">
 
-                            <Image Source="Images/Rubex_logo.png" Stretch="Uniform" />
+                            <Image Source="Images/Rubex_logo.png"
+                                   Stretch="Uniform" />
                         </Border>
 
                         <StackPanel Margin="18,0,0,0">
@@ -292,13 +382,13 @@
                             <StackPanel>
 
                                 <TextBlock x:Name="CurrentTimeText"
-           FontSize="16"
-           Foreground="#18424A"/>
+                                           FontSize="16"
+                                           Foreground="#18424A"/>
 
                                 <TextBlock x:Name="CurrentDateText"
-           FontSize="14"
-           Margin="0,4,0,0"
-           Foreground="#777"/>
+                                           FontSize="14"
+                                           Margin="0,4,0,0"
+                                           Foreground="#777"/>
                             </StackPanel>
                         </StackPanel>
 

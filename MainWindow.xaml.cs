@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Navigation;
 using System.Windows.Threading;
 
@@ -25,7 +26,10 @@ namespace RubexOps
 
             StartClock();
 
-            MainFrame.Navigate(new HomePage());
+            NavigateToPage(
+                new HomePage(),
+                HomeButton
+            );
         }
 
 
@@ -67,6 +71,97 @@ namespace RubexOps
 
 
         // =====================================================
+        // NAVIGATION HELPER
+        // =====================================================
+
+        private void NavigateToPage(
+            Page page,
+            Button activeButton)
+        {
+            MainFrame.Navigate(page);
+
+            ResetNavigationStyles();
+
+            ApplyActiveStyle(activeButton);
+        }
+
+
+
+        // =====================================================
+        // RESET ALL BUTTON STYLES
+        // =====================================================
+
+        private void ResetNavigationStyles()
+        {
+            // MAIN BUTTONS
+
+            HomeButton.Style =
+                (Style)FindResource(
+                    "NavButtonStyle"
+                );
+
+            PurchaseButton.Style =
+                (Style)FindResource(
+                    "NavButtonStyle"
+                );
+
+            SalesButton.Style =
+                (Style)FindResource(
+                    "NavButtonStyle"
+                );
+
+            ProductionButton.Style =
+                (Style)FindResource(
+                    "NavButtonStyle"
+                );
+
+
+
+            // BOTTOM BUTTONS
+
+            SettingsButton.Style =
+                (Style)FindResource(
+                    "BottomNavButtonStyle"
+                );
+
+            AboutButton.Style =
+                (Style)FindResource(
+                    "BottomNavButtonStyle"
+                );
+        }
+
+
+
+        // =====================================================
+        // APPLY ACTIVE STYLE
+        // =====================================================
+
+        private void ApplyActiveStyle(
+            Button button)
+        {
+            if (
+                button == SettingsButton
+                ||
+                button == AboutButton
+            )
+            {
+                button.Style =
+                    (Style)FindResource(
+                        "ActiveBottomNavButtonStyle"
+                    );
+            }
+            else
+            {
+                button.Style =
+                    (Style)FindResource(
+                        "ActiveNavButtonStyle"
+                    );
+            }
+        }
+
+
+
+        // =====================================================
         // HOME
         // =====================================================
 
@@ -74,7 +169,10 @@ namespace RubexOps
             object sender,
             RoutedEventArgs e)
         {
-            MainFrame.Navigate(new HomePage());
+            NavigateToPage(
+                new HomePage(),
+                HomeButton
+            );
         }
 
 
@@ -87,7 +185,10 @@ namespace RubexOps
             object sender,
             RoutedEventArgs e)
         {
-            MainFrame.Navigate(new PurchasePage());
+            NavigateToPage(
+                new PurchasePage(),
+                PurchaseButton
+            );
         }
 
 
@@ -100,7 +201,10 @@ namespace RubexOps
             object sender,
             RoutedEventArgs e)
         {
-            MainFrame.Navigate(new SalesPage());
+            NavigateToPage(
+                new SalesPage(),
+                SalesButton
+            );
         }
 
 
@@ -113,7 +217,10 @@ namespace RubexOps
             object sender,
             RoutedEventArgs e)
         {
-            MainFrame.Navigate(new ProductionPage());
+            NavigateToPage(
+                new ProductionPage(),
+                ProductionButton
+            );
         }
 
 
@@ -126,7 +233,10 @@ namespace RubexOps
             object sender,
             RoutedEventArgs e)
         {
-            MainFrame.Navigate(new SettingsPage());
+            NavigateToPage(
+                new SettingsPage(),
+                SettingsButton
+            );
         }
 
 
@@ -139,7 +249,10 @@ namespace RubexOps
             object sender,
             RoutedEventArgs e)
         {
-            MainFrame.Navigate(new AboutPage());
+            NavigateToPage(
+                new AboutPage(),
+                AboutButton
+            );
         }
     }
 }

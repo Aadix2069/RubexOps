@@ -21,43 +21,13 @@ namespace RubexOps
         // CONTRACT MANAGEMENT NAVIGATION
         // =====================================================
 
-        private void CreateContract_Click(
-            object sender,
-            RoutedEventArgs e)
-        {
-            NavigateToPage(
-                new CreateSalesContractPage());
-        }
 
-        private void ViewContracts_Click(
-            object sender,
-            RoutedEventArgs e)
-        {
-            NavigateToPage(
-                new ViewSalesContractsPage());
-        }
 
 
 
         // =====================================================
         // DATA MANAGEMENT NAVIGATION
         // =====================================================
-
-        private void EnterSalesData_Click(
-            object sender,
-            RoutedEventArgs e)
-        {
-            NavigateToPage(
-                new EnterSalesDataPage());
-        }
-
-        private void ViewSalesData_Click(
-            object sender,
-            RoutedEventArgs e)
-        {
-            NavigateToPage(
-                new ViewSalesPage());
-        }
 
 
 

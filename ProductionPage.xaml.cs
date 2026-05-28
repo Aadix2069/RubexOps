@@ -20,21 +20,7 @@ namespace RubexOps
         // NAVIGATION
         // =====================================================
 
-        private void EnterProductionData_Click(
-            object sender,
-            RoutedEventArgs e)
-        {
-            NavigateToPage(
-                new EnterProductionDataPage());
-        }
-
-        private void ViewEditProductionData_Click(
-            object sender,
-            RoutedEventArgs e)
-        {
-            NavigateToPage(
-                new ViewEditProductionDataPage());
-        }
+   
 
 
 

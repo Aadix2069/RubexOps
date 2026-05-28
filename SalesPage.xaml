@@ -174,7 +174,7 @@
                                             Foreground="White"
                                             BorderThickness="0"
                                             Cursor="Hand"
-                                            Click="CreateContract_Click">
+                                         >
 
                                         <Button.Effect>
                                             <DropShadowEffect BlurRadius="14"
@@ -190,7 +190,7 @@
                                             Foreground="White"
                                             BorderThickness="0"
                                             Cursor="Hand"
-                                            Click="ViewContracts_Click">
+                                            >
 
                                         <Button.Effect>
                                             <DropShadowEffect BlurRadius="14"
@@ -287,7 +287,7 @@
                                             Foreground="White"
                                             BorderThickness="0"
                                             Cursor="Hand"
-                                            Click="EnterSalesData_Click">
+                                            >
 
                                         <Button.Effect>
                                             <DropShadowEffect BlurRadius="14"
@@ -303,7 +303,7 @@
                                             Foreground="White"
                                             BorderThickness="0"
                                             Cursor="Hand"
-                                            Click="ViewSalesData_Click">
+                                            >
 
                                         <Button.Effect>
                                             <DropShadowEffect BlurRadius="14"

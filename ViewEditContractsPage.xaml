@@ -425,10 +425,8 @@
 
                             <ComboBoxItem Content="Name Ascending"/>
                             <ComboBoxItem Content="Name Descending"/>
-                            <ComboBoxItem Content="Quantity Ascending"/>
-                            <ComboBoxItem Content="Quantity Descending"/>
-                            <ComboBoxItem Content="Base Rate Ascending"/>
-                            <ComboBoxItem Content="Base Rate Descending"/>
+                            <ComboBoxItem Content="Agreed Qty Ascending"/>
+                            <ComboBoxItem Content="Agreed Qty Descending"/>
 
                         </ComboBox>
 
@@ -454,14 +452,15 @@
             <!-- ================================================= -->
 
             <ScrollViewer Grid.Row="6"
-                          VerticalScrollBarVisibility="Auto">
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled">
 
                 <ItemsControl x:Name="ContractsItemsControl">
 
                     <ItemsControl.ItemsPanel>
 
                         <ItemsPanelTemplate>
-                            <WrapPanel Orientation="Horizontal"/>
+                            <UniformGrid Columns="3"/>
                         </ItemsPanelTemplate>
 
                     </ItemsControl.ItemsPanel>
@@ -476,14 +475,15 @@
 
                         <DataTemplate>
 
-                            <Border Width="430"
-                                    Margin="0,0,22,22"
+                            <Border Margin="0,0,18,22"
                                     Background="#88FFFFFF"
                                     CornerRadius="26"
                                     Padding="22"
                                     BorderBrush="#99FFFFFF"
                                     BorderThickness="1"
-                                    Opacity="{Binding CardOpacity}">
+                                    Opacity="{Binding CardOpacity}"
+                                    MinWidth="320"
+                                    HorizontalAlignment="Stretch">
 
                                 <Border.Effect>
                                     <DropShadowEffect BlurRadius="28"
@@ -573,11 +573,11 @@
                                                         Grid.Column="0"
                                                         Margin="0,0,14,12">
 
-                                                <TextBlock Text="Item Code"
+                                                <TextBlock Text="Start Date"
                                                            FontSize="12"
                                                            Foreground="#6B7280"/>
 
-                                                <TextBlock Text="{Binding item_code}"
+                                                <TextBlock Text="{Binding start_date}"
                                                            FontSize="16"
                                                            FontWeight="SemiBold"
                                                            Foreground="#111827"/>
@@ -607,11 +607,11 @@
                                                         Grid.Column="0"
                                                         Margin="0,0,14,12">
 
-                                                <TextBlock Text="Agreed Quantity"
+                                                <TextBlock Text="Purchased Qty So Far"
                                                            FontSize="12"
                                                            Foreground="#6B7280"/>
 
-                                                <TextBlock Text="{Binding AgreedQtyDisplay}"
+                                                <TextBlock Text="{Binding PurchasedQtySoFarDisplay}"
                                                            FontSize="16"
                                                            FontWeight="SemiBold"
                                                            Foreground="#111827"/>
@@ -623,11 +623,11 @@
                                             <StackPanel Grid.Row="3"
                                                         Grid.Column="0">
 
-                                                <TextBlock Text="Remaining Quantity"
+                                                <TextBlock Text="Deliveries So Far"
                                                            FontSize="12"
                                                            Foreground="#6B7280"/>
 
-                                                <TextBlock Text="{Binding RemainingQtyDisplay}"
+                                                <TextBlock Text="{Binding DeliveriesSoFarDisplay}"
                                                            FontSize="16"
                                                            FontWeight="SemiBold"
                                                            Foreground="#111827"/>
@@ -639,23 +639,6 @@
                                             <!-- RIGHT -->
 
                                             <StackPanel Grid.Row="0"
-                                                        Grid.Column="1"
-                                                        Margin="0,0,0,12">
-
-                                                <TextBlock Text="Start Date"
-                                                           FontSize="12"
-                                                           Foreground="#6B7280"/>
-
-                                                <TextBlock Text="{Binding start_date}"
-                                                           FontSize="16"
-                                                           FontWeight="SemiBold"
-                                                           Foreground="#111827"/>
-
-                                            </StackPanel>
-
-
-
-                                            <StackPanel Grid.Row="1"
                                                         Grid.Column="1"
                                                         Margin="0,0,0,12">
 
@@ -672,15 +655,32 @@
 
 
 
+                                            <StackPanel Grid.Row="1"
+                                                        Grid.Column="1"
+                                                        Margin="0,0,0,12">
+
+                                                <TextBlock Text="Agreed Quantity"
+                                                           FontSize="12"
+                                                           Foreground="#6B7280"/>
+
+                                                <TextBlock Text="{Binding AgreedQtyDisplay}"
+                                                           FontSize="16"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="#111827"/>
+
+                                            </StackPanel>
+
+
+
                                             <StackPanel Grid.Row="2"
                                                         Grid.Column="1"
                                                         Margin="0,0,0,12">
 
-                                                <TextBlock Text="Completion"
+                                                <TextBlock Text="Remaining Quantity"
                                                            FontSize="12"
                                                            Foreground="#6B7280"/>
 
-                                                <TextBlock Text="{Binding CompletionDisplay}"
+                                                <TextBlock Text="{Binding RemainingQtyDisplay}"
                                                            FontSize="16"
                                                            FontWeight="SemiBold"
                                                            Foreground="#111827"/>
@@ -692,11 +692,11 @@
                                             <StackPanel Grid.Row="3"
                                                         Grid.Column="1">
 
-                                                <TextBlock Text="Days Remaining"
+                                                <TextBlock Text="Completion"
                                                            FontSize="12"
                                                            Foreground="#6B7280"/>
 
-                                                <TextBlock Text="{Binding DaysRemainingDisplay}"
+                                                <TextBlock Text="{Binding CompletionDisplay}"
                                                            FontSize="16"
                                                            FontWeight="SemiBold"
                                                            Foreground="#111827"/>
@@ -736,87 +736,38 @@
 
 
                                         <!-- ================================================= -->
-                                        <!-- BUTTONS -->
+                                        <!-- EDIT BUTTON -->
                                         <!-- ================================================= -->
 
-                                        <Grid Margin="0,8,0,0">
+                                        <Button Height="46"
+                                                Background="#0EA5A8"
+                                                Foreground="White"
+                                                BorderThickness="0"
+                                                Cursor="Hand"
+                                                ToolTip="{Binding EditToolTip}"
+                                                Click="EditButton_Click">
 
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="12"/>
-                                                <ColumnDefinition Width="*"/>
-                                            </Grid.ColumnDefinitions>
+                                            <Button.Effect>
+                                                <DropShadowEffect BlurRadius="10"
+                                                                  ShadowDepth="0"
+                                                                  Opacity="0.14"/>
+                                            </Button.Effect>
 
+                                            <StackPanel Orientation="Horizontal"
+                                                        HorizontalAlignment="Center">
 
+                                                <materialDesign:PackIcon Kind="Pencil"
+                                                                         Width="18"
+                                                                         Height="18"
+                                                                         Margin="0,0,8,0"
+                                                                         Foreground="White"/>
 
-                                            <!-- EDIT -->
+                                                <TextBlock Text="Edit Contract"
+                                                           FontWeight="Bold"/>
 
-                                            <Button Grid.Column="0"
-                                                    Height="46"
-                                                    Background="#0EA5A8"
-                                                    Foreground="White"
-                                                    BorderThickness="0"
-                                                    Cursor="Hand"
-                                                    ToolTip="{Binding EditToolTip}"
-                                                    Click="EditButton_Click">
+                                            </StackPanel>
 
-                                                <Button.Effect>
-                                                    <DropShadowEffect BlurRadius="10"
-                                                                      ShadowDepth="0"
-                                                                      Opacity="0.14"/>
-                                                </Button.Effect>
-
-                                                <StackPanel Orientation="Horizontal"
-                                                            HorizontalAlignment="Center">
-
-                                                    <materialDesign:PackIcon Kind="Pencil"
-                                                                             Width="18"
-                                                                             Height="18"
-                                                                             Margin="0,0,8,0"
-                                                                             Foreground="White"/>
-
-                                                    <TextBlock Text="Edit Contract"
-                                                               FontWeight="Bold"/>
-
-                                                </StackPanel>
-
-                                            </Button>
-
-
-
-                                            <!-- RENEW -->
-
-                                            <Button Grid.Column="2"
-                                                    Height="46"
-                                                    Background="#F59E0B"
-                                                    Foreground="White"
-                                                    BorderThickness="0"
-                                                    Cursor="Hand"
-                                                    Click="RenewContract_Click">
-
-                                                <Button.Effect>
-                                                    <DropShadowEffect BlurRadius="10"
-                                                                      ShadowDepth="0"
-                                                                      Opacity="0.14"/>
-                                                </Button.Effect>
-
-                                                <StackPanel Orientation="Horizontal"
-                                                            HorizontalAlignment="Center">
-
-                                                    <materialDesign:PackIcon Kind="Refresh"
-                                                                             Width="18"
-                                                                             Height="18"
-                                                                             Margin="0,0,8,0"
-                                                                             Foreground="White"/>
-
-                                                    <TextBlock Text="Renew"
-                                                               FontWeight="Bold"/>
-
-                                                </StackPanel>
-
-                                            </Button>
-
-                                        </Grid>
+                                        </Button>
 
                                     </StackPanel>
 
@@ -837,4 +788,3 @@
     </Grid>
 
 </Page>
-    
