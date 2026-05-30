@@ -10,13 +10,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-
 namespace RubexOps
 {
-    // =====================================================
-    // DATA MODEL
-    // =====================================================
-
     public sealed class PurchaseDataRecord
     {
         public int RowNumber { get; set; }
@@ -24,6 +19,14 @@ namespace RubexOps
         public string VendorName { get; set; } = "";
 
         public string VendorID { get; set; } = "";
+
+        public string ContractID { get; set; } = "";
+
+        public string contract_id
+        {
+            get => ContractID;
+            set => ContractID = value ?? "";
+        }
 
         public string ItemName { get; set; } = "";
 
@@ -43,7 +46,7 @@ namespace RubexOps
 
         public decimal? ReceivedWeight { get; set; }
 
-        public int? NoOfBags { get; set; }
+        public decimal? NoOfBags { get; set; }
 
         public decimal? NetWeight { get; set; }
 
@@ -72,25 +75,13 @@ namespace RubexOps
         public decimal? NetPayable { get; set; }
     }
 
-
-
     public partial class ViewEditPurchaseDataPage : Page
     {
-        // =====================================================
-        // FIELDS
-        // =====================================================
-
         private readonly List<PurchaseDataRecord> allPurchaseData =
             new List<PurchaseDataRecord>();
 
         private readonly List<PurchaseDataRecord> filteredPurchaseData =
             new List<PurchaseDataRecord>();
-
-
-
-        // =====================================================
-        // CONSTRUCTOR
-        // =====================================================
 
         public ViewEditPurchaseDataPage()
         {
@@ -98,12 +89,6 @@ namespace RubexOps
 
             Loaded += ViewEditPurchaseDataPage_Loaded;
         }
-
-
-
-        // =====================================================
-        // PAGE LOAD
-        // =====================================================
 
         private async void ViewEditPurchaseDataPage_Loaded(
             object sender,
@@ -113,12 +98,6 @@ namespace RubexOps
 
             await LoadPurchaseData();
         }
-
-
-
-        // =====================================================
-        // LOAD PURCHASE DATA
-        // =====================================================
 
         private async Task LoadPurchaseData()
         {
@@ -151,10 +130,11 @@ namespace RubexOps
 
                 string output =
                     await RunPythonScript(
-                        pythonScript,
-                        "");
+                        pythonScript);
 
-                if (output.Contains("ERROR"))
+                if (output.TrimStart().StartsWith(
+                        "ERROR",
+                        StringComparison.OrdinalIgnoreCase))
                 {
                     MessageBox.Show(
                         output,
@@ -165,7 +145,7 @@ namespace RubexOps
                     return;
                 }
 
-                List<PurchaseDataRecord> rows =
+                List<PurchaseDataRecord>? rows =
                     JsonSerializer.Deserialize<List<PurchaseDataRecord>>(
                         output,
                         new JsonSerializerOptions
@@ -200,12 +180,6 @@ namespace RubexOps
             }
         }
 
-
-
-        // =====================================================
-        // APPLY SEARCH FILTER SORT
-        // =====================================================
-
         private void ApplyView()
         {
             if (PurchaseDataGrid == null)
@@ -226,7 +200,16 @@ namespace RubexOps
                         row.VendorName.IndexOf(
                             searchText,
                             StringComparison.OrdinalIgnoreCase) >= 0 ||
+
                         row.VendorID.IndexOf(
+                            searchText,
+                            StringComparison.OrdinalIgnoreCase) >= 0 ||
+
+                        row.ContractID.IndexOf(
+                            searchText,
+                            StringComparison.OrdinalIgnoreCase) >= 0 ||
+
+                        row.InvoiceNumber.IndexOf(
                             searchText,
                             StringComparison.OrdinalIgnoreCase) >= 0);
             }
@@ -258,12 +241,6 @@ namespace RubexOps
                 ClearSelectedDetails();
             }
         }
-
-
-
-        // =====================================================
-        // DATE FILTER
-        // =====================================================
 
         private IEnumerable<PurchaseDataRecord> ApplyDateFilter(
             IEnumerable<PurchaseDataRecord> query)
@@ -329,12 +306,6 @@ namespace RubexOps
             return query;
         }
 
-
-
-        // =====================================================
-        // SORT
-        // =====================================================
-
         private IEnumerable<PurchaseDataRecord> ApplySort(
             IEnumerable<PurchaseDataRecord> query)
         {
@@ -376,12 +347,6 @@ namespace RubexOps
             }
         }
 
-
-
-        // =====================================================
-        // SELECTED DETAILS
-        // =====================================================
-
         private void PurchaseDataGrid_SelectionChanged(
             object sender,
             SelectionChangedEventArgs e)
@@ -393,16 +358,19 @@ namespace RubexOps
             }
         }
 
-
-
         private void ShowSelectedDetails(
             PurchaseDataRecord row)
         {
             SelectedVendorNameText.Text =
                 $"{row.VendorName} ({row.VendorID})";
 
+            string contractPart =
+                string.IsNullOrWhiteSpace(row.ContractID)
+                    ? ""
+                    : $" | Contract {row.ContractID}";
+
             SelectedInvoiceText.Text =
-                $"Invoice {row.InvoiceNumber} | Purchase Order {row.PurchaseOrderDate}";
+                $"Invoice {row.InvoiceNumber}{contractPart} | Purchase Order {row.PurchaseOrderDate}";
 
             DetailDeliveryDateText.Text =
                 SafeText(row.DeliveryDate);
@@ -421,8 +389,6 @@ namespace RubexOps
             DetailNetPayableText.Text =
                 FormatDecimal(row.NetPayable);
         }
-
-
 
         private void ClearSelectedDetails()
         {
@@ -443,28 +409,16 @@ namespace RubexOps
             DetailNetPayableText.Text = "-";
         }
 
-
-
-        // =====================================================
-        // EDIT PURCHASE
-        // =====================================================
-
         private async void EditPurchase_Click(
             object sender,
             RoutedEventArgs e)
         {
-            Button button =
-                sender as Button;
-
-            if (button == null)
+            if (sender is not Button button)
             {
                 return;
             }
 
-            PurchaseDataRecord selectedRow =
-                button.Tag as PurchaseDataRecord;
-
-            if (selectedRow == null)
+            if (button.Tag is not PurchaseDataRecord selectedRow)
             {
                 return;
             }
@@ -486,20 +440,12 @@ namespace RubexOps
             }
         }
 
-
-
-        // =====================================================
-        // FILTER EVENTS
-        // =====================================================
-
         private void SearchBox_TextChanged(
             object sender,
             TextChangedEventArgs e)
         {
             ApplyView();
         }
-
-
 
         private void DateModeComboBox_SelectionChanged(
             object sender,
@@ -510,8 +456,6 @@ namespace RubexOps
             ApplyView();
         }
 
-
-
         private void DatePicker_SelectedDateChanged(
             object sender,
             SelectionChangedEventArgs e)
@@ -519,16 +463,12 @@ namespace RubexOps
             ApplyView();
         }
 
-
-
         private void SortComboBox_SelectionChanged(
             object sender,
             SelectionChangedEventArgs e)
         {
             ApplyView();
         }
-
-
 
         private void ClearFilters_Click(
             object sender,
@@ -547,20 +487,12 @@ namespace RubexOps
             ApplyView();
         }
 
-
-
         private async void Refresh_Click(
             object sender,
             RoutedEventArgs e)
         {
             await LoadPurchaseData();
         }
-
-
-
-        // =====================================================
-        // DATE UI STATE
-        // =====================================================
 
         private void SetDateFilterState()
         {
@@ -607,12 +539,6 @@ namespace RubexOps
             }
         }
 
-
-
-        // =====================================================
-        // HELPERS
-        // =====================================================
-
         private string GetSelectedTag(
             ComboBox comboBox)
         {
@@ -626,8 +552,6 @@ namespace RubexOps
             return "";
         }
 
-
-
         private bool TryParseDate(
             string text,
             out DateTime date)
@@ -640,8 +564,6 @@ namespace RubexOps
                 out date);
         }
 
-
-
         private string FormatDecimal(
             decimal? value)
         {
@@ -649,8 +571,6 @@ namespace RubexOps
                 ? value.Value.ToString("0.##", CultureInfo.InvariantCulture)
                 : "-";
         }
-
-
 
         private string SafeText(
             string value)
@@ -660,25 +580,14 @@ namespace RubexOps
                 : value;
         }
 
-
-
-        // =====================================================
-        // PYTHON RUNNER
-        // =====================================================
-
         private async Task<string> RunPythonScript(
             string pythonScript,
-            string arguments)
+            params string[] arguments)
         {
-            string pythonExe = "python";
-
             ProcessStartInfo start =
-                new ProcessStartInfo
+                new()
                 {
-                    FileName = pythonExe,
-
-                    Arguments =
-                        $"\"{pythonScript}\" {arguments}",
+                    FileName = "python",
 
                     UseShellExecute = false,
 
@@ -694,9 +603,18 @@ namespace RubexOps
                             "backend")
                 };
 
+            start.ArgumentList.Add(pythonScript);
+
+            foreach (string argument in arguments)
+            {
+                start.ArgumentList.Add(argument);
+            }
+
             string output = "";
 
             string error = "";
+
+            int exitCode = 0;
 
             await Task.Run(() =>
             {
@@ -712,11 +630,30 @@ namespace RubexOps
                     process.StandardError.ReadToEnd();
 
                 process.WaitForExit();
+
+                exitCode =
+                    process.ExitCode;
             });
+
+            if (exitCode != 0)
+            {
+                string message =
+                    !string.IsNullOrWhiteSpace(error)
+                        ? error.Trim()
+                        : output.Trim();
+
+                if (string.IsNullOrWhiteSpace(message))
+                {
+                    message =
+                        $"Backend process failed with exit code {exitCode}.";
+                }
+
+                throw new Exception(message);
+            }
 
             if (!string.IsNullOrWhiteSpace(error))
             {
-                throw new Exception(error);
+                throw new Exception(error.Trim());
             }
 
             return output.Trim();

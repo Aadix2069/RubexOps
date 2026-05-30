@@ -1,172 +1,100 @@
 import json
-import os
 import sys
 from datetime import date
-from pathlib import Path
-from openpyxl import load_workbook
 
-# ============================================================
-# CONFIG
-# ============================================================
+from contract_engine import ITEM_CODE, ITEM_NAME, build_contract_summary, parse_date, safe_string
+from database import read_pcon, read_purchase
 
-CONFIG_PATH = (
-    Path.home()
-    / "Documents"
-    / "RubexOps"
-    / "database_config.json"
-)
 
-PCON_SHEET_NAME = "pcon"
-START_ROW = 5
+def fail(message):
+    print(f"ERROR: {message}", file=sys.stderr)
+    sys.exit(1)
 
-# ============================================================
-# DATABASE PATH
-# ============================================================
-def get_database_path():
-    if not CONFIG_PATH.exists():
-        raise FileNotFoundError(f"Database config file not found: {CONFIG_PATH}")
 
-    with open(CONFIG_PATH, "r", encoding="utf-8") as file:
-        config = json.load(file)
+def successor_lookup(contracts):
+    successors = set()
 
-    database_path = config.get("database_path") or config.get("excel_path") or config.get("path")
+    for contract in contracts:
+        previous_contract_id = safe_string(contract.get("renewal_reference"))
+        if previous_contract_id:
+            successors.add(previous_contract_id.casefold())
 
-    if not database_path:
-        raise ValueError("Database path was not found in database_config.json.")
+    return successors
 
-    if not os.path.exists(database_path):
-        raise FileNotFoundError(f"Excel database file not found: {database_path}")
 
-    return database_path
+def is_active_for_purchase(summary, renewed_contract_ids):
+    contract_id = safe_string(summary.get("contract_id"))
+    if contract_id == "" or contract_id.casefold() in renewed_contract_ids:
+        return False
 
-# ============================================================
-# STATUS ENGINE  (mirrors full Python status logic)
-# ============================================================
-def compute_status(start_date, end_date, remaining_qty, breach):
-    """
-    Returns one of: Upcoming | Active | Completed | Violated | Expired
-    Status is never read from Excel — always computed here.
-    """
-    today = date.today()
-
-    if isinstance(start_date, str):
-        try:
-            from datetime import datetime
-            start_date = datetime.strptime(start_date, "%d-%m-%Y").date()
-        except Exception:
-            start_date = None
-
-    if isinstance(end_date, str):
-        try:
-            from datetime import datetime
-            end_date = datetime.strptime(end_date, "%d-%m-%Y").date()
-        except Exception:
-            end_date = None
+    start_date = parse_date(summary.get("start_date"))
+    end_date = parse_date(summary.get("end_date"))
 
     if start_date is None or end_date is None:
-        return "Unknown"
+        return False
 
-    try:
-        remaining = float(remaining_qty) if remaining_qty not in (None, "") else 0
-    except (TypeError, ValueError):
-        remaining = 0
+    today = date.today()
 
-    breach_yes = str(breach).strip().upper() == "YES" if breach else False
+    if not (start_date <= today <= end_date):
+        return False
 
-    if today < start_date:
-        return "Upcoming"
-    if remaining <= 0:
-        return "Completed"
-    if today > end_date and remaining > 0:
-        return "Violated"
-    if start_date <= today <= end_date and remaining > 0 and not breach_yes:
-        return "Active"
+    if summary.get("remaining_qty", 0) <= 0:
+        return False
 
-    return "Expired"
+    if summary.get("breach_detected"):
+        return False
 
-# ============================================================
-# READ ACTIVE CONTRACTS
-# ============================================================
+    return True
+
+
 def read_active_contracts():
-    database_path = get_database_path()
+    contracts = read_pcon()
+    purchases = read_purchase()
+    renewed_contract_ids = successor_lookup(contracts)
+    active_contracts = []
 
-    workbook = load_workbook(database_path, data_only=True)
+    for contract in contracts:
+        summary = build_contract_summary(contract, purchases)
 
-    if PCON_SHEET_NAME not in workbook.sheetnames:
-        raise ValueError(f"Sheet not found: {PCON_SHEET_NAME}")
-
-    sheet = workbook[PCON_SHEET_NAME]
-    contracts = []
-
-    for row in range(START_ROW, sheet.max_row + 1):
-
-        vendor_name    = sheet[f"B{row}"].value
-        vendor_id      = sheet[f"C{row}"].value
-        item_code      = sheet[f"E{row}"].value
-        start_raw      = sheet[f"F{row}"].value
-        end_raw        = sheet[f"G{row}"].value
-        
-        # Mapped specifically to Column L as requested by configuration overrides
-        base_price     = sheet[f"L{row}"].value 
-        remaining_qty  = sheet[f"M{row}"].value  
-        breach         = sheet[f"O{row}"].value  
-
-        if vendor_name is None or vendor_id is None:
+        if not is_active_for_purchase(summary, renewed_contract_ids):
             continue
 
-        vendor_name = str(vendor_name).strip()
-        vendor_id   = str(vendor_id).strip()
+        active_contracts.append(
+            {
+                "VendorName": summary["vendor_name"],
+                "VendorID": summary["vendor_id"],
+                "ContractID": summary["contract_id"],
+                "ItemName": ITEM_NAME,
+                "ItemCode": ITEM_CODE,
+                "BaseRate": str(summary["base_price"]),
+                "StartDate": summary["start_date"],
+                "EndDate": summary["end_date"],
+                "RemainingQty": summary["remaining_qty"],
+                "CompletionPercent": summary["completion_percent"],
+                "vendor_name": summary["vendor_name"],
+                "vendor_id": summary["vendor_id"],
+                "contract_id": summary["contract_id"],
+                "item_name": ITEM_NAME,
+                "item_code": ITEM_CODE,
+                "base_rate": summary["base_price"],
+                "start_date": summary["start_date"],
+                "end_date": summary["end_date"],
+                "remaining_qty": summary["remaining_qty"],
+                "completion_percent": summary["completion_percent"],
+            }
+        )
 
-        if not vendor_name or not vendor_id:
-            continue
+    active_contracts.sort(
+        key=lambda item: (
+            item["VendorName"].lower(),
+            item["ContractID"].lower(),
+        )
+    )
 
-        start_str = ""
-        end_str   = ""
+    return active_contracts
 
-        if hasattr(start_raw, "strftime"):
-            start_str = start_raw.strftime("%d-%m-%Y")
-            start_date = start_raw.date() if hasattr(start_raw, "date") else start_raw
-        else:
-            start_str  = str(start_raw).strip() if start_raw else ""
-            start_date = start_raw
 
-        if hasattr(end_raw, "strftime"):
-            end_str = end_raw.strftime("%d-%m-%Y")
-            end_date = end_raw.date() if hasattr(end_raw, "date") else end_raw
-        else:
-            end_str  = str(end_raw).strip() if end_raw else ""
-            end_date = end_raw
-
-        status = compute_status(start_date, end_date, remaining_qty, breach)
-
-        if status != "Active":
-            continue
-
-        base_rate_str = ""
-        if base_price not in (None, ""):
-            try:
-                base_rate_str = str(float(base_price))
-            except (TypeError, ValueError):
-                base_rate_str = str(base_price).strip()
-
-        item_code_str = str(item_code).strip() if item_code else ""
-
-        contracts.append({
-            "VendorName": vendor_name,
-            "VendorID":   vendor_id,
-            "ItemCode":   item_code_str,
-            "BaseRate":   base_rate_str,
-            "StartDate":  start_str,
-            "EndDate":    end_str,
-        })
-
-    return contracts
-
-# ============================================================
-# MAIN
-# ============================================================
 try:
     print(json.dumps(read_active_contracts(), ensure_ascii=False))
 except Exception as error:
-    print(f"ERROR: {error}", file=sys.stderr)
-    sys.exit(1)
+    fail(str(error))

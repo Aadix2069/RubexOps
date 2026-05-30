@@ -158,7 +158,7 @@ namespace RubexOps
 
 
 
-                DatabaseConfig config =
+                DatabaseConfig? config =
                     JsonSerializer.Deserialize<DatabaseConfig>(
                         json
                     );

@@ -1,261 +1,307 @@
-import json
-import os
 import sys
-from copy import copy
-from datetime import datetime, date
-from pathlib import Path
+from datetime import date, datetime
 
-from openpyxl.formula.translate import Translator
-from openpyxl import load_workbook
+from contract_engine import build_contract_summary, parse_date, safe_string
+from database import append_purchase, read_pcon, read_purchase
+from inventory_engine import build_purchase_summary, normalize_percent_value
 
-# ============================================================
-# CONFIG
-# ============================================================
 
-CONFIG_PATH = (
-    Path.home()
-    / "Documents"
-    / "RubexOps"
-    / "database_config.json"
-)
+DATE_FORMAT = "%d-%m-%Y"
 
-PCON_SHEET_NAME     = "pcon"
-PURCHASE_SHEET_NAME = "purchase"
-START_ROW           = 5
 
-# ============================================================
-# COLUMN MAP  (purchase sheet)
-# ============================================================
+def fail(message):
+    print(f"ERROR: {message}", file=sys.stderr)
+    sys.exit(1)
 
-COL_SERIAL_NO       = "A"
-COL_VENDOR_ID       = "C"
-COL_INVOICE_NUMBER  = "F"
-COL_PURCHASE_ORDER  = "G"
-COL_DELIVERY        = "H"
-COL_INVOICE_WEIGHT  = "I"
-COL_BEFORE_UNLOAD   = "J"
-COL_CARRIER_WEIGHT  = "K"
-COL_NO_OF_BAGS      = "M"
-COL_CALCULATED_DRC  = "O"
-COL_GST             = "S"   
-COL_TDS             = "T"   
-COL_UNLOADING       = "V"   
 
-# ============================================================
-# DATABASE PATH
-# ============================================================
+def looks_like_contract_id(value):
+    text = safe_string(value)
+    return "-R" in text.upper()
 
-def get_database_path():
-    if not CONFIG_PATH.exists():
-        raise FileNotFoundError(f"Database config file not found: {CONFIG_PATH}")
-    with open(CONFIG_PATH, "r", encoding="utf-8") as file:
-        config = json.load(file)
-    database_path = config.get("database_path") or config.get("excel_path") or config.get("path")
-    if not database_path:
-        raise ValueError("Database path was not found in database_config.json.")
-    if not os.path.exists(database_path):
-        raise FileNotFoundError(f"Excel database file not found: {database_path}")
-    return database_path
 
-# ============================================================
-# CONTRACT VALIDATION
-# ============================================================
+def parse_date_text(value, field_name, required=True):
+    text = safe_string(value)
+    if text == "":
+        if required:
+            raise ValueError(f"{field_name} is required.")
+        return None
 
-def verify_contract_active(sheet, vendor_id, purchase_order_date):
+    try:
+        return datetime.strptime(text, DATE_FORMAT).date()
+    except ValueError as error:
+        raise ValueError(f"{field_name} must be in dd-MM-yyyy format.") from error
+
+
+def clean_number(value):
+    return safe_string(value).replace(",", "").replace("%", "")
+
+
+def parse_required_number(value, field_name, allow_zero=True):
+    text = clean_number(value)
+    if text == "":
+        raise ValueError(f"{field_name} is required.")
+
+    try:
+        number = float(text)
+    except ValueError as error:
+        raise ValueError(f"{field_name} must be numeric.") from error
+
+    if allow_zero:
+        if number < 0:
+            raise ValueError(f"{field_name} cannot be negative.")
+    elif number <= 0:
+        raise ValueError(f"{field_name} must be greater than zero.")
+
+    return number
+
+
+def parse_optional_number(value, field_name):
+    text = clean_number(value)
+    if text == "":
+        return 0.0
+
+    try:
+        number = float(text)
+    except ValueError as error:
+        raise ValueError(f"{field_name} must be numeric.") from error
+
+    if number < 0:
+        raise ValueError(f"{field_name} cannot be negative.")
+
+    return number
+
+
+def parse_purchase_args(args):
+    if len(args) == 12:
+        vendor_id = safe_string(args[0])
+        contract_id = ""
+        values = args[1:]
+    elif len(args) == 13:
+        if looks_like_contract_id(args[0]) and not looks_like_contract_id(args[1]):
+            contract_id = safe_string(args[0])
+            vendor_id = safe_string(args[1])
+        else:
+            vendor_id = safe_string(args[0])
+            contract_id = safe_string(args[1])
+        values = args[2:]
+    else:
+        raise ValueError(
+            "Expected 12 legacy arguments or 13 arguments including Contract ID."
+        )
+
+    (
+        invoice_number,
+        purchase_order_date,
+        delivery_date,
+        invoice_weight,
+        before_unloading,
+        carrier_weight,
+        number_of_bags,
+        calculated_drc,
+        gst_percent,
+        tds_percent,
+        unloading_charge,
+    ) = values
+
+    return {
+        "vendor_id": vendor_id,
+        "contract_id": contract_id,
+        "invoice_number": safe_string(invoice_number),
+        "purchase_order_date": purchase_order_date,
+        "delivery_date": delivery_date,
+        "invoice_weight": invoice_weight,
+        "before_unloading": before_unloading,
+        "carrier_weight": carrier_weight,
+        "number_of_bags": number_of_bags,
+        "calculated_drc_percent": calculated_drc,
+        "gst_percent": gst_percent,
+        "tds_percent": tds_percent,
+        "unloading_charge": unloading_charge,
+    }
+
+
+def find_contract_by_id(contracts, contract_id):
+    key = safe_string(contract_id).casefold()
+    if key == "":
+        return None
+
+    for contract in contracts:
+        if safe_string(contract.get("contract_id")).casefold() == key:
+            return contract
+
+    return None
+
+
+def find_contract_for_vendor(contracts, vendor_id, purchase_order_date):
+    vendor_key = safe_string(vendor_id).casefold()
+    if vendor_key == "":
+        return None
+
+    matches = []
+    for contract in contracts:
+        if safe_string(contract.get("vendor_id")).casefold() != vendor_key:
+            continue
+
+        start_date = parse_date(contract.get("start_date"))
+        end_date = parse_date(contract.get("end_date"))
+        if start_date is None or end_date is None:
+            continue
+
+        if start_date <= purchase_order_date <= end_date:
+            matches.append(contract)
+
+    if not matches:
+        return None
+
+    matches.sort(
+        key=lambda item: (
+            parse_date(item.get("end_date")) or date.min,
+            safe_string(item.get("contract_id")),
+        ),
+        reverse=True,
+    )
+    return matches[0]
+
+
+def invoice_exists(purchases, invoice_number):
+    invoice_key = safe_string(invoice_number).casefold()
+    if invoice_key == "":
+        return False
+
+    return any(
+        safe_string(purchase.get("invoice_number")).casefold() == invoice_key
+        for purchase in purchases
+    )
+
+
+def validate_contract(contract, purchases, purchase_order_date):
+    if contract is None:
+        raise ValueError("No active contract found. Please select a valid contract.")
+
+    contract_id = safe_string(contract.get("contract_id"))
+    if contract_id == "":
+        raise ValueError("Selected contract is missing Contract ID.")
+
+    start_date = parse_date(contract.get("start_date"))
+    end_date = parse_date(contract.get("end_date"))
+
+    if start_date is None or end_date is None:
+        raise ValueError(f"Selected contract {contract_id} has invalid dates.")
+
+    if purchase_order_date < start_date or purchase_order_date > end_date:
+        raise ValueError(
+            "Purchase Order Date is outside the selected contract period "
+            f"({start_date.strftime(DATE_FORMAT)} - {end_date.strftime(DATE_FORMAT)})."
+        )
+
     today = date.today()
-    found = False
+    if today < start_date:
+        raise ValueError(
+            f"The selected contract has not started yet (Start Date: {start_date.strftime(DATE_FORMAT)})."
+        )
 
-    for row in range(START_ROW, sheet.max_row + 1):
-        cid = sheet[f"C{row}"].value
-        if cid is None:
-            continue
-        if str(cid).strip() != str(vendor_id).strip():
-            continue
+    if today > end_date:
+        raise ValueError(
+            f"The selected contract has expired (End Date: {end_date.strftime(DATE_FORMAT)}). "
+            "Please renew the contract before entering purchases."
+        )
 
-        found = True
-        start_raw      = sheet[f"F{row}"].value
-        end_raw        = sheet[f"G{row}"].value
-        
-        remaining_qty  = sheet[f"M{row}"].value 
-        breach         = sheet[f"O{row}"].value 
+    summary = build_contract_summary(contract, purchases)
 
-        if hasattr(start_raw, "date"):
-            contract_start = start_raw.date()
-        else:
-            try:
-                contract_start = datetime.strptime(str(start_raw).strip(), "%d-%m-%Y").date()
-            except Exception:
-                raise ValueError(f"Cannot parse contract start date for Vendor ID {vendor_id}.")
+    if summary["remaining_qty"] <= 0:
+        raise ValueError("The selected contract is already completed. No further purchases can be entered.")
 
-        if hasattr(end_raw, "date"):
-            contract_end = end_raw.date()
-        else:
-            try:
-                contract_end = datetime.strptime(str(end_raw).strip(), "%d-%m-%Y").date()
-            except Exception:
-                raise ValueError(f"Cannot parse contract end date for Vendor ID {vendor_id}.")
+    if summary["breach_detected"]:
+        raise ValueError("The selected contract is in breach. Resolve the breach before entering purchases.")
 
-        try:
-            po_date = datetime.strptime(str(purchase_order_date).strip(), "%d-%m-%Y").date()
-        except Exception:
-            raise ValueError(f"Invalid Purchase Order Date format: {purchase_order_date}. Expected dd-MM-yyyy.")
+    return summary
 
-        try:
-            remaining = float(remaining_qty) if remaining_qty not in (None, "") else 0
-        except (TypeError, ValueError):
-            remaining = 0
-
-        breach_yes = str(breach).strip().upper() == "YES" if breach else False
-
-        if today > contract_end:
-            raise ValueError(f"The contract for Vendor ID '{vendor_id}' has expired (End Date: {contract_end.strftime('%d-%m-%Y')}). Please renew the contract before entering purchases.")
-        if today < contract_start:
-            raise ValueError(f"The contract for Vendor ID '{vendor_id}' has not started yet (Start Date: {contract_start.strftime('%d-%m-%Y')}).")
-        if remaining <= 0:
-            raise ValueError(f"The contract for Vendor ID '{vendor_id}' is already completed (Remaining Quantity: 0). No further purchases can be entered.")
-        if breach_yes:
-            raise ValueError(f"The contract for Vendor ID '{vendor_id}' is in breach. Resolve the breach before entering new purchases.")
-
-        if po_date < contract_start or po_date > contract_end:
-            raise ValueError(f"Purchase Order Date ({po_date.strftime('%d-%m-%Y')}) is outside the contract period ({contract_start.strftime('%d-%m-%Y')} — {contract_end.strftime('%d-%m-%Y')}).")
-        return
-
-    if not found:
-        raise ValueError(f"No active contract found for Vendor ID '{vendor_id}'. Please select a valid active contract.")
-
-# ============================================================
-# ROW HELPERS
-# ============================================================
-
-def get_next_purchase_row(sheet):
-    row = START_ROW
-    while True:
-        vendor_id      = sheet[f"{COL_VENDOR_ID}{row}"].value
-        invoice_number = sheet[f"{COL_INVOICE_NUMBER}{row}"].value
-        if vendor_id is None and invoice_number is None:
-            return row
-        row += 1
-
-def copy_row_style_and_formulas(sheet, source_row, target_row):
-    for column in range(1, sheet.max_column + 1):
-        source_cell = sheet.cell(row=source_row, column=column)
-        target_cell = sheet.cell(row=target_row, column=column)
-        if source_cell.has_style:
-            target_cell.font          = copy(source_cell.font)
-            target_cell.fill          = copy(source_cell.fill)
-            target_cell.border        = copy(source_cell.border)
-            target_cell.alignment     = copy(source_cell.alignment)
-            target_cell.number_format = source_cell.number_format
-            target_cell.protection    = copy(source_cell.protection)
-        if isinstance(source_cell.value, str) and source_cell.value.startswith("="):
-            target_cell.value = Translator(source_cell.value, origin=source_cell.coordinate).translate_formula(target_cell.coordinate)
-    if source_row in sheet.row_dimensions:
-        sheet.row_dimensions[target_row].height = sheet.row_dimensions[source_row].height
-
-# ============================================================
-# WRITE PURCHASE DATA
-# ============================================================
 
 def create_purchase_data(args):
-    if len(args) != 12:
-        raise ValueError("Expected 12 arguments.")
+    data = parse_purchase_args(args)
 
-    (vendor_id, invoice_number, purchase_order_date, delivery_date, invoice_weight, 
-     before_unloading, carrier_weight, no_of_bags, calculated_drc, gst, tds, unloading_charge) = args
+    if data["invoice_number"] == "":
+        raise ValueError("Invoice Number is required.")
 
-    def to_float_or_none(value, field_name):
-        if value == "" or value is None: return None
-        try: result = float(value)
-        except (ValueError, TypeError): raise ValueError(f"{field_name} must be numeric.")
-        if result < 0: raise ValueError(f"{field_name} cannot be negative.")
-        return result
+    purchase_order_date = parse_date_text(
+        data["purchase_order_date"],
+        "Purchase Order Date",
+        required=True,
+    )
+    delivery_date = parse_date_text(
+        data["delivery_date"],
+        "Delivery Date",
+        required=False,
+    )
 
-    def to_int_or_none(value, field_name):
-        if value == "" or value is None: return None
-        try: result = int(value)
-        except (ValueError, TypeError): raise ValueError(f"{field_name} must be a whole number.")
-        if result < 0: raise ValueError(f"{field_name} cannot be negative.")
-        return result
+    if delivery_date is not None and delivery_date < purchase_order_date:
+        raise ValueError("Delivery Date cannot be before the Purchase Order Date.")
 
-    def to_float_required(value, field_name):
-        if value == "" or value is None: raise ValueError(f"{field_name} is required.")
-        try: result = float(value)
-        except (ValueError, TypeError): raise ValueError(f"{field_name} must be numeric.")
-        if result < 0: raise ValueError(f"{field_name} cannot be negative.")
-        return result
+    invoice_weight = parse_optional_number(data["invoice_weight"], "Invoice Weight")
+    before_unloading = parse_required_number(data["before_unloading"], "Before Unloading", allow_zero=False)
+    carrier_weight = parse_required_number(data["carrier_weight"], "Carrier Weight", allow_zero=True)
+    number_of_bags = parse_optional_number(data["number_of_bags"], "Number Of Bags")
+    calculated_drc_percent = normalize_percent_value(
+        parse_required_number(data["calculated_drc_percent"], "Calculated DRC", allow_zero=True)
+    )
+    gst_percent = normalize_percent_value(
+        parse_required_number(data["gst_percent"], "GST", allow_zero=True)
+    )
+    tds_percent = normalize_percent_value(
+        parse_required_number(data["tds_percent"], "TDS 194Q", allow_zero=True)
+    )
+    unloading_charge = parse_optional_number(data["unloading_charge"], "Unloading Charge")
 
-    before_unloading_val = to_float_required(before_unloading, "Before Unloading")
-    carrier_weight_val   = to_float_required(carrier_weight,   "Carrier Weight")
-    calculated_drc_val   = to_float_required(calculated_drc,   "Calculated DRC")
-    
-    # PERCENTAGE BUG FIX: Divide exactly by 100 to map to raw Excel float logic safely
-    gst_val              = to_float_required(gst,              "GST") / 100.0
-    tds_val              = to_float_required(tds,              "TDS 194Q") / 100.0
+    if carrier_weight > before_unloading:
+        raise ValueError("Carrier Weight cannot be greater than Before Unloading weight.")
 
-    if not (0 <= calculated_drc_val <= 100): raise ValueError("Calculated DRC must be between 0 and 100.")
-    if gst_val < 0: raise ValueError("GST cannot be negative.")
-    if tds_val < 0 or tds_val > 1: raise ValueError("TDS 194Q must be between 0 and 100.")
+    contracts = read_pcon()
+    purchases = read_purchase()
 
-    invoice_weight_val   = to_float_or_none(invoice_weight,   "Invoice Weight")
-    no_of_bags_val       = to_int_or_none(no_of_bags,         "No. of Bags")
-    unloading_val        = to_float_or_none(unloading_charge, "Unloading Charge")
+    contract = find_contract_by_id(contracts, data["contract_id"])
+    if contract is None:
+        contract = find_contract_for_vendor(contracts, data["vendor_id"], purchase_order_date)
 
-    delivery_date_val = None
-    if delivery_date.strip():
-        try:
-            po  = datetime.strptime(purchase_order_date.strip(), "%d-%m-%Y")
-            dlv = datetime.strptime(delivery_date.strip(),       "%d-%m-%Y")
-        except ValueError as exc:
-            raise ValueError(f"Invalid date format. Expected dd-MM-yyyy.")
-        if dlv < po: raise ValueError("Delivery Date cannot be before the Purchase Order Date.")
-        delivery_date_val = dlv
+    summary = validate_contract(contract, purchases, purchase_order_date)
+    contract_vendor_id = safe_string(contract.get("vendor_id"))
 
-    po_date_val = datetime.strptime(purchase_order_date.strip(), "%d-%m-%Y")
+    if data["vendor_id"] and data["vendor_id"].casefold() != contract_vendor_id.casefold():
+        raise ValueError("Vendor ID does not match the selected contract.")
 
-    database_path = get_database_path()
-    workbook = load_workbook(database_path, data_only=False)
+    if invoice_exists(purchases, data["invoice_number"]):
+        raise ValueError("Invoice Number already exists in the purchase sheet.")
 
-    if PCON_SHEET_NAME not in workbook.sheetnames: raise ValueError(f"Sheet not found: {PCON_SHEET_NAME}")
-    pcon_sheet = workbook[PCON_SHEET_NAME]
-    verify_contract_active(pcon_sheet, vendor_id, purchase_order_date)
+    purchase_record = {
+        "vendor_id": contract_vendor_id,
+        "contract_id": safe_string(contract.get("contract_id")),
+        "invoice_number": data["invoice_number"],
+        "purchase_order_date": purchase_order_date,
+        "delivery_date": delivery_date or "",
+        "invoice_weight": invoice_weight,
+        "before_unloading": before_unloading,
+        "carrier_weight": carrier_weight,
+        "number_of_bags": number_of_bags,
+        "calculated_drc_percent": calculated_drc_percent,
+        "gst_percent": gst_percent,
+        "tds_percent": tds_percent,
+        "unloading_charge": unloading_charge,
+    }
 
-    if PURCHASE_SHEET_NAME not in workbook.sheetnames: raise ValueError(f"Sheet not found: {PURCHASE_SHEET_NAME}")
-    sheet = workbook[PURCHASE_SHEET_NAME]
+    build_purchase_summary(
+        purchase_record,
+        base_price=summary["base_price"],
+    )
 
-    target_row = get_next_purchase_row(sheet)
-    template_row = target_row - 1 if target_row > START_ROW else START_ROW
-    copy_row_style_and_formulas(sheet, template_row, target_row)
+    sl_no = append_purchase(purchase_record)
 
-    sheet[f"{COL_SERIAL_NO}{target_row}"] = target_row - START_ROW + 1
-    sheet[f"{COL_VENDOR_ID}{target_row}"]      = vendor_id
-    sheet[f"{COL_INVOICE_NUMBER}{target_row}"] = invoice_number
-    sheet[f"{COL_PURCHASE_ORDER}{target_row}"] = po_date_val
+    return (
+        f"Purchase entry saved successfully. Sl.No: {sl_no}. "
+        f"Vendor ID: {contract_vendor_id} | Contract ID: {purchase_record['contract_id']} "
+        f"| Invoice: {data['invoice_number']} | PO Date: {purchase_order_date.strftime(DATE_FORMAT)}"
+    )
 
-    if delivery_date_val is not None: sheet[f"{COL_DELIVERY}{target_row}"] = delivery_date_val
-    if invoice_weight_val is not None: sheet[f"{COL_INVOICE_WEIGHT}{target_row}"] = invoice_weight_val
 
-    sheet[f"{COL_BEFORE_UNLOAD}{target_row}"]  = before_unloading_val
-    sheet[f"{COL_CARRIER_WEIGHT}{target_row}"] = carrier_weight_val
-
-    if no_of_bags_val is not None: sheet[f"{COL_NO_OF_BAGS}{target_row}"] = no_of_bags_val
-
-    sheet[f"{COL_CALCULATED_DRC}{target_row}"] = calculated_drc_val
-    sheet[f"{COL_GST}{target_row}"]            = gst_val
-    sheet[f"{COL_TDS}{target_row}"]            = tds_val
-
-    if unloading_val is not None: sheet[f"{COL_UNLOADING}{target_row}"] = unloading_val
-
-    workbook.calculation.fullCalcOnLoad = True
-    workbook.calculation.forceFullCalc  = True
-    workbook.save(database_path)
-
-    return f"Purchase entry saved successfully at row {target_row}.\nVendor ID: {vendor_id}  |  Invoice: {invoice_number}  |  PO Date: {purchase_order_date}"
-
-# ============================================================
-# MAIN
-# ============================================================
 try:
     print(create_purchase_data(sys.argv[1:]))
 except Exception as error:
-    print(f"ERROR: {error}", file=sys.stderr)
-    sys.exit(1)
+    fail(str(error))

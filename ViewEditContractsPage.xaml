@@ -7,15 +7,7 @@
       mc:Ignorable="d"
       Background="#F5F7F8">
 
-    <!-- ================================================= -->
-    <!-- ROOT CONTAINER -->
-    <!-- ================================================= -->
-
     <Grid>
-
-        <!-- ================================================= -->
-        <!-- FIXED WATERMARK -->
-        <!-- ================================================= -->
 
         <Image Source="Images/Rubex_logo.png"
                Width="500"
@@ -26,12 +18,6 @@
                VerticalAlignment="Center"
                IsHitTestVisible="False"
                Panel.ZIndex="0"/>
-
-
-
-        <!-- ================================================= -->
-        <!-- MAIN CONTENT -->
-        <!-- ================================================= -->
 
         <Grid x:Name="MainGrid"
               Margin="24"
@@ -46,12 +32,6 @@
                 <RowDefinition Height="20"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-
-
-
-            <!-- ================================================= -->
-            <!-- HEADER -->
-            <!-- ================================================= -->
 
             <Grid Grid.Row="0">
 
@@ -99,15 +79,9 @@
 
                 </StackPanel>
 
-
-
-                <!-- RIGHT SIDE -->
-
                 <StackPanel Grid.Column="1"
                             Orientation="Horizontal"
                             HorizontalAlignment="Right">
-
-                    <!-- RENEW BUTTON -->
 
                     <Button Width="190"
                             Height="54"
@@ -142,10 +116,6 @@
 
                     </Button>
 
-
-
-                    <!-- STATS CARD -->
-
                     <Border Padding="18,12"
                             CornerRadius="18"
                             Background="#88FFFFFF"
@@ -176,12 +146,6 @@
                 </StackPanel>
 
             </Grid>
-
-
-
-            <!-- ================================================= -->
-            <!-- STATUS LEGEND -->
-            <!-- ================================================= -->
 
             <Border Grid.Row="2"
                     Background="#88FFFFFF"
@@ -277,12 +241,6 @@
 
             </Border>
 
-
-
-            <!-- ================================================= -->
-            <!-- SEARCH + FILTER + SORT -->
-            <!-- ================================================= -->
-
             <Grid Grid.Row="4">
 
                 <Grid.ColumnDefinitions>
@@ -292,10 +250,6 @@
                     <ColumnDefinition Width="18"/>
                     <ColumnDefinition Width="1.5*"/>
                 </Grid.ColumnDefinitions>
-
-
-
-                <!-- SEARCH -->
 
                 <Border Grid.Column="0"
                         Height="50"
@@ -331,26 +285,17 @@
                                    IsHitTestVisible="False">
 
                             <TextBlock.Style>
-
                                 <Style TargetType="TextBlock">
-
                                     <Setter Property="Visibility"
                                             Value="Collapsed"/>
-
                                     <Style.Triggers>
-
                                         <DataTrigger Binding="{Binding Text, ElementName=SearchBox}"
                                                      Value="">
-
                                             <Setter Property="Visibility"
                                                     Value="Visible"/>
-
                                         </DataTrigger>
-
                                     </Style.Triggers>
-
                                 </Style>
-
                             </TextBlock.Style>
 
                         </TextBlock>
@@ -358,10 +303,6 @@
                     </Grid>
 
                 </Border>
-
-
-
-                <!-- FILTER -->
 
                 <Border Grid.Column="2"
                         Height="50"
@@ -402,10 +343,6 @@
 
                 </Border>
 
-
-
-                <!-- SORT -->
-
                 <Border Grid.Column="4"
                         Height="50"
                         CornerRadius="14"
@@ -445,12 +382,6 @@
 
             </Grid>
 
-
-
-            <!-- ================================================= -->
-            <!-- CONTRACT CARDS -->
-            <!-- ================================================= -->
-
             <ScrollViewer Grid.Row="6"
                           VerticalScrollBarVisibility="Auto"
                           HorizontalScrollBarVisibility="Disabled">
@@ -458,18 +389,10 @@
                 <ItemsControl x:Name="ContractsItemsControl">
 
                     <ItemsControl.ItemsPanel>
-
                         <ItemsPanelTemplate>
                             <UniformGrid Columns="3"/>
                         </ItemsPanelTemplate>
-
                     </ItemsControl.ItemsPanel>
-
-
-
-                    <!-- ================================================= -->
-                    <!-- CONTRACT CARD TEMPLATE -->
-                    <!-- ================================================= -->
 
                     <ItemsControl.ItemTemplate>
 
@@ -482,7 +405,7 @@
                                     BorderBrush="#99FFFFFF"
                                     BorderThickness="1"
                                     Opacity="{Binding CardOpacity}"
-                                    MinWidth="320"
+                                    MinWidth="300"
                                     HorizontalAlignment="Stretch">
 
                                 <Border.Effect>
@@ -493,42 +416,43 @@
 
                                 <Grid>
 
-                                    <!-- INNER GLASS -->
-
                                     <Border CornerRadius="22"
                                             Background="#20FFFFFF"
                                             Margin="-8"/>
 
-                                    <StackPanel>
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="14"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="12"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="12"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="12"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="12"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="16"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="18"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
 
-                                        <!-- ================================================= -->
-                                        <!-- HEADER -->
-                                        <!-- ================================================= -->
-
-                                        <Grid Margin="0,0,0,18">
+                                        <Grid Grid.Row="0">
 
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
 
-                                            <StackPanel>
-
-                                                <TextBlock Text="{Binding vendor_name}"
-                                                           FontSize="24"
-                                                           FontWeight="Bold"
-                                                           Foreground="#111827"/>
-
-                                                <TextBlock Text="{Binding vendor_id}"
-                                                           Margin="0,5,0,0"
-                                                           FontSize="14"
-                                                           Foreground="#6B7280"/>
-
-                                            </StackPanel>
-
-
-
-                                            <!-- STATUS -->
+                                            <TextBlock Text="{Binding vendor_name}"
+                                                       FontSize="24"
+                                                       FontWeight="Bold"
+                                                       Foreground="#111827"
+                                                       TextWrapping="Wrap"
+                                                       VerticalAlignment="Top"
+                                                       Margin="0,0,12,0"/>
 
                                             <Border Grid.Column="1"
                                                     Padding="12,6"
@@ -545,201 +469,272 @@
 
                                         </Grid>
 
-
-
-                                        <!-- ================================================= -->
-                                        <!-- DETAILS -->
-                                        <!-- ================================================= -->
-
-                                        <Grid Margin="0,0,0,18">
+                                        <Grid Grid.Row="2">
 
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="18"/>
                                                 <ColumnDefinition Width="*"/>
                                             </Grid.ColumnDefinitions>
 
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="Auto"/>
-                                                <RowDefinition Height="Auto"/>
-                                                <RowDefinition Height="Auto"/>
-                                                <RowDefinition Height="Auto"/>
-                                            </Grid.RowDefinitions>
+                                            <Grid Grid.Column="0">
 
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
 
+                                                <TextBlock Text="Contract ID"
+                                                           FontSize="12"
+                                                           Foreground="#6B7280"/>
 
-                                            <!-- LEFT -->
+                                                <TextBlock Grid.Row="1"
+                                                           Text="{Binding ContractIdDisplay}"
+                                                           FontSize="15"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="#111827"
+                                                           TextWrapping="Wrap"/>
 
-                                            <StackPanel Grid.Row="0"
-                                                        Grid.Column="0"
-                                                        Margin="0,0,14,12">
+                                            </Grid>
+
+                                            <Grid Grid.Column="2">
+
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <TextBlock Text="Item Code"
+                                                           FontSize="12"
+                                                           Foreground="#6B7280"/>
+
+                                                <TextBlock Grid.Row="1"
+                                                           Text="{Binding ItemCodeDisplay}"
+                                                           FontSize="15"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="#111827"
+                                                           TextWrapping="Wrap"/>
+
+                                            </Grid>
+
+                                        </Grid>
+
+                                        <Grid Grid.Row="4">
+
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="18"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <Grid Grid.Column="0">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
 
                                                 <TextBlock Text="Start Date"
                                                            FontSize="12"
                                                            Foreground="#6B7280"/>
 
-                                                <TextBlock Text="{Binding start_date}"
+                                                <TextBlock Grid.Row="1"
+                                                           Text="{Binding start_date}"
                                                            FontSize="16"
                                                            FontWeight="SemiBold"
-                                                           Foreground="#111827"/>
+                                                           Foreground="#111827"
+                                                           TextWrapping="Wrap"/>
+                                            </Grid>
 
-                                            </StackPanel>
-
-
-
-                                            <StackPanel Grid.Row="1"
-                                                        Grid.Column="0"
-                                                        Margin="0,0,14,12">
-
-                                                <TextBlock Text="Base Price"
-                                                           FontSize="12"
-                                                           Foreground="#6B7280"/>
-
-                                                <TextBlock Text="{Binding BasePriceDisplay}"
-                                                           FontSize="16"
-                                                           FontWeight="SemiBold"
-                                                           Foreground="#111827"/>
-
-                                            </StackPanel>
-
-
-
-                                            <StackPanel Grid.Row="2"
-                                                        Grid.Column="0"
-                                                        Margin="0,0,14,12">
-
-                                                <TextBlock Text="Purchased Qty So Far"
-                                                           FontSize="12"
-                                                           Foreground="#6B7280"/>
-
-                                                <TextBlock Text="{Binding PurchasedQtySoFarDisplay}"
-                                                           FontSize="16"
-                                                           FontWeight="SemiBold"
-                                                           Foreground="#111827"/>
-
-                                            </StackPanel>
-
-
-
-                                            <StackPanel Grid.Row="3"
-                                                        Grid.Column="0">
-
-                                                <TextBlock Text="Deliveries So Far"
-                                                           FontSize="12"
-                                                           Foreground="#6B7280"/>
-
-                                                <TextBlock Text="{Binding DeliveriesSoFarDisplay}"
-                                                           FontSize="16"
-                                                           FontWeight="SemiBold"
-                                                           Foreground="#111827"/>
-
-                                            </StackPanel>
-
-
-
-                                            <!-- RIGHT -->
-
-                                            <StackPanel Grid.Row="0"
-                                                        Grid.Column="1"
-                                                        Margin="0,0,0,12">
+                                            <Grid Grid.Column="2">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
 
                                                 <TextBlock Text="End Date"
                                                            FontSize="12"
                                                            Foreground="#6B7280"/>
 
-                                                <TextBlock Text="{Binding end_date}"
+                                                <TextBlock Grid.Row="1"
+                                                           Text="{Binding end_date}"
                                                            FontSize="16"
                                                            FontWeight="SemiBold"
-                                                           Foreground="#111827"/>
-
-                                            </StackPanel>
-
-
-
-                                            <StackPanel Grid.Row="1"
-                                                        Grid.Column="1"
-                                                        Margin="0,0,0,12">
-
-                                                <TextBlock Text="Agreed Quantity"
-                                                           FontSize="12"
-                                                           Foreground="#6B7280"/>
-
-                                                <TextBlock Text="{Binding AgreedQtyDisplay}"
-                                                           FontSize="16"
-                                                           FontWeight="SemiBold"
-                                                           Foreground="#111827"/>
-
-                                            </StackPanel>
-
-
-
-                                            <StackPanel Grid.Row="2"
-                                                        Grid.Column="1"
-                                                        Margin="0,0,0,12">
-
-                                                <TextBlock Text="Remaining Quantity"
-                                                           FontSize="12"
-                                                           Foreground="#6B7280"/>
-
-                                                <TextBlock Text="{Binding RemainingQtyDisplay}"
-                                                           FontSize="16"
-                                                           FontWeight="SemiBold"
-                                                           Foreground="#111827"/>
-
-                                            </StackPanel>
-
-
-
-                                            <StackPanel Grid.Row="3"
-                                                        Grid.Column="1">
-
-                                                <TextBlock Text="Completion"
-                                                           FontSize="12"
-                                                           Foreground="#6B7280"/>
-
-                                                <TextBlock Text="{Binding CompletionDisplay}"
-                                                           FontSize="16"
-                                                           FontWeight="SemiBold"
-                                                           Foreground="#111827"/>
-
-                                            </StackPanel>
+                                                           Foreground="#111827"
+                                                           TextWrapping="Wrap"/>
+                                            </Grid>
 
                                         </Grid>
 
+                                        <Grid Grid.Row="6">
 
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="18"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
 
-                                        <!-- ================================================= -->
-                                        <!-- BREACH PANEL -->
-                                        <!-- ================================================= -->
+                                            <Grid Grid.Column="0">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
 
-                                        <Border Background="#FFF5F5"
+                                                <TextBlock Text="Days Remaining"
+                                                           FontSize="12"
+                                                           Foreground="#6B7280"/>
+
+                                                <TextBlock Grid.Row="1"
+                                                           Text="{Binding DaysRemainingDisplay}"
+                                                           FontSize="16"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="#111827"
+                                                           TextWrapping="Wrap"/>
+                                            </Grid>
+
+                                            <Grid Grid.Column="2">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <TextBlock Text="Agreed Qty"
+                                                           FontSize="12"
+                                                           Foreground="#6B7280"/>
+
+                                                <TextBlock Grid.Row="1"
+                                                           Text="{Binding AgreedQtyDisplay}"
+                                                           FontSize="16"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="#111827"
+                                                           TextWrapping="Wrap"/>
+                                            </Grid>
+
+                                        </Grid>
+
+                                        <Grid Grid.Row="8">
+
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="18"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <Grid Grid.Column="0">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <TextBlock Text="Base Price"
+                                                           FontSize="12"
+                                                           Foreground="#6B7280"/>
+
+                                                <TextBlock Grid.Row="1"
+                                                           Text="{Binding BasePriceDisplay}"
+                                                           FontSize="16"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="#111827"
+                                                           TextWrapping="Wrap"/>
+                                            </Grid>
+
+                                            <Grid Grid.Column="2">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <TextBlock Text="Deliveries"
+                                                           FontSize="12"
+                                                           Foreground="#6B7280"/>
+
+                                                <TextBlock Grid.Row="1"
+                                                           Text="{Binding DeliveriesSoFarDisplay}"
+                                                           FontSize="16"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="#111827"
+                                                           TextWrapping="Wrap"/>
+                                            </Grid>
+
+                                        </Grid>
+
+                                        <Grid Grid.Row="10">
+
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="18"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <Grid Grid.Column="0">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <TextBlock Text="Qty Delivered So Far"
+                                                           FontSize="12"
+                                                           Foreground="#6B7280"/>
+
+                                                <TextBlock Grid.Row="1"
+                                                           Text="{Binding QtyDeliveredSoFarDisplay}"
+                                                           FontSize="16"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="#111827"
+                                                           TextWrapping="Wrap"/>
+                                            </Grid>
+
+                                            <Grid Grid.Column="2">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <TextBlock Text="Remaining"
+                                                           FontSize="12"
+                                                           Foreground="#6B7280"/>
+
+                                                <TextBlock Grid.Row="1"
+                                                           Text="{Binding RemainingQtyDisplay}"
+                                                           FontSize="16"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="#111827"
+                                                           TextWrapping="Wrap"/>
+                                            </Grid>
+
+                                        </Grid>
+
+                                        <Border Grid.Row="12"
+                                                Background="#20FFFFFF"
+                                                BorderBrush="#55FFFFFF"
+                                                BorderThickness="1"
                                                 CornerRadius="16"
-                                                Padding="14"
-                                                Margin="0,0,0,18"
-                                                Visibility="{Binding BreachPanelVisibility}">
+                                                Padding="14">
 
-                                            <StackPanel>
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
 
-                                                <TextBlock Text="Breach Detected"
+                                                <TextBlock Text="Percentage Completion"
+                                                           FontSize="12"
+                                                           Foreground="#6B7280"
+                                                           HorizontalAlignment="Center"/>
+
+                                                <TextBlock Grid.Row="1"
+                                                           Text="{Binding CompletionDisplay}"
+                                                           Margin="0,4,0,0"
+                                                           FontSize="24"
                                                            FontWeight="Bold"
-                                                           FontSize="15"
-                                                           Foreground="#DC2626"/>
-
-                                                <TextBlock Text="{Binding breach_responsibility}"
-                                                           Margin="0,6,0,0"
-                                                           FontSize="14"
-                                                           Foreground="#7F1D1D"/>
-
-                                            </StackPanel>
+                                                           Foreground="#111827"
+                                                           HorizontalAlignment="Center"
+                                                           TextWrapping="Wrap"/>
+                                            </Grid>
 
                                         </Border>
 
-
-
-                                        <!-- ================================================= -->
-                                        <!-- EDIT BUTTON -->
-                                        <!-- ================================================= -->
-
-                                        <Button Height="46"
+                                        <Button Grid.Row="14"
+                                                Height="46"
                                                 Background="#0EA5A8"
                                                 Foreground="White"
                                                 BorderThickness="0"
@@ -769,7 +764,7 @@
 
                                         </Button>
 
-                                    </StackPanel>
+                                    </Grid>
 
                                 </Grid>
 

@@ -13,27 +13,11 @@ namespace RubexOps
 {
     public partial class ViewEditContractsPage : Page
     {
-        // =====================================================
-        // MASTER CONTRACT LIST
-        // =====================================================
-
         private List<PurchaseContract> allContracts =
             new();
 
-
-
-        // =====================================================
-        // PYTHON COMMAND
-        // =====================================================
-
         private readonly string pythonExe =
             "python";
-
-
-
-        // =====================================================
-        // CONSTRUCTOR
-        // =====================================================
 
         public ViewEditContractsPage()
         {
@@ -47,12 +31,6 @@ namespace RubexOps
 
             LoadContracts();
         }
-
-
-
-        // =====================================================
-        // ENSURE BACKEND FOLDER EXISTS
-        // =====================================================
 
         private void EnsureBackendFolderExists()
         {
@@ -79,12 +57,6 @@ namespace RubexOps
                 );
             }
         }
-
-
-
-        // =====================================================
-        // LOAD CONTRACTS
-        // =====================================================
 
         private void LoadContracts()
         {
@@ -234,24 +206,12 @@ namespace RubexOps
             }
         }
 
-
-
-        // =====================================================
-        // SEARCH
-        // =====================================================
-
         private void SearchBox_TextChanged(
             object sender,
             TextChangedEventArgs e)
         {
             ApplySortingAndSearch();
         }
-
-
-
-        // =====================================================
-        // FILTER
-        // =====================================================
 
         private void FilterComboBox_SelectionChanged(
             object sender,
@@ -260,24 +220,12 @@ namespace RubexOps
             ApplySortingAndSearch();
         }
 
-
-
-        // =====================================================
-        // SORT
-        // =====================================================
-
         private void SortComboBox_SelectionChanged(
             object sender,
             SelectionChangedEventArgs e)
         {
             ApplySortingAndSearch();
         }
-
-
-
-        // =====================================================
-        // APPLY SEARCH + FILTER + SORT
-        // =====================================================
 
         private void ApplySortingAndSearch()
         {
@@ -337,12 +285,6 @@ namespace RubexOps
                 filtered.ToList();
         }
 
-
-
-        // =====================================================
-        // APPLY SORT
-        // =====================================================
-
         private IEnumerable<PurchaseContract> ApplySort(
             IEnumerable<PurchaseContract> contracts)
         {
@@ -376,12 +318,6 @@ namespace RubexOps
             };
         }
 
-
-
-        // =====================================================
-        // GLOBAL RENEW CONTRACT
-        // =====================================================
-
         private void RenewContract_Click(
             object sender,
             RoutedEventArgs e)
@@ -408,12 +344,6 @@ namespace RubexOps
                     MessageBoxImage.Error);
             }
         }
-
-
-
-        // =====================================================
-        // EDIT BUTTON
-        // =====================================================
 
         private void EditButton_Click(
             object sender,
@@ -467,12 +397,6 @@ namespace RubexOps
         }
     }
 
-
-
-    // =====================================================
-    // CONTRACT MODEL
-    // =====================================================
-
     public partial class PurchaseContract
     {
         public int row { get; set; }
@@ -480,6 +404,8 @@ namespace RubexOps
         public string? vendor_name { get; set; }
 
         public string? vendor_id { get; set; }
+
+        public string? contract_id { get; set; }
 
         public string? item_name { get; set; }
 
@@ -506,6 +432,8 @@ namespace RubexOps
         public double? agreed_qty { get; set; }
 
         public double? delivered_qty { get; set; }
+
+        public double? qty_delivered_so_far { get; set; }
 
         public double? remaining_qty { get; set; }
 
@@ -540,12 +468,6 @@ namespace RubexOps
         public bool show_responsibility { get; set; }
 
         public bool show_breach_panel { get; set; }
-
-
-
-        // =====================================================
-        // DISPLAY HELPERS
-        // =====================================================
 
         public string DisplayStatus
         {
@@ -657,6 +579,16 @@ namespace RubexOps
             }
         }
 
+        public string ContractIdDisplay =>
+            string.IsNullOrWhiteSpace(contract_id)
+                ? "-"
+                : contract_id;
+
+        public string ItemCodeDisplay =>
+            string.IsNullOrWhiteSpace(item_code)
+                ? "NRFC"
+                : item_code;
+
         public string BasePriceDisplay =>
             $"Rs. {FormatNumber(base_price)}";
 
@@ -667,7 +599,10 @@ namespace RubexOps
             FormatNumber(delivered_qty);
 
         public string PurchasedQtySoFarDisplay =>
-            FormatNumber(delivered_qty);
+            FormatNumber(qty_delivered_so_far ?? delivered_qty);
+
+        public string QtyDeliveredSoFarDisplay =>
+            FormatNumber(qty_delivered_so_far ?? delivered_qty);
 
         public string DeliveriesSoFarDisplay =>
             string.IsNullOrWhiteSpace(deliveries_so_far)
@@ -748,18 +683,22 @@ namespace RubexOps
             {
                 if (string.IsNullOrWhiteSpace(days_remaining))
                 {
-                    return "Days remaining unavailable";
+                    return "0 days";
                 }
 
-                return $"{days_remaining} days remaining";
+                string text =
+                    days_remaining.Trim();
+
+                if (text.Contains(
+                        "day",
+                        StringComparison.OrdinalIgnoreCase))
+                {
+                    return text;
+                }
+
+                return $"{text} days";
             }
         }
-
-
-
-        // =====================================================
-        // FORMATTER
-        // =====================================================
 
         private static string FormatNumber(
             double? value)

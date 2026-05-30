@@ -1,30 +1,25 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 
 namespace RubexOps
 {
     public partial class CreatePurchaseContractPage : Page
     {
-        // =====================================================
-        // CONSTRUCTOR
-        // =====================================================
+        private const string DefaultItemCode = "NRFC";
 
         public CreatePurchaseContractPage()
         {
             InitializeComponent();
+
+            ItemCodeBox.Text = DefaultItemCode;
+            ItemCodeBox.IsReadOnly = true;
         }
-
-
-
-        // =====================================================
-        // ENTER KEY SUBMIT
-        // =====================================================
 
         private void MainGrid_PreviewKeyDown(object sender, KeyEventArgs e)
         {
@@ -35,12 +30,6 @@ namespace RubexOps
             }
         }
 
-
-
-        // =====================================================
-        // CREATE CONTRACT
-        // =====================================================
-
         private async void CreateContract_Click(
             object sender,
             RoutedEventArgs e)
@@ -50,31 +39,15 @@ namespace RubexOps
 
             try
             {
-                // =============================================
-                // MINIMAL LOADING EFFECT
-                // =============================================
-
                 Mouse.OverrideCursor = Cursors.Wait;
                 MainGrid.IsEnabled = false;
                 MainGrid.Opacity = 0.75;
-
-
-
-                // =============================================
-                // DISABLE BUTTON
-                // =============================================
 
                 if (clickedButton != null)
                 {
                     clickedButton.IsEnabled = false;
                     clickedButton.Content = "Creating...";
                 }
-
-
-
-                // =============================================
-                // REQUIRED FIELD VALIDATION
-                // =============================================
 
                 if (string.IsNullOrWhiteSpace(VendorNameBox.Text))
                 {
@@ -148,24 +121,12 @@ namespace RubexOps
                     return;
                 }
 
-
-
-                // =============================================
-                // TRIM VALUES
-                // =============================================
-
                 string vendorName = VendorNameBox.Text.Trim();
                 string vendorID = VendorIDBox.Text.Trim();
-                string itemCode = ItemCodeBox.Text.Trim();
+                string itemCode = DefaultItemCode;
 
                 string penaltyRateText = PenaltyRateBox.Text.Trim();
                 string remedyDaysText = RemedyDaysBox.Text.Trim();
-
-
-
-                // =============================================
-                // OPTIONAL VALUES DEFAULT TO ZERO
-                // =============================================
 
                 if (string.IsNullOrWhiteSpace(penaltyRateText))
                 {
@@ -177,13 +138,10 @@ namespace RubexOps
                     remedyDaysText = "0";
                 }
 
+                DateTime startDateValue = StartDatePicker.SelectedDate.Value;
+                DateTime endDateValue = EndDatePicker.SelectedDate.Value;
 
-
-                // =============================================
-                // DATE VALIDATION
-                // =============================================
-
-                if (StartDatePicker.SelectedDate > EndDatePicker.SelectedDate)
+                if (endDateValue <= startDateValue)
                 {
                     MessageBox.Show(
                         "End Date must be after Start Date.",
@@ -191,16 +149,15 @@ namespace RubexOps
                         MessageBoxButton.OK,
                         MessageBoxImage.Warning);
 
+                    EndDatePicker.Focus();
                     return;
                 }
 
-
-
-                // =============================================
-                // BASE PRICE VALIDATION
-                // =============================================
-
-                if (!decimal.TryParse(BasePriceBox.Text, out decimal basePrice))
+                if (!decimal.TryParse(
+                        BasePriceBox.Text.Trim(),
+                        NumberStyles.Number,
+                        CultureInfo.CurrentCulture,
+                        out decimal basePrice))
                 {
                     MessageBox.Show(
                         "Base Price must be a valid number.",
@@ -224,16 +181,14 @@ namespace RubexOps
                     return;
                 }
 
-
-
-                // =============================================
-                // AGREED QUANTITY VALIDATION
-                // =============================================
-
-                if (!int.TryParse(AgreedQuantityBox.Text, out int agreedQuantity))
+                if (!decimal.TryParse(
+                        AgreedQuantityBox.Text.Trim(),
+                        NumberStyles.Number,
+                        CultureInfo.CurrentCulture,
+                        out decimal agreedQuantity))
                 {
                     MessageBox.Show(
-                        "Agreed Quantity must be a whole number.",
+                        "Agreed Quantity must be a valid number.",
                         "Validation Error",
                         MessageBoxButton.OK,
                         MessageBoxImage.Warning);
@@ -254,15 +209,13 @@ namespace RubexOps
                     return;
                 }
 
+                penaltyRateText = penaltyRateText.Replace("%", "").Trim();
 
-
-                // =============================================
-                // PENALTY RATE VALIDATION
-                // =============================================
-
-                penaltyRateText = penaltyRateText.Replace("%", "");
-
-                if (!double.TryParse(penaltyRateText, out double penaltyRate))
+                if (!double.TryParse(
+                        penaltyRateText,
+                        NumberStyles.Number,
+                        CultureInfo.CurrentCulture,
+                        out double penaltyRate))
                 {
                     MessageBox.Show(
                         "Penalty Rate must be numeric.",
@@ -286,13 +239,11 @@ namespace RubexOps
                     return;
                 }
 
-
-
-                // =============================================
-                // REMEDY DAYS VALIDATION
-                // =============================================
-
-                if (!int.TryParse(remedyDaysText, out int remedyDays))
+                if (!int.TryParse(
+                        remedyDaysText,
+                        NumberStyles.Integer,
+                        CultureInfo.CurrentCulture,
+                        out int remedyDays))
                 {
                     MessageBox.Show(
                         "Remedy Days must be a whole number.",
@@ -316,37 +267,17 @@ namespace RubexOps
                     return;
                 }
 
-
-
-                // =============================================
-                // FORMAT DATES
-                // =============================================
-
                 string startDate =
-                    StartDatePicker.SelectedDate?
-                    .ToString("dd-MM-yyyy") ?? "";
+                    startDateValue.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture);
 
                 string endDate =
-                    EndDatePicker.SelectedDate?
-                    .ToString("dd-MM-yyyy") ?? "";
-
-
-
-                // =============================================
-                // PYTHON SCRIPT PATH
-                // =============================================
+                    endDateValue.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture);
 
                 string pythonScript = Path.Combine(
                     AppDomain.CurrentDomain.BaseDirectory,
                     "backend",
                     "create_purchase_contract.py"
                 );
-
-
-
-                // =============================================
-                // CHECK SCRIPT EXISTS
-                // =============================================
 
                 if (!File.Exists(pythonScript))
                 {
@@ -360,67 +291,34 @@ namespace RubexOps
                     return;
                 }
 
-
-
-                // =============================================
-                // PYTHON COMMAND
-                // =============================================
-
-                string pythonExe = "python";
-
-
-
-                // =============================================
-                // BUILD ARGUMENTS
-                // =============================================
-
-                string arguments =
-                    $"\"{vendorName}\" " +
-                    $"\"{vendorID}\" " +
-                    $"\"{itemCode}\" " +
-                    $"\"{startDate}\" " +
-                    $"\"{endDate}\" " +
-                    $"\"{basePrice}\" " +
-                    $"\"{agreedQuantity}\" " +
-                    $"\"{penaltyRateText}\" " +
-                    $"\"{remedyDaysText}\"";
-
-
-
-                // =============================================
-                // PROCESS INFO
-                // =============================================
-
                 ProcessStartInfo start =
-                    new ProcessStartInfo
+                    new()
                     {
-                        FileName = pythonExe,
-
-                        Arguments =
-                            $"\"{pythonScript}\" {arguments}",
-
+                        FileName = "python",
                         UseShellExecute = false,
-
                         RedirectStandardOutput = true,
-
                         RedirectStandardError = true,
-
                         CreateNoWindow = true,
-
                         WorkingDirectory =
                             Path.Combine(
                                 AppDomain.CurrentDomain.BaseDirectory,
                                 "backend")
                     };
 
-
-
-                // =============================================
-                // RUN PROCESS
-                // =============================================
+                start.ArgumentList.Add(pythonScript);
+                start.ArgumentList.Add(vendorName);
+                start.ArgumentList.Add(vendorID);
+                start.ArgumentList.Add(itemCode);
+                start.ArgumentList.Add(startDate);
+                start.ArgumentList.Add(endDate);
+                start.ArgumentList.Add(basePrice.ToString(CultureInfo.InvariantCulture));
+                start.ArgumentList.Add(agreedQuantity.ToString(CultureInfo.InvariantCulture));
+                start.ArgumentList.Add(penaltyRate.ToString(CultureInfo.InvariantCulture));
+                start.ArgumentList.Add(remedyDays.ToString(CultureInfo.InvariantCulture));
 
                 string output = "";
                 string error = "";
+                int exitCode = 0;
 
                 await Task.Run(() =>
                 {
@@ -436,18 +334,36 @@ namespace RubexOps
                         process.StandardError.ReadToEnd();
 
                     process.WaitForExit();
+
+                    exitCode = process.ExitCode;
                 });
 
+                if (exitCode != 0)
+                {
+                    string message =
+                        !string.IsNullOrWhiteSpace(error)
+                            ? error.Trim()
+                            : output.Trim();
 
+                    if (string.IsNullOrWhiteSpace(message))
+                    {
+                        message =
+                            $"Backend process failed with exit code {exitCode}.";
+                    }
 
-                // =============================================
-                // HANDLE ERRORS
-                // =============================================
+                    MessageBox.Show(
+                        message,
+                        "Backend Error",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+
+                    return;
+                }
 
                 if (!string.IsNullOrWhiteSpace(error))
                 {
                     MessageBox.Show(
-                        error,
+                        error.Trim(),
                         "Backend Error",
                         MessageBoxButton.OK,
                         MessageBoxImage.Error);
@@ -455,10 +371,12 @@ namespace RubexOps
                     return;
                 }
 
-                if (output.Contains("ERROR"))
+                if (output.TrimStart().StartsWith(
+                        "ERROR",
+                        StringComparison.OrdinalIgnoreCase))
                 {
                     MessageBox.Show(
-                        output,
+                        output.Trim(),
                         "Backend Error",
                         MessageBoxButton.OK,
                         MessageBoxImage.Error);
@@ -466,27 +384,14 @@ namespace RubexOps
                     return;
                 }
 
-
-
-                // =============================================
-                // SUCCESS
-                // =============================================
-
                 MessageBox.Show(
-                    output,
+                    output.Trim(),
                     "Success",
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);
 
                 ClearForm();
             }
-
-
-
-            // =============================================
-            // APPLICATION ERROR
-            // =============================================
-
             catch (Exception ex)
             {
                 MessageBox.Show(
@@ -495,13 +400,6 @@ namespace RubexOps
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             }
-
-
-
-            // =============================================
-            // RESTORE UI
-            // =============================================
-
             finally
             {
                 Mouse.OverrideCursor = null;
@@ -517,12 +415,6 @@ namespace RubexOps
             }
         }
 
-
-
-        // =====================================================
-        // CLEAR FORM BUTTON
-        // =====================================================
-
         private void ClearForm_Click(
             object sender,
             RoutedEventArgs e)
@@ -530,17 +422,11 @@ namespace RubexOps
             ClearForm();
         }
 
-
-
-        // =====================================================
-        // CLEAR FORM METHOD
-        // =====================================================
-
         private void ClearForm()
         {
             VendorNameBox.Clear();
             VendorIDBox.Clear();
-            ItemCodeBox.Text = "NRFC";
+            ItemCodeBox.Text = DefaultItemCode;
             StartDatePicker.SelectedDate = null;
             EndDatePicker.SelectedDate = null;
             BasePriceBox.Clear();

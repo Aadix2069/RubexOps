@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,17 +11,9 @@ namespace RubexOps
 {
     public partial class EditPurchaseDataWindow : Window
     {
-        // =====================================================
-        // FIELDS
-        // =====================================================
+        private const string DefaultItemCode = "NRFC";
 
         private readonly PurchaseDataRecord purchaseData;
-
-
-
-        // =====================================================
-        // CONSTRUCTOR
-        // =====================================================
 
         public EditPurchaseDataWindow(
             PurchaseDataRecord selectedPurchaseData)
@@ -35,12 +26,6 @@ namespace RubexOps
             LoadPurchaseData();
         }
 
-
-
-        // =====================================================
-        // LOAD DATA
-        // =====================================================
-
         private void LoadPurchaseData()
         {
             VendorNameBox.Text =
@@ -49,10 +34,12 @@ namespace RubexOps
             VendorIDBox.Text =
                 purchaseData.VendorID;
 
+            VendorIDBox.IsReadOnly = true;
+
             ItemCodeBox.Text =
-                string.IsNullOrWhiteSpace(purchaseData.ItemCode)
-                    ? "NRFC"
-                    : purchaseData.ItemCode;
+                DefaultItemCode;
+
+            ItemCodeBox.IsReadOnly = true;
 
             InvoiceNumberBox.Text =
                 purchaseData.InvoiceNumber;
@@ -91,16 +78,13 @@ namespace RubexOps
                 FormatNullableDecimal(purchaseData.UnloadingCharge);
         }
 
-
-
-        // =====================================================
-        // SAVE
-        // =====================================================
-
         private async void Save_Click(
             object sender,
             RoutedEventArgs e)
         {
+            object? originalContent =
+                SaveButton.Content;
+
             try
             {
                 Mouse.OverrideCursor =
@@ -139,19 +123,20 @@ namespace RubexOps
 
                 string purchaseOrderDate =
                     PurchaseOrderDatePicker.SelectedDate?
-                    .ToString("dd-MM-yyyy") ?? "";
+                    .ToString("dd-MM-yyyy", CultureInfo.InvariantCulture) ?? "";
 
                 string deliveryDate =
                     DeliveryDatePicker.SelectedDate?
-                    .ToString("dd-MM-yyyy") ?? "";
+                    .ToString("dd-MM-yyyy", CultureInfo.InvariantCulture) ?? "";
 
-                string arguments =
-                    BuildArguments(
-                        purchaseData.RowNumber.ToString(
-                            CultureInfo.InvariantCulture),
+                string output =
+                    await RunPythonScript(
+                        pythonScript,
+                        purchaseData.RowNumber.ToString(CultureInfo.InvariantCulture),
                         VendorNameBox.Text.Trim(),
                         VendorIDBox.Text.Trim(),
-                        ItemCodeBox.Text.Trim(),
+                        GetContractId(),
+                        DefaultItemCode,
                         InvoiceNumberBox.Text.Trim(),
                         purchaseOrderDate,
                         deliveryDate,
@@ -164,12 +149,9 @@ namespace RubexOps
                         GetRequiredDecimalArgument(Tds194QBox),
                         GetRequiredDecimalArgument(UnloadingChargeBox));
 
-                string output =
-                    await RunPythonScript(
-                        pythonScript,
-                        arguments);
-
-                if (output.Contains("ERROR"))
+                if (output.TrimStart().StartsWith(
+                        "ERROR",
+                        StringComparison.OrdinalIgnoreCase))
                 {
                     MessageBox.Show(
                         output,
@@ -209,15 +191,9 @@ namespace RubexOps
                 SaveButton.IsEnabled = true;
 
                 SaveButton.Content =
-                    "Save Changes";
+                    originalContent ?? "Save Changes";
             }
         }
-
-
-
-        // =====================================================
-        // VALIDATION
-        // =====================================================
 
         private bool ValidateForm()
         {
@@ -240,6 +216,21 @@ namespace RubexOps
             {
                 MessageBox.Show(
                     "Vendor ID is required.",
+                    "Validation Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                VendorIDBox.Focus();
+
+                return false;
+            }
+
+            if (!VendorIDBox.Text.Trim().Equals(
+                    purchaseData.VendorID ?? "",
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                MessageBox.Show(
+                    "Vendor ID cannot be changed for an existing purchase row.",
                     "Validation Error",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
@@ -322,7 +313,7 @@ namespace RubexOps
             if (!ValidateRequiredDecimal(
                     CarrierWeightBox,
                     "Carrier Weight",
-                    false))
+                    true))
             {
                 return false;
             }
@@ -390,12 +381,6 @@ namespace RubexOps
             return true;
         }
 
-
-
-        // =====================================================
-        // DECIMAL VALIDATION
-        // =====================================================
-
         private bool ValidateRequiredDecimal(
             TextBox textBox,
             string fieldName,
@@ -461,8 +446,6 @@ namespace RubexOps
             return true;
         }
 
-
-
         private bool ValidateOptionalDecimal(
             TextBox textBox,
             string fieldName,
@@ -519,8 +502,6 @@ namespace RubexOps
 
             return true;
         }
-
-
 
         private bool ValidateRequiredPercent(
             TextBox textBox,
@@ -589,8 +570,6 @@ namespace RubexOps
             return true;
         }
 
-
-
         private bool ValidateOptionalWholeNumber(
             TextBox textBox,
             string fieldName)
@@ -634,18 +613,14 @@ namespace RubexOps
             return true;
         }
 
-
-
-        // =====================================================
-        // FORMATTERS
-        // =====================================================
-
         private bool TryParseDecimalText(
             string text,
             out decimal value)
         {
             string cleanText =
-                text.Trim().Replace("%", "");
+                text.Trim()
+                    .Replace("%", "")
+                    .Replace(",", "");
 
             if (decimal.TryParse(
                     cleanText,
@@ -663,8 +638,6 @@ namespace RubexOps
                 out value);
         }
 
-
-
         private decimal GetDecimalValue(
             TextBox textBox)
         {
@@ -675,16 +648,12 @@ namespace RubexOps
             return value;
         }
 
-
-
         private string GetRequiredDecimalArgument(
             TextBox textBox)
         {
             return GetDecimalValue(textBox)
                 .ToString(CultureInfo.InvariantCulture);
         }
-
-
 
         private string GetOptionalDecimalArgument(
             TextBox textBox)
@@ -698,8 +667,6 @@ namespace RubexOps
             return GetRequiredDecimalArgument(
                 textBox);
         }
-
-
 
         private string GetOptionalWholeNumberArgument(
             TextBox textBox)
@@ -720,7 +687,25 @@ namespace RubexOps
                 CultureInfo.InvariantCulture);
         }
 
+        private string GetContractId()
+        {
+            object? value =
+                purchaseData
+                    .GetType()
+                    .GetProperty("ContractID")
+                    ?.GetValue(purchaseData);
 
+            if (value == null)
+            {
+                value =
+                    purchaseData
+                        .GetType()
+                        .GetProperty("contract_id")
+                        ?.GetValue(purchaseData);
+            }
+
+            return value?.ToString()?.Trim() ?? "";
+        }
 
         private DateTime? ParseDate(
             string value)
@@ -738,8 +723,6 @@ namespace RubexOps
             return null;
         }
 
-
-
         private string FormatNullableDecimal(
             decimal? value)
         {
@@ -748,57 +731,14 @@ namespace RubexOps
                 : "";
         }
 
-
-
-        private string BuildArguments(
-            params string[] values)
-        {
-            StringBuilder builder =
-                new StringBuilder();
-
-            foreach (string value in values)
-            {
-                if (builder.Length > 0)
-                {
-                    builder.Append(" ");
-                }
-
-                builder.Append(
-                    QuoteArgument(value));
-            }
-
-            return builder.ToString();
-        }
-
-
-
-        private string QuoteArgument(
-            string value)
-        {
-            return "\"" +
-                   value.Replace("\"", "\\\"") +
-                   "\"";
-        }
-
-
-
-        // =====================================================
-        // PYTHON RUNNER
-        // =====================================================
-
         private async Task<string> RunPythonScript(
             string pythonScript,
-            string arguments)
+            params string[] arguments)
         {
-            string pythonExe = "python";
-
             ProcessStartInfo start =
-                new ProcessStartInfo
+                new()
                 {
-                    FileName = pythonExe,
-
-                    Arguments =
-                        $"\"{pythonScript}\" {arguments}",
+                    FileName = "python",
 
                     UseShellExecute = false,
 
@@ -814,9 +754,16 @@ namespace RubexOps
                             "backend")
                 };
 
-            string output = "";
+            start.ArgumentList.Add(pythonScript);
 
+            foreach (string argument in arguments)
+            {
+                start.ArgumentList.Add(argument);
+            }
+
+            string output = "";
             string error = "";
+            int exitCode = 0;
 
             await Task.Run(() =>
             {
@@ -832,21 +779,34 @@ namespace RubexOps
                     process.StandardError.ReadToEnd();
 
                 process.WaitForExit();
+
+                exitCode =
+                    process.ExitCode;
             });
+
+            if (exitCode != 0)
+            {
+                string message =
+                    !string.IsNullOrWhiteSpace(error)
+                        ? error.Trim()
+                        : output.Trim();
+
+                if (string.IsNullOrWhiteSpace(message))
+                {
+                    message =
+                        $"Backend process failed with exit code {exitCode}.";
+                }
+
+                throw new Exception(message);
+            }
 
             if (!string.IsNullOrWhiteSpace(error))
             {
-                throw new Exception(error);
+                throw new Exception(error.Trim());
             }
 
             return output.Trim();
         }
-
-
-
-        // =====================================================
-        // CANCEL
-        // =====================================================
 
         private void Cancel_Click(
             object sender,

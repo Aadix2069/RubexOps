@@ -1,620 +1,109 @@
 import sys
-import os
-import json
 import warnings
-from pathlib import Path
-from openpyxl import load_workbook
 from datetime import datetime
+
+from contract_engine import ITEM_CODE, generate_contract_id, safe_percent
+from database import append_pcon, read_pcon, safe_string
 
 warnings.filterwarnings("ignore")
 
 
+EXPECTED_ARGUMENTS = 10
+DATE_FORMAT = "%d-%m-%Y"
 
-# =========================================================
-# SAFE ERROR FUNCTION
-# =========================================================
 
 def fail(message):
-
-    # IMPORTANT:
-    # SEND ERRORS TO STDERR
-    # SO JSON / OUTPUT DOES NOT BREAK
-
     sys.stderr.write(f"ERROR: {message}\n")
-
     sys.exit(1)
 
 
-
-# =========================================================
-# LOAD DATABASE CONFIG
-# =========================================================
-
-try:
-
-    # =============================================
-    # CONFIG PATH
-    # =============================================
-
-    CONFIG_PATH = (
-        Path.home()
-        / "Documents"
-        / "RubexOps"
-        / "database_config.json"
-    )
-
-
-
-    # =============================================
-    # SHEET NAMES
-    # =============================================
-
-    PURCHASE_SHEET_NAME = "purchase"
-
-    PRODUCTION_SHEET_NAME = "production"
-
-
-
-    # =============================================
-    # DEFAULT START ROW
-    # =============================================
-
-    START_ROW = 5
-
-
-
-    # =============================================
-    # CHECK CONFIG EXISTS
-    # =============================================
-
-    if not CONFIG_PATH.exists():
-
-        fail(
-            "database_config.json not found."
-        )
-
-
-
-    # =============================================
-    # READ CONFIG
-    # =============================================
-
-    with open(CONFIG_PATH, "r") as file:
-
-        config = json.load(file)
-
-
-
-except json.JSONDecodeError:
-
-    fail(
-        "Invalid JSON inside database_config.json."
-    )
-
-except Exception as ex:
-
-    fail(str(ex))
-
-
-
-# =========================================================
-# DATABASE PATH
-# =========================================================
-
-DATABASE_PATH = str(
-    config.get(
-        "database_path",
-        ""
-    )
-).strip()
-
-
-
-SHEET_NAME = "pcon"
-
-
-
-# =========================================================
-# VALIDATE DATABASE PATH
-# =========================================================
-
-if DATABASE_PATH == "":
-
-    fail("Database path is empty.")
-
-
-
-if not os.path.exists(DATABASE_PATH):
-
-    fail("Database file not found.")
-
-
-
-# =========================================================
-# COLUMN MAPPING
-# =========================================================
-
-COLUMN_MAP = {
-    "vendor_name": "B",
-    "vendor_id": "C",
-    "item_code": "E",
-    "start_date": "F",
-    "end_date": "G",
-    "base_price": "L",
-    "agreed_quantity": "M",
-    "penalty_rate": "S",
-    "remedy_days": "V"
-}
-
-
-
-# =========================================================
-# VALIDATE ARGUMENT COUNT
-# =========================================================
-
-EXPECTED_ARGUMENTS = 10
-
-
-
-if len(sys.argv) != EXPECTED_ARGUMENTS:
-
-    fail("Missing required arguments.")
-
-
-
-# =========================================================
-# SAFE CONVERSION FUNCTIONS
-# =========================================================
-
-def safe_string(value):
-
-    if value is None:
-
-        return ""
-
-
-
-    return str(value).strip()
-
-
-
-def safe_float(value, field_name):
+def parse_date_text(value, field_name):
+    text = safe_string(value)
+    if text == "":
+        fail(f"{field_name} is required.")
 
     try:
+        return datetime.strptime(text, DATE_FORMAT).date()
+    except ValueError:
+        fail(f"{field_name} must be in dd-MM-yyyy format.")
 
-        number = float(value)
 
-        return number
+def parse_decimal(value, field_name):
+    text = safe_string(value).replace(",", "").replace("%", "")
+    if text == "":
+        fail(f"{field_name} is required.")
 
-    except:
-
+    try:
+        return float(text)
+    except ValueError:
         fail(f"{field_name} must be numeric.")
 
 
+def create_purchase_contract(args):
+    if len(args) != EXPECTED_ARGUMENTS - 1:
+        fail("Missing required arguments.")
 
-# =========================================================
-# GET ARGUMENTS
-# =========================================================
+    vendor_name = safe_string(args[0])
+    vendor_id = safe_string(args[1])
 
-vendor_name = safe_string(
-    sys.argv[1]
-)
+    # Kept only for old C# call compatibility. Item data is now constant.
+    _legacy_item_code = safe_string(args[2]) or ITEM_CODE
 
+    start_date = parse_date_text(args[3], "Start Date")
+    end_date = parse_date_text(args[4], "End Date")
+    base_price = parse_decimal(args[5], "Base Price")
+    agreed_qty = parse_decimal(args[6], "Agreed Quantity")
+    penalty_discount_percent = safe_percent(
+        parse_decimal(args[7], "Penalty / Discount Percentage")
+    )
+    remedy_days = parse_decimal(args[8], "Remedy Days")
 
+    if vendor_name == "":
+        fail("Vendor Name cannot be empty.")
 
-vendor_id = safe_string(
-    sys.argv[2]
-)
+    if vendor_id == "":
+        fail("Vendor ID cannot be empty.")
 
+    if end_date <= start_date:
+        fail("End date must be after start date.")
 
+    if base_price <= 0:
+        fail("Base Price must be greater than 0.")
 
-item_code = safe_string(
-    sys.argv[3]
-)
+    if agreed_qty <= 0:
+        fail("Agreed Quantity must be greater than 0.")
 
+    if remedy_days < 0:
+        fail("Remedy Days cannot be negative.")
 
+    existing_contracts = read_pcon()
+    vendor_key = vendor_id.casefold()
 
-start_date = safe_string(
-    sys.argv[4]
-)
+    if any(safe_string(contract.get("vendor_id")).casefold() == vendor_key for contract in existing_contracts):
+        fail("Vendor ID already exists. Please renew the existing contract instead.")
 
+    contract_id = generate_contract_id(vendor_id, existing_contracts)
 
+    append_pcon(
+        {
+            "vendor_name": vendor_name,
+            "vendor_id": vendor_id,
+            "contract_id": contract_id,
+            "start_date": start_date,
+            "end_date": end_date,
+            "base_price": base_price,
+            "agreed_qty": agreed_qty,
+            "breach_responsibility": "Pending",
+            "penalty_discount_percent": penalty_discount_percent,
+            "remedy_days": remedy_days,
+            "renewal_reference": "",
+        }
+    )
 
-end_date = safe_string(
-    sys.argv[5]
-)
+    return "Purchase Contract Created Successfully"
 
-
-
-base_price = safe_float(
-    sys.argv[6],
-    "Base Price"
-)
-
-
-
-agreed_quantity = safe_float(
-    sys.argv[7],
-    "Agreed Quantity"
-)
-
-
-
-penalty_rate = safe_float(
-    sys.argv[8],
-    "Penalty Rate"
-)
-
-
-
-remedy_days = safe_float(
-    sys.argv[9],
-    "Remedy Days"
-)
-
-
-
-# =========================================================
-# EMPTY VALIDATION
-# =========================================================
-
-if vendor_name == "":
-
-    fail("Vendor Name cannot be empty.")
-
-
-
-if vendor_id == "":
-
-    fail("Vendor ID cannot be empty.")
-
-
-
-if item_code == "":
-
-    fail("Item Code cannot be empty.")
-
-
-
-# =========================================================
-# NEGATIVE VALIDATION
-# =========================================================
-
-if base_price <= 0:
-
-    fail("Base Price must be greater than 0.")
-
-
-
-if agreed_quantity <= 0:
-
-    fail("Agreed Quantity must be greater than 0.")
-
-
-
-if penalty_rate < 0:
-
-    fail("Penalty Rate cannot be negative.")
-
-
-
-if remedy_days < 0:
-
-    fail("Remedy Days cannot be negative.")
-
-
-
-# =========================================================
-# DATE VALIDATION
-# =========================================================
 
 try:
-
-    start_date_object = datetime.strptime(
-        start_date,
-        "%d-%m-%Y"
-    )
-
-
-
-    end_date_object = datetime.strptime(
-        end_date,
-        "%d-%m-%Y"
-    )
-
-
-
-except:
-
-    fail("Invalid date format.")
-
-
-
-if end_date_object <= start_date_object:
-
-    fail(
-        "End date must be after start date."
-    )
-
-
-
-# =========================================================
-# LOAD WORKBOOK
-# =========================================================
-
-try:
-
-    workbook = load_workbook(
-        DATABASE_PATH
-    )
-
-
-
-except PermissionError:
-
-    fail(
-        "Close Excel workbook before continuing."
-    )
-
-except Exception as ex:
-
-    fail(
-        f"Failed to load workbook.\n{str(ex)}"
-    )
-
-
-
-# =========================================================
-# VALIDATE SHEET
-# =========================================================
-
-if SHEET_NAME not in workbook.sheetnames:
-
-    fail(
-        f"Sheet '{SHEET_NAME}' does not exist."
-    )
-
-
-
-sheet = workbook[SHEET_NAME]
-
-
-
-# =========================================================
-# DUPLICATE VENDOR ID VALIDATION
-# =========================================================
-
-for row in range(START_ROW, sheet.max_row + 1):
-
-    existing_vendor_id = sheet[f"C{row}"].value
-
-    termination_status = sheet[f"Y{row}"].value
-
-
-
-    if existing_vendor_id is None:
-
-        continue
-
-
-
-    existing_vendor_id = str(
-        existing_vendor_id
-    ).strip().lower()
-
-
-
-    current_vendor_id = vendor_id.strip().lower()
-
-
-
-    # =============================================
-    # SKIP TERMINATED CONTRACTS
-    # =============================================
-
-    is_terminated = False
-
-
-
-    if termination_status is not None:
-
-        is_terminated = (
-            str(termination_status)
-            .strip()
-            .upper()
-            == "TERMINATED"
-        )
-
-
-
-    # =============================================
-    # DUPLICATE CHECK
-    # =============================================
-
-    if (
-        existing_vendor_id == current_vendor_id
-        and not is_terminated
-    ):
-
-        fail(
-            "Vendor ID already exists.\n"
-            "Please use a different Vendor ID."
-        )
-
-
-
-# =========================================================
-# FIND NEXT EMPTY ROW
-# =========================================================
-
-next_row = START_ROW
-
-
-
-while sheet[f"B{next_row}"].value not in [None, ""]:
-
-    next_row += 1
-
-
-
-# =========================================================
-# WRITE DATA
-# =========================================================
-
-try:
-
-    # =============================================
-    # BASIC DETAILS
-    # =============================================
-
-    sheet[
-        f"{COLUMN_MAP['vendor_name']}{next_row}"
-    ] = vendor_name
-
-
-
-    sheet[
-        f"{COLUMN_MAP['vendor_id']}{next_row}"
-    ] = vendor_id
-
-
-
-    sheet[
-        f"{COLUMN_MAP['item_code']}{next_row}"
-    ] = item_code
-
-
-
-    # =============================================
-    # DATES
-    # =============================================
-
-    sheet[
-        f"{COLUMN_MAP['start_date']}{next_row}"
-    ] = start_date_object
-
-
-
-    sheet[
-        f"{COLUMN_MAP['end_date']}{next_row}"
-    ] = end_date_object
-
-
-
-    sheet[
-        f"{COLUMN_MAP['start_date']}{next_row}"
-    ].number_format = "DD-MM-YYYY"
-
-
-
-    sheet[
-        f"{COLUMN_MAP['end_date']}{next_row}"
-    ].number_format = "DD-MM-YYYY"
-
-
-
-    # =============================================
-    # CONTRACT VALUES
-    # =============================================
-
-    sheet[
-        f"{COLUMN_MAP['base_price']}{next_row}"
-    ] = base_price
-
-
-
-    sheet[
-        f"{COLUMN_MAP['agreed_quantity']}{next_row}"
-    ] = agreed_quantity
-
-
-
-    # =============================================
-    # PENALTY RATE
-    # =============================================
-
-    if penalty_rate > 1:
-
-        penalty_rate = penalty_rate / 100
-
-
-
-    sheet[
-        f"{COLUMN_MAP['penalty_rate']}{next_row}"
-    ] = penalty_rate
-
-
-
-    sheet[
-        f"{COLUMN_MAP['penalty_rate']}{next_row}"
-    ].number_format = "0%"
-
-
-
-    # =============================================
-    # REMEDY DAYS
-    # =============================================
-
-    sheet[
-        f"{COLUMN_MAP['remedy_days']}{next_row}"
-    ] = remedy_days
-
-
-
-    # =============================================
-    # DEFAULT VALUES
-    # =============================================
-
-    sheet[f"R{next_row}"] = "Pending"
-
-
-
-    # =============================================
-    # CLEAR TERMINATION STATUS
-    # =============================================
-
-    sheet[f"Y{next_row}"] = ""
-
-
-
-except Exception as ex:
-
-    fail(
-        f"Failed to write contract data.\n{str(ex)}"
-    )
-
-
-
-# =========================================================
-# SAVE WORKBOOK
-# =========================================================
-
-try:
-
-    workbook.save(
-        DATABASE_PATH
-    )
-
-
-
-except PermissionError:
-
-    fail(
-        "Cannot save workbook. Close Excel file first."
-    )
-
-except Exception as ex:
-
-    fail(
-        f"Failed to save workbook.\n{str(ex)}"
-    )
-
-
-
-# =========================================================
-# SUCCESS
-# =========================================================
-
-print(
-    "Purchase Contract Created Successfully"
-)
+    print(create_purchase_contract(sys.argv[1:]))
+except Exception as error:
+    fail(str(error))

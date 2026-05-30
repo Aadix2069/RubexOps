@@ -11,26 +11,10 @@ namespace RubexOps
 {
     public partial class EditContractWindow : Window
     {
-        // =====================================================
-        // CURRENT CONTRACT
-        // =====================================================
-
         private readonly PurchaseContract currentContract;
-
-
-
-        // =====================================================
-        // PYTHON COMMAND
-        // =====================================================
 
         private readonly string pythonExe =
             "python";
-
-
-
-        // =====================================================
-        // CONSTRUCTOR
-        // =====================================================
 
         public EditContractWindow(
             PurchaseContract contract)
@@ -42,16 +26,15 @@ namespace RubexOps
             LoadContractData();
         }
 
-
-
-        // =====================================================
-        // LOAD EXISTING DATA
-        // =====================================================
-
         private void LoadContractData()
         {
+            string contractId =
+                string.IsNullOrWhiteSpace(currentContract.contract_id)
+                    ? ""
+                    : $" | {currentContract.contract_id}";
+
             ContractSummaryText.Text =
-                $"{currentContract.vendor_name ?? ""} - {currentContract.vendor_id ?? ""}";
+                $"{currentContract.vendor_name ?? ""} - {currentContract.vendor_id ?? ""}{contractId}";
 
             StatusTextBlock.Text =
                 currentContract.DisplayStatus.ToUpperInvariant();
@@ -65,6 +48,8 @@ namespace RubexOps
 
             VendorIDBox.Text =
                 currentContract.vendor_id ?? "";
+
+            VendorIDBox.IsReadOnly = true;
 
             BasePriceBox.Text =
                 FormatNumberForInput(
@@ -97,12 +82,6 @@ namespace RubexOps
 
             ConfigureBreachResponsibilityState();
         }
-
-
-
-        // =====================================================
-        // BREACH RESPONSIBILITY STATE
-        // =====================================================
 
         private void ConfigureBreachResponsibilityState()
         {
@@ -151,14 +130,8 @@ namespace RubexOps
                 "No breach detected";
 
             BreachInfoMessage.Text =
-                "Breach responsibility is locked because Excel column Q does not indicate a breach.";
+                "Breach responsibility is locked because the Python contract engine has not detected a breach.";
         }
-
-
-
-        // =====================================================
-        // RESPONSIBILITY CHANGED
-        // =====================================================
 
         private void ResponsibilityComboBox_SelectionChanged(
             object sender,
@@ -191,16 +164,15 @@ namespace RubexOps
                 assigned ? 1 : 0.65;
         }
 
-
-
-        // =====================================================
-        // SAVE BUTTON
-        // =====================================================
-
         private void SaveButton_Click(
             object sender,
             RoutedEventArgs e)
         {
+            object? originalContent =
+                sender is Button clickedButton
+                    ? clickedButton.Content
+                    : null;
+
             try
             {
                 Mouse.OverrideCursor =
@@ -251,35 +223,10 @@ namespace RubexOps
                     return;
                 }
 
-                string arguments =
-                    QuoteArgument(currentContract.row.ToString(
-                        CultureInfo.InvariantCulture)) + " " +
-
-                    QuoteArgument(VendorNameBox.Text.Trim()) + " " +
-
-                    QuoteArgument(VendorIDBox.Text.Trim()) + " " +
-
-                    QuoteArgument(basePrice.ToString(
-                        CultureInfo.InvariantCulture)) + " " +
-
-                    QuoteArgument(agreedQty.ToString(
-                        CultureInfo.InvariantCulture)) + " " +
-
-                    QuoteArgument(penaltyPercent.ToString(
-                        CultureInfo.InvariantCulture)) + " " +
-
-                    QuoteArgument(remedyDays.ToString(
-                        CultureInfo.InvariantCulture)) + " " +
-
-                    QuoteArgument(responsibility);
-
                 ProcessStartInfo start =
-                    new ProcessStartInfo
+                    new()
                     {
                         FileName = pythonExe,
-
-                        Arguments =
-                            $"\"{pythonScript}\" {arguments}",
 
                         UseShellExecute = false,
 
@@ -295,6 +242,16 @@ namespace RubexOps
                                 "backend"
                             )
                     };
+
+                start.ArgumentList.Add(pythonScript);
+                start.ArgumentList.Add(currentContract.row.ToString(CultureInfo.InvariantCulture));
+                start.ArgumentList.Add(VendorNameBox.Text.Trim());
+                start.ArgumentList.Add(VendorIDBox.Text.Trim());
+                start.ArgumentList.Add(basePrice.ToString(CultureInfo.InvariantCulture));
+                start.ArgumentList.Add(agreedQty.ToString(CultureInfo.InvariantCulture));
+                start.ArgumentList.Add(penaltyPercent.ToString(CultureInfo.InvariantCulture));
+                start.ArgumentList.Add(remedyDays.ToString(CultureInfo.InvariantCulture));
+                start.ArgumentList.Add(responsibility);
 
                 using Process process =
                     Process.Start(start)
@@ -350,7 +307,7 @@ namespace RubexOps
                         StringComparison.OrdinalIgnoreCase))
                 {
                     MessageBox.Show(
-                        output,
+                        output.Trim(),
                         "Backend Error",
                         MessageBoxButton.OK,
                         MessageBoxImage.Error
@@ -360,7 +317,7 @@ namespace RubexOps
                 }
 
                 MessageBox.Show(
-                    output,
+                    output.Trim(),
                     "Success",
                     MessageBoxButton.OK,
                     MessageBoxImage.Information
@@ -391,16 +348,10 @@ namespace RubexOps
                 {
                     button.IsEnabled = true;
 
-                    button.Content = "Save Changes";
+                    button.Content = originalContent ?? "Save Changes";
                 }
             }
         }
-
-
-
-        // =====================================================
-        // VALIDATION
-        // =====================================================
 
         private bool ValidateForm(
             out double basePrice,
@@ -428,6 +379,20 @@ namespace RubexOps
             {
                 ShowValidation(
                     "Vendor ID is required.",
+                    VendorIDBox);
+
+                return false;
+            }
+
+            string currentVendorId =
+                currentContract.vendor_id ?? "";
+
+            if (!VendorIDBox.Text.Trim().Equals(
+                    currentVendorId,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                ShowValidation(
+                    "Vendor ID cannot be changed after Contract ID has been generated.",
                     VendorIDBox);
 
                 return false;
@@ -533,12 +498,6 @@ namespace RubexOps
             return true;
         }
 
-
-
-        // =====================================================
-        // HELPERS
-        // =====================================================
-
         private bool IsBreachDetected()
         {
             return currentContract.IsBreachDetected;
@@ -609,17 +568,18 @@ namespace RubexOps
                 CultureInfo.InvariantCulture);
         }
 
-        private static string QuoteArgument(
-            string value)
-        {
-            return "\"" + value.Replace("\"", "\\\"") + "\"";
-        }
-
         private static SolidColorBrush BrushFromHex(
-            string hex)
+    string hex)
         {
-            return (SolidColorBrush)
+            object? converted =
                 new BrushConverter().ConvertFromString(hex);
+
+            if (converted is SolidColorBrush brush)
+            {
+                return brush;
+            }
+
+            return new SolidColorBrush(Colors.Transparent);
         }
 
         private static void ShowValidation(
@@ -634,12 +594,6 @@ namespace RubexOps
 
             control.Focus();
         }
-
-
-
-        // =====================================================
-        // CANCEL BUTTON
-        // =====================================================
 
         private void CancelButton_Click(
             object sender,
