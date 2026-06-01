@@ -63,6 +63,19 @@ def normalize_percent_value(value):
 
     return min(max(number, 0.0), 100.0)
 
+def normalize_tds_percent(value):
+    """
+    TDS is stored literally.
+
+    Examples:
+        0.1 -> 0.1
+        1   -> 1
+        5   -> 5
+    """
+
+    number = abs(safe_float(value, 0.0))
+
+    return min(max(number, 0.0), 100.0)
 
 def normalize_ratio(value):
     """
@@ -215,9 +228,9 @@ def build_purchase_summary(purchase_record, base_price=0):
         purchase_record.get("gst_percent")
     )
 
-    tds_percent = normalize_percent_value(
-        purchase_record.get("tds_percent")
-    )
+    tds_percent = normalize_tds_percent(
+    purchase_record.get("tds_percent")
+)
 
     unloading_charge = clamp_non_negative(
         purchase_record.get("unloading_charge")

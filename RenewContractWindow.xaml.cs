@@ -34,7 +34,7 @@ namespace RubexOps
                 RenewButton.IsEnabled = false;
 
                 MessageBox.Show(
-                    "No renewable contracts are available. Only current Completed or Violated contracts can be renewed.",
+                    "No renewable contracts are available. Only Completed or Expired contracts can be renewed.",
                     "Renew Contract",
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);

@@ -2,7 +2,7 @@ import sys
 import warnings
 from datetime import datetime
 
-from contract_engine import ITEM_CODE, generate_contract_id, safe_percent
+from purchase_contract_engine import ITEM_CODE, generate_contract_id, safe_percent
 from database import append_pcon, read_pcon, safe_string
 
 warnings.filterwarnings("ignore")

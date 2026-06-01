@@ -32,6 +32,8 @@ namespace RubexOps
         private ContractOption? selectedContract = null;
 
         private bool isSelectingVendor;
+        private bool suppressSuggestionCommit;
+        private int suggestionIndex = -1;
 
         public EnterPurchaseDataPage()
         {
@@ -55,6 +57,38 @@ namespace RubexOps
             object sender,
             KeyEventArgs e)
         {
+            if (VendorSuggestionPopup.IsOpen &&
+                VendorSuggestionList.Items.Count > 0)
+            {
+                if (e.Key == Key.Down)
+                {
+                    MoveSuggestionSelection(1);
+                    e.Handled = true;
+                    return;
+                }
+
+                if (e.Key == Key.Up)
+                {
+                    MoveSuggestionSelection(-1);
+                    e.Handled = true;
+                    return;
+                }
+
+                if (e.Key == Key.Enter)
+                {
+                    CommitSelectedSuggestion();
+                    e.Handled = true;
+                    return;
+                }
+
+                if (e.Key == Key.Escape)
+                {
+                    VendorSuggestionPopup.IsOpen = false;
+                    e.Handled = true;
+                    return;
+                }
+            }
+
             if (e.Key == Key.Enter)
             {
                 e.Handled = true;
@@ -152,40 +186,144 @@ namespace RubexOps
             if (searchText.Length == 0)
             {
                 VendorSuggestionPopup.IsOpen = false;
-
+                VendorSuggestionList.ItemsSource = null;
+                suggestionIndex = -1;
                 return;
             }
 
             List<ContractOption> matches =
-                contractOptions.FindAll(c =>
-                    (c.VendorName ?? "").IndexOf(
-                        searchText,
-                        StringComparison.OrdinalIgnoreCase) >= 0 ||
+     contractOptions.FindAll(c =>
 
-                    (c.VendorID ?? "").IndexOf(
-                        searchText,
-                        StringComparison.OrdinalIgnoreCase) >= 0 ||
+         (!string.IsNullOrWhiteSpace(c.VendorName) &&
+          c.VendorName.Trim().StartsWith(
+              searchText,
+              StringComparison.OrdinalIgnoreCase))
 
-                    (c.ContractID ?? "").IndexOf(
-                        searchText,
-                        StringComparison.OrdinalIgnoreCase) >= 0);
+         ||
+
+         (!string.IsNullOrWhiteSpace(c.VendorID) &&
+          c.VendorID.Trim().StartsWith(
+              searchText,
+              StringComparison.OrdinalIgnoreCase))
+
+         ||
+
+         (!string.IsNullOrWhiteSpace(c.ContractID) &&
+          c.ContractID.Trim().StartsWith(
+              searchText,
+              StringComparison.OrdinalIgnoreCase)));
 
             VendorSuggestionList.ItemsSource =
                 matches;
+
+            if (matches.Count > 0)
+            {
+                suggestionIndex = 0;
+
+                suppressSuggestionCommit = true;
+                try
+                {
+                    VendorSuggestionList.SelectedIndex = suggestionIndex;
+
+                    if (VendorSuggestionList.SelectedItem != null)
+                    {
+                        VendorSuggestionList.ScrollIntoView(
+                            VendorSuggestionList.SelectedItem);
+                    }
+                }
+                finally
+                {
+                    suppressSuggestionCommit = false;
+                }
+            }
+            else
+            {
+                suggestionIndex = -1;
+                VendorSuggestionList.SelectedItem = null;
+            }
 
             VendorSuggestionPopup.IsOpen =
                 matches.Count > 0;
         }
 
-        private void VendorSuggestionList_SelectionChanged(
+        // Fired when the user explicitly clicks a suggestion with the mouse
+        private void VendorSuggestionItem_PreviewMouseLeftButtonUp(
             object sender,
-            SelectionChangedEventArgs e)
+            MouseButtonEventArgs e)
         {
-            if (VendorSuggestionList.SelectedItem is not ContractOption contract)
+            if (sender is ListBoxItem item && item.DataContext is ContractOption contract)
+            {
+                SelectContract(contract);
+                e.Handled = true;
+            }
+        }
+
+        private void MoveSuggestionSelection(
+            int direction)
+        {
+            int itemCount =
+                VendorSuggestionList.Items.Count;
+
+            if (itemCount <= 0)
             {
                 return;
             }
 
+            if (suggestionIndex < 0)
+            {
+                suggestionIndex = 0;
+            }
+            else
+            {
+                suggestionIndex += direction;
+            }
+
+            if (suggestionIndex < 0)
+            {
+                suggestionIndex = itemCount - 1;
+            }
+            else if (suggestionIndex >= itemCount)
+            {
+                suggestionIndex = 0;
+            }
+
+            suppressSuggestionCommit = true;
+            try
+            {
+                VendorSuggestionList.SelectedIndex = suggestionIndex;
+
+                if (VendorSuggestionList.SelectedItem != null)
+                {
+                    VendorSuggestionList.ScrollIntoView(
+                        VendorSuggestionList.SelectedItem);
+                }
+            }
+            finally
+            {
+                suppressSuggestionCommit = false;
+            }
+
+            VendorSuggestionPopup.IsOpen = true;
+        }
+
+        private void CommitSelectedSuggestion()
+        {
+            if (VendorSuggestionList.SelectedItem is ContractOption contract)
+            {
+                SelectContract(contract);
+                return;
+            }
+
+            if (VendorSuggestionList.Items.Count > 0 &&
+                VendorSuggestionList.Items[0] is ContractOption firstContract)
+            {
+                SelectContract(firstContract);
+            }
+        }
+
+        private void SelectContract(
+            ContractOption contract)
+        {
             isSelectingVendor = true;
 
             selectedContract = contract;
@@ -196,7 +334,7 @@ namespace RubexOps
                     : $"  —  {contract.ContractID}";
 
             VendorSearchBox.Text =
-                $"{contract.VendorName}  —  {contract.VendorID}{contractText}";
+                $"{contract.VendorName}{contractText}";
 
             VendorNameBox.Text =
                 contract.VendorName;
@@ -221,10 +359,27 @@ namespace RubexOps
                 ContractPeriodBadge.Visibility =
                     Visibility.Visible;
             }
+            else
+            {
+                ContractPeriodText.Text = "";
+
+                ContractPeriodBadge.Visibility =
+                    Visibility.Collapsed;
+            }
 
             VendorSuggestionPopup.IsOpen = false;
 
-            VendorSuggestionList.SelectedItem = null;
+            suppressSuggestionCommit = true;
+            try
+            {
+                VendorSuggestionList.SelectedItem = null;
+            }
+            finally
+            {
+                suppressSuggestionCommit = false;
+            }
+
+            suggestionIndex = -1;
 
             isSelectingVendor = false;
 
@@ -956,6 +1111,9 @@ namespace RubexOps
             UnloadingChargeBox.Clear();
 
             VendorSuggestionPopup.IsOpen = false;
+
+            suggestionIndex = -1;
+            suppressSuggestionCommit = false;
 
             UpdateSearchPlaceholder();
 

@@ -24,6 +24,22 @@ namespace RubexOps
                 selectedPurchaseData;
 
             LoadPurchaseData();
+
+            // Listen for the Enter key across the entire window to trigger a save
+            this.KeyDown += EditPurchaseDataWindow_KeyDown;
+        }
+
+        // New event handler for the Enter key
+        private void EditPurchaseDataWindow_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                // Prevent the key event from propagating further
+                e.Handled = true;
+
+                // Trigger the existing async save logic
+                Save_Click(this, new RoutedEventArgs());
+            }
         }
 
         private void LoadPurchaseData()

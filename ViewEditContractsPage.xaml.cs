@@ -8,16 +8,45 @@ using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace RubexOps
 {
     public partial class ViewEditContractsPage : Page
     {
+        private const string KilogramUnit = "Kg";
+        private const string TonnesUnit = "Tonnes";
+
+        private const string AllContractsFilter = "All Contracts";
+        private const string AllContractsIncludingExpiredFilter = "All Contracts (Including Expired)";
+
+        private static bool sessionFocusMode;
+        private static int sessionCardsPerRow = 3;
+
+        public static readonly DependencyProperty CardMinWidthProperty =
+            DependencyProperty.Register(
+                nameof(CardMinWidth),
+                typeof(double),
+                typeof(ViewEditContractsPage),
+                new PropertyMetadata(300.0));
+
+        private readonly Dictionary<FrameworkElement, Visibility> focusHiddenElements =
+            new();
+
         private List<PurchaseContract> allContracts =
             new();
 
         private readonly string pythonExe =
             "python";
+
+        private string selectedWeightUnit =
+            KilogramUnit;
+
+        public double CardMinWidth
+        {
+            get => (double)GetValue(CardMinWidthProperty);
+            set => SetValue(CardMinWidthProperty, value);
+        }
 
         public ViewEditContractsPage()
         {
@@ -27,7 +56,9 @@ namespace RubexOps
 
             SortComboBox.SelectedIndex = 0;
 
-            FilterComboBox.SelectedIndex = -1;
+            FilterComboBox.SelectedIndex = 0;
+
+            RestoreSessionViewState();
 
             LoadContracts();
         }
@@ -56,6 +87,47 @@ namespace RubexOps
                     MessageBoxImage.Error
                 );
             }
+        }
+
+        private void RestoreSessionViewState()
+        {
+            SelectCardsPerRow(sessionCardsPerRow);
+
+            FocusModeCheckBox.IsChecked =
+                sessionFocusMode;
+
+            ApplyFocusMode(
+                sessionFocusMode);
+        }
+
+        private void SelectCardsPerRow(
+            int cardsPerRow)
+        {
+            foreach (ComboBoxItem item in CardsPerRowComboBox.Items)
+            {
+                string text =
+                    item.Content?.ToString() ?? "";
+
+                if (int.TryParse(
+                        text,
+                        NumberStyles.Integer,
+                        CultureInfo.InvariantCulture,
+                        out int value) &&
+                    value == cardsPerRow)
+                {
+                    CardsPerRowComboBox.SelectedItem =
+                        item;
+
+                    ApplyCardsPerRow(
+                        value);
+
+                    return;
+                }
+            }
+
+            CardsPerRowComboBox.SelectedIndex = 0;
+
+            ApplyCardsPerRow(3);
         }
 
         private void LoadContracts()
@@ -185,6 +257,8 @@ namespace RubexOps
                         options
                     ) ?? new();
 
+                ApplyWeightDisplayUnit();
+
                 ApplySortingAndSearch();
             }
             catch (Exception ex)
@@ -227,6 +301,179 @@ namespace RubexOps
             ApplySortingAndSearch();
         }
 
+        private void UnitRadioButton_Checked(
+            object sender,
+            RoutedEventArgs e)
+        {
+            selectedWeightUnit =
+                TonnesRadioButton?.IsChecked == true
+                    ? TonnesUnit
+                    : KilogramUnit;
+
+            ApplyWeightDisplayUnit();
+
+            ApplySortingAndSearch();
+        }
+
+        private void CardsPerRowComboBox_SelectionChanged(
+            object sender,
+            SelectionChangedEventArgs e)
+        {
+            if (CardsPerRowComboBox?.SelectedItem is not ComboBoxItem item)
+            {
+                return;
+            }
+
+            string text =
+                item.Content?.ToString() ?? "";
+
+            if (!int.TryParse(
+                    text,
+                    NumberStyles.Integer,
+                    CultureInfo.InvariantCulture,
+                    out int cardsPerRow))
+            {
+                cardsPerRow = 3;
+            }
+
+            ApplyCardsPerRow(
+                cardsPerRow);
+        }
+
+        private void ApplyCardsPerRow(
+            int cardsPerRow)
+        {
+            if (cardsPerRow < 3 ||
+                cardsPerRow > 5)
+            {
+                cardsPerRow = 3;
+            }
+
+            sessionCardsPerRow =
+                cardsPerRow;
+
+            CardMinWidth =
+                cardsPerRow switch
+                {
+                    4 => 240.0,
+                    5 => 200.0,
+                    _ => 300.0
+                };
+
+            if (ContractsItemsControl != null)
+            {
+                ContractsItemsControl.Tag =
+                    cardsPerRow;
+            }
+        }
+
+        private void FocusModeCheckBox_Checked(
+            object sender,
+            RoutedEventArgs e)
+        {
+            bool enabled =
+                FocusModeCheckBox?.IsChecked == true;
+
+            sessionFocusMode =
+                enabled;
+
+            ApplyFocusMode(
+                enabled);
+        }
+
+        private void ApplyFocusMode(
+            bool enabled)
+        {
+            HeaderSection.Visibility =
+                enabled ? Visibility.Collapsed : Visibility.Visible;
+
+            StatusLegendPanel.Visibility =
+                enabled ? Visibility.Collapsed : Visibility.Visible;
+
+            WatermarkLogo.Visibility =
+                enabled ? Visibility.Collapsed : Visibility.Visible;
+
+            HeaderRow.Height =
+                enabled ? new GridLength(0) : GridLength.Auto;
+
+            HeaderSpacerRow.Height =
+                enabled ? new GridLength(0) : new GridLength(18);
+
+            LegendRow.Height =
+                enabled ? new GridLength(0) : GridLength.Auto;
+
+            LegendSpacerRow.Height =
+                enabled ? new GridLength(0) : new GridLength(18);
+
+            SetExternalNavigationFocusMode(
+                enabled);
+        }
+
+        private void SetExternalNavigationFocusMode(
+            bool enabled)
+        {
+            Window? window =
+                Window.GetWindow(this);
+
+            if (window == null)
+            {
+                return;
+            }
+
+            string[] possibleNavigationNames =
+            {
+                "NavigationRail",
+                "NavigationPanel",
+                "NavigationSidebar",
+                "Sidebar",
+                "SideBar",
+                "LeftSidebar",
+                "LeftNavigation",
+                "NavPanel",
+                "NavGrid",
+                "MenuGrid",
+                "SideMenu"
+            };
+
+            if (enabled)
+            {
+                foreach (string name in possibleNavigationNames)
+                {
+                    if (window.FindName(name) is FrameworkElement element &&
+                        element != this)
+                    {
+                        if (!focusHiddenElements.ContainsKey(element))
+                        {
+                            focusHiddenElements[element] =
+                                element.Visibility;
+                        }
+
+                        element.Visibility =
+                            Visibility.Collapsed;
+                    }
+                }
+
+                return;
+            }
+
+            foreach (KeyValuePair<FrameworkElement, Visibility> item in focusHiddenElements)
+            {
+                item.Key.Visibility =
+                    item.Value;
+            }
+
+            focusHiddenElements.Clear();
+        }
+
+        private void ApplyWeightDisplayUnit()
+        {
+            foreach (PurchaseContract contract in allContracts)
+            {
+                contract.DisplayUnit =
+                    selectedWeightUnit;
+            }
+        }
+
         private void ApplySortingAndSearch()
         {
             if (ContractsItemsControl == null)
@@ -242,16 +489,19 @@ namespace RubexOps
 
             if (!string.IsNullOrWhiteSpace(search))
             {
+                search = search.Trim();
+
                 filtered = filtered.Where(c =>
+
                     (!string.IsNullOrWhiteSpace(c.vendor_name) &&
-                     c.vendor_name.Contains(
+                     c.vendor_name.Trim().StartsWith(
                          search,
                          StringComparison.OrdinalIgnoreCase))
 
                     ||
 
                     (!string.IsNullOrWhiteSpace(c.vendor_id) &&
-                     c.vendor_id.Contains(
+                     c.vendor_id.Trim().StartsWith(
                          search,
                          StringComparison.OrdinalIgnoreCase)));
             }
@@ -262,14 +512,24 @@ namespace RubexOps
                 ?.ToString()
                 ?.Trim() ?? "";
 
-            if (string.IsNullOrWhiteSpace(filter))
+            if (string.IsNullOrWhiteSpace(filter) ||
+                filter.Equals(
+                    AllContractsFilter,
+                    StringComparison.OrdinalIgnoreCase) ||
+                filter.Equals(
+                    "All",
+                    StringComparison.OrdinalIgnoreCase))
             {
                 filtered =
                     filtered.Where(c => !c.IsExpiredStatus);
             }
-            else if (!filter.Equals(
-                         "All",
+            else if (filter.Equals(
+                         AllContractsIncludingExpiredFilter,
                          StringComparison.OrdinalIgnoreCase))
+            {
+                // Show everything, including expired contracts.
+            }
+            else
             {
                 filtered =
                     filtered.Where(c =>
@@ -351,13 +611,12 @@ namespace RubexOps
         {
             try
             {
-                Button button =
-                    (Button)sender;
+                if (sender is not Button button)
+                {
+                    return;
+                }
 
-                PurchaseContract? contract =
-                    button.DataContext as PurchaseContract;
-
-                if (contract == null)
+                if (button.DataContext is not PurchaseContract contract)
                 {
                     return;
                 }
@@ -399,6 +658,9 @@ namespace RubexOps
 
     public partial class PurchaseContract
     {
+        private const double RingCenter = 48.0;
+        private const double RingRadius = 36.0;
+
         public int row { get; set; }
 
         public string? vendor_name { get; set; }
@@ -468,6 +730,8 @@ namespace RubexOps
         public bool show_responsibility { get; set; }
 
         public bool show_breach_panel { get; set; }
+
+        public string DisplayUnit { get; set; } = "Kg";
 
         public string DisplayStatus
         {
@@ -590,19 +854,19 @@ namespace RubexOps
                 : item_code;
 
         public string BasePriceDisplay =>
-            $"Rs. {FormatNumber(base_price)}";
+            $"Rs. {FormatPlainNumber(base_price)}";
 
         public string AgreedQtyDisplay =>
-            FormatNumber(agreed_qty);
+            FormatWeight(agreed_qty);
 
         public string DeliveredQtyDisplay =>
-            FormatNumber(delivered_qty);
+            FormatWeight(delivered_qty);
 
         public string PurchasedQtySoFarDisplay =>
-            FormatNumber(qty_delivered_so_far ?? delivered_qty);
+            FormatWeight(qty_delivered_so_far ?? delivered_qty);
 
         public string QtyDeliveredSoFarDisplay =>
-            FormatNumber(qty_delivered_so_far ?? delivered_qty);
+            FormatWeight(qty_delivered_so_far ?? delivered_qty);
 
         public string DeliveriesSoFarDisplay =>
             string.IsNullOrWhiteSpace(deliveries_so_far)
@@ -610,11 +874,11 @@ namespace RubexOps
                 : deliveries_so_far;
 
         public string RemainingQtyDisplay =>
-            FormatNumber(remaining_qty);
+            FormatWeight(remaining_qty);
 
         public string RevisedRateDisplay =>
             revised_rate.HasValue
-                ? $"Rs. {FormatNumber(revised_rate)}"
+                ? $"Rs. {FormatPlainNumber(revised_rate)}"
                 : "Not calculated";
 
         public string BreachDisplay
@@ -674,6 +938,78 @@ namespace RubexOps
             }
         }
 
+        public Geometry CompletionArcData
+        {
+            get
+            {
+                double percent =
+                    SafeCompletionPercent;
+
+                if (percent <= 0)
+                {
+                    return new PathGeometry();
+                }
+
+                PathFigure figure =
+                    new()
+                    {
+                        StartPoint = PointOnRing(-90),
+                        IsClosed = false
+                    };
+
+                if (percent >= 100)
+                {
+                    figure.Segments.Add(
+                        new ArcSegment(
+                            PointOnRing(90),
+                            new Size(RingRadius, RingRadius),
+                            0,
+                            false,
+                            SweepDirection.Clockwise,
+                            true));
+
+                    figure.Segments.Add(
+                        new ArcSegment(
+                            PointOnRing(270),
+                            new Size(RingRadius, RingRadius),
+                            0,
+                            false,
+                            SweepDirection.Clockwise,
+                            true));
+                }
+                else
+                {
+                    double sweepAngle =
+                        360.0 * percent / 100.0;
+
+                    figure.Segments.Add(
+                        new ArcSegment(
+                            PointOnRing(-90 + sweepAngle),
+                            new Size(RingRadius, RingRadius),
+                            0,
+                            sweepAngle > 180,
+                            SweepDirection.Clockwise,
+                            true));
+                }
+
+                PathGeometry geometry =
+                    new();
+
+                geometry.Figures.Add(figure);
+
+                return geometry;
+            }
+        }
+
+        public Brush CompletionBrush
+        {
+            get
+            {
+                return new SolidColorBrush(
+                    GetCompletionColor(SafeCompletionPercent));
+            }
+        }
+
         public string CompletionDisplay =>
             $"{SafeCompletionPercent:0.##}%";
 
@@ -700,7 +1036,33 @@ namespace RubexOps
             }
         }
 
-        private static string FormatNumber(
+        private bool UseTonnes =>
+            DisplayUnit.Equals(
+                "Tonnes",
+                StringComparison.OrdinalIgnoreCase);
+
+        private string FormatWeight(
+            double? value)
+        {
+            if (!value.HasValue)
+            {
+                return UseTonnes
+                    ? "0 Tonnes"
+                    : "0 Kg";
+            }
+
+            if (UseTonnes)
+            {
+                double tonnes =
+                    value.Value / 1000.0;
+
+                return $"{tonnes.ToString("#,0.###", CultureInfo.InvariantCulture)} Tonnes";
+            }
+
+            return $"{value.Value.ToString("#,0.##", CultureInfo.InvariantCulture)} Kg";
+        }
+
+        private static string FormatPlainNumber(
             double? value)
         {
             if (!value.HasValue)
@@ -711,6 +1073,57 @@ namespace RubexOps
             return value.Value.ToString(
                 "0.##",
                 CultureInfo.InvariantCulture);
+        }
+
+        private static Point PointOnRing(
+            double angleDegrees)
+        {
+            double radians =
+                Math.PI * angleDegrees / 180.0;
+
+            return new Point(
+                RingCenter + RingRadius * Math.Cos(radians),
+                RingCenter + RingRadius * Math.Sin(radians));
+        }
+
+        private static Color GetCompletionColor(
+            double percent)
+        {
+            Color start =
+                Color.FromRgb(134, 239, 172);
+
+            Color middle =
+                Color.FromRgb(14, 165, 168);
+
+            Color end =
+                Color.FromRgb(29, 78, 216);
+
+            if (percent <= 50)
+            {
+                return BlendColor(
+                    start,
+                    middle,
+                    percent / 50.0);
+            }
+
+            return BlendColor(
+                middle,
+                end,
+                (percent - 50.0) / 50.0);
+        }
+
+        private static Color BlendColor(
+            Color from,
+            Color to,
+            double amount)
+        {
+            amount =
+                Math.Max(0, Math.Min(1, amount));
+
+            return Color.FromRgb(
+                (byte)Math.Round(from.R + ((to.R - from.R) * amount)),
+                (byte)Math.Round(from.G + ((to.G - from.G) * amount)),
+                (byte)Math.Round(from.B + ((to.B - from.B) * amount)));
         }
     }
 }

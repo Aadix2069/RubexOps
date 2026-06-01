@@ -16,8 +16,8 @@ PCON_SHEET_NAME = "pcon"
 PURCHASE_SHEET_NAME = "purchase"
 START_ROW = 5
 
-# pcon columns (A:L)
-PCON_USED_COLUMNS = tuple("BCDEFGHIJKL")
+# pcon columns (A:M)
+PCON_USED_COLUMNS = tuple("BCDEFGHIJKLM")
 PCON_REQUIRED_COLUMNS = ("B", "C", "D")
 
 # purchase columns (A:N)
@@ -53,6 +53,27 @@ def safe_int(value: Any, default: int = 0) -> int:
         return int(float(text.replace(",", "")))
     except Exception:
         return int(default)
+
+
+def safe_bool(value: Any, default: bool = False) -> bool:
+    if value is None:
+        return default
+
+    if isinstance(value, bool):
+        return value
+
+    if isinstance(value, (int, float)):
+        return value != 0
+
+    text = safe_string(value).casefold()
+
+    if text in {"1", "true", "yes", "y", "on"}:
+        return True
+
+    if text in {"0", "false", "no", "n", "off", ""}:
+        return False
+
+    return default
 
 
 def safe_cell(sheet, row: int, col: str) -> Any:
@@ -108,10 +129,17 @@ def first_available_row(sheet, used_columns: tuple[str, ...]) -> int:
     for row in range(START_ROW, sheet.max_row + 1):
         if row_is_empty(sheet, row, used_columns):
             return row
+
     return sheet.max_row + 1 if sheet.max_row >= START_ROW else START_ROW
 
 
+# =========================================================
+# DATABASE PATH
+# =========================================================
+
 def get_database_path() -> str:
+    CONFIG_FOLDER.mkdir(parents=True, exist_ok=True)
+
     if not CONFIG_FILE.exists():
         raise FileNotFoundError(
             f"Database configuration not found:\n{CONFIG_FILE}"
@@ -128,8 +156,18 @@ def get_database_path() -> str:
     return database_path
 
 
+# =========================================================
+# WORKBOOK HELPERS
+# =========================================================
+
 def load_database():
     db_path = get_database_path()
+
+    if not Path(db_path).exists():
+        raise FileNotFoundError(
+            f"Database file not found:\n{db_path}"
+        )
+
     return load_workbook(db_path)
 
 
@@ -145,6 +183,9 @@ def save_database(workbook) -> None:
 def read_pcon() -> List[Dict[str, Any]]:
     wb = load_database()
     try:
+        if PCON_SHEET_NAME not in wb.sheetnames:
+            raise ValueError(f"Sheet not found: {PCON_SHEET_NAME}")
+
         sheet = wb[PCON_SHEET_NAME]
         contracts: List[Dict[str, Any]] = []
 
@@ -152,12 +193,16 @@ def read_pcon() -> List[Dict[str, Any]]:
             if row_is_empty(sheet, row, PCON_REQUIRED_COLUMNS):
                 continue
 
+            contract_id = safe_string(safe_cell(sheet, row, "D"))
+            if contract_id == "":
+                continue
+
             contracts.append(
                 {
                     "sl_no": safe_int(safe_cell(sheet, row, "A")),
                     "vendor_name": safe_string(safe_cell(sheet, row, "B")),
                     "vendor_id": safe_string(safe_cell(sheet, row, "C")),
-                    "contract_id": safe_string(safe_cell(sheet, row, "D")),
+                    "contract_id": contract_id,
                     "start_date": safe_cell(sheet, row, "E"),
                     "end_date": safe_cell(sheet, row, "F"),
                     "base_price": safe_number(safe_cell(sheet, row, "G")),
@@ -166,6 +211,7 @@ def read_pcon() -> List[Dict[str, Any]]:
                     "penalty_discount_percent": safe_number(safe_cell(sheet, row, "J")),
                     "remedy_days": safe_number(safe_cell(sheet, row, "K")),
                     "renewal_reference": safe_string(safe_cell(sheet, row, "L")),
+                    "ignore_remaining_qty": safe_bool(safe_cell(sheet, row, "M")),
                 }
             )
 
@@ -181,6 +227,9 @@ def read_pcon() -> List[Dict[str, Any]]:
 def read_purchase() -> List[Dict[str, Any]]:
     wb = load_database()
     try:
+        if PURCHASE_SHEET_NAME not in wb.sheetnames:
+            raise ValueError(f"Sheet not found: {PURCHASE_SHEET_NAME}")
+
         sheet = wb[PURCHASE_SHEET_NAME]
         purchases: List[Dict[str, Any]] = []
 
@@ -219,6 +268,9 @@ def read_purchase() -> List[Dict[str, Any]]:
 def append_pcon(contract_data: Dict[str, Any]) -> int:
     wb = load_database()
     try:
+        if PCON_SHEET_NAME not in wb.sheetnames:
+            raise ValueError(f"Sheet not found: {PCON_SHEET_NAME}")
+
         sheet = wb[PCON_SHEET_NAME]
 
         row = first_available_row(sheet, PCON_USED_COLUMNS)
@@ -236,6 +288,7 @@ def append_pcon(contract_data: Dict[str, Any]) -> int:
         sheet[f"J{row}"] = contract_data.get("penalty_discount_percent", 0)
         sheet[f"K{row}"] = contract_data.get("remedy_days", 0)
         sheet[f"L{row}"] = contract_data.get("renewal_reference", "")
+        sheet[f"M{row}"] = 1 if safe_bool(contract_data.get("ignore_remaining_qty", False)) else 0
 
         save_database(wb)
         return sl_no
@@ -250,6 +303,9 @@ def append_pcon(contract_data: Dict[str, Any]) -> int:
 def append_purchase(purchase_data: Dict[str, Any]) -> int:
     wb = load_database()
     try:
+        if PURCHASE_SHEET_NAME not in wb.sheetnames:
+            raise ValueError(f"Sheet not found: {PURCHASE_SHEET_NAME}")
+
         sheet = wb[PURCHASE_SHEET_NAME]
 
         row = first_available_row(sheet, PURCHASE_USED_COLUMNS)
@@ -288,6 +344,9 @@ def delete_pcon_by_contract_id(contract_id: str) -> int:
     """
     wb = load_database()
     try:
+        if PCON_SHEET_NAME not in wb.sheetnames:
+            raise ValueError(f"Sheet not found: {PCON_SHEET_NAME}")
+
         sheet = wb[PCON_SHEET_NAME]
         contract_id = safe_string(contract_id)
 
@@ -312,6 +371,9 @@ def delete_purchase_by_contract_id(contract_id: str) -> int:
     """
     wb = load_database()
     try:
+        if PURCHASE_SHEET_NAME not in wb.sheetnames:
+            raise ValueError(f"Sheet not found: {PURCHASE_SHEET_NAME}")
+
         sheet = wb[PURCHASE_SHEET_NAME]
         contract_id = safe_string(contract_id)
 

@@ -13,7 +13,6 @@
             <Setter Property="SnapsToDevicePixels" Value="True"/>
         </Style>
 
-        <!-- Locked / auto-filled field style -->
         <Style x:Key="LockedFieldStyle" TargetType="TextBox">
             <Setter Property="Height" Value="50"/>
             <Setter Property="FontSize" Value="15"/>
@@ -27,7 +26,6 @@
             <Setter Property="Cursor" Value="Arrow"/>
         </Style>
 
-        <!-- Normal editable field style -->
         <Style x:Key="InputFieldStyle" TargetType="TextBox">
             <Setter Property="Height" Value="50"/>
             <Setter Property="FontSize" Value="15"/>
@@ -38,7 +36,6 @@
             <Setter Property="BorderThickness" Value="1.2"/>
         </Style>
 
-        <!-- Red star style -->
         <Style x:Key="RequiredStarStyle" TargetType="TextBlock">
             <Setter Property="Text" Value=" *"/>
             <Setter Property="Foreground" Value="#DC2626"/>
@@ -51,15 +48,7 @@
 
 
 
-    <!-- ================================================= -->
-    <!-- ROOT GRID -->
-    <!-- ================================================= -->
-
     <Grid>
-
-        <!-- ================================================= -->
-        <!-- FIXED WATERMARK -->
-        <!-- ================================================= -->
 
         <Image Source="Images/Rubex_logo.png"
                Width="550"
@@ -73,10 +62,6 @@
 
 
 
-        <!-- ================================================= -->
-        <!-- MAIN CONTENT -->
-        <!-- ================================================= -->
-
         <Grid x:Name="MainGrid"
               Margin="24"
               Panel.ZIndex="1">
@@ -88,10 +73,6 @@
             </Grid.RowDefinitions>
 
 
-
-            <!-- ================================================= -->
-            <!-- PAGE HEADER -->
-            <!-- ================================================= -->
 
             <Grid Grid.Row="0">
 
@@ -142,10 +123,6 @@
 
 
 
-            <!-- ================================================= -->
-            <!-- MAIN GLASS CARD -->
-            <!-- ================================================= -->
-
             <Border Grid.Row="2"
                     Background="#88FFFFFF"
                     CornerRadius="24"
@@ -165,10 +142,6 @@
 
 
 
-                        <!-- ================================================= -->
-                        <!-- SECTION: VENDOR DETAILS                           -->
-                        <!-- ================================================= -->
-
                         <TextBlock Text="Vendor Details"
                                    FontSize="26"
                                    FontWeight="Bold"
@@ -183,8 +156,6 @@
 
                             <StackPanel>
 
-                                <!-- ─── SEARCH BOX ─── -->
-
                                 <Grid Margin="0,0,0,18">
 
                                     <Grid.ColumnDefinitions>
@@ -192,7 +163,6 @@
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
 
-                                    <!-- Label -->
                                     <StackPanel Orientation="Horizontal"
                                                 VerticalAlignment="Center">
                                         <TextBlock Text="Search Contract"
@@ -201,7 +171,6 @@
                                                    Foreground="#111827"/>
                                     </StackPanel>
 
-                                    <!-- Search input + popup -->
                                     <Grid Grid.Column="1">
 
                                         <TextBox x:Name="VendorSearchBox"
@@ -215,7 +184,6 @@
                                                  TextChanged="VendorSearchBox_TextChanged"
                                                  Tag="Search using Vendor Name or ID"/>
 
-                                        <!-- Placeholder simulation -->
                                         <TextBlock x:Name="SearchPlaceholder"
                                                    Text="Search using Vendor Name or ID"
                                                    FontSize="14"
@@ -245,11 +213,11 @@
 
                                                 <ListBox x:Name="VendorSuggestionList"
                                                          BorderThickness="0"
-                                                         Background="Transparent"
-                                                         SelectionChanged="VendorSuggestionList_SelectionChanged">
+                                                         Background="Transparent">
 
                                                     <ListBox.ItemContainerStyle>
                                                         <Style TargetType="ListBoxItem">
+                                                            <EventSetter Event="PreviewMouseLeftButtonUp" Handler="VendorSuggestionItem_PreviewMouseLeftButtonUp"/>
                                                             <Setter Property="Padding" Value="0"/>
                                                             <Setter Property="Background" Value="Transparent"/>
                                                             <Style.Triggers>
@@ -296,12 +264,9 @@
 
                                 </Grid>
 
-                                <!-- ─── DIVIDER ─── -->
                                 <Border Height="1"
                                         Background="#E5E7EB"
                                         Margin="0,0,0,18"/>
-
-                                <!-- ─── AUTO-FILL FIELDS GRID ─── -->
 
                                 <Grid>
 
@@ -317,7 +282,6 @@
                                         <RowDefinition Height="72"/>
                                     </Grid.RowDefinitions>
 
-                                    <!-- Labels -->
                                     <TextBlock Text="Vendor Name"
                                                Grid.Row="0"
                                                FontSize="16"
@@ -346,7 +310,6 @@
                                                VerticalAlignment="Center"
                                                Foreground="#111827"/>
 
-                                    <!-- Locked fields with lock icon -->
                                     <Grid Grid.Row="0" Grid.Column="1" VerticalAlignment="Center">
                                         <TextBox x:Name="VendorNameBox"
                                                  Style="{StaticResource LockedFieldStyle}"/>
@@ -397,7 +360,6 @@
 
                                 </Grid>
 
-                                <!-- ─── CONTRACT PERIOD BADGE ─── -->
                                 <Border x:Name="ContractPeriodBadge"
                                         Background="#F0FDFE"
                                         BorderBrush="#A5F3FC"
@@ -426,10 +388,6 @@
 
 
 
-                        <!-- ================================================= -->
-                        <!-- SECTION: PURCHASE ENTRY                           -->
-                        <!-- ================================================= -->
-
                         <TextBlock Text="Purchase Entry"
                                    FontSize="26"
                                    FontWeight="Bold"
@@ -455,7 +413,6 @@
                                     <RowDefinition Height="78"/>
                                 </Grid.RowDefinitions>
 
-                                <!-- Invoice Number * -->
                                 <StackPanel Grid.Row="0"
                                             Orientation="Horizontal"
                                             VerticalAlignment="Center">
@@ -467,7 +424,6 @@
                                     <TextBlock Style="{StaticResource RequiredStarStyle}"/>
                                 </StackPanel>
 
-                                <!-- Purchase Order * -->
                                 <StackPanel Grid.Row="1"
                                             Orientation="Horizontal"
                                             VerticalAlignment="Center">
@@ -479,7 +435,6 @@
                                     <TextBlock Style="{StaticResource RequiredStarStyle}"/>
                                 </StackPanel>
 
-                                <!-- Delivery (optional) -->
                                 <StackPanel Grid.Row="2"
                                             Orientation="Horizontal"
                                             VerticalAlignment="Center">
@@ -494,14 +449,12 @@
                                                VerticalAlignment="Center"/>
                                 </StackPanel>
 
-                                <!-- Invoice Number input -->
                                 <TextBox x:Name="InvoiceNumberBox"
                                          Grid.Row="0"
                                          Grid.Column="1"
                                          Style="{StaticResource InputFieldStyle}"
                                          VerticalAlignment="Center"/>
 
-                                <!-- Purchase Order Date -->
                                 <Border Grid.Row="1"
                                         Grid.Column="1"
                                         Background="#66FFFFFF"
@@ -519,7 +472,6 @@
                                                 SelectedDateChanged="PurchaseOrderDatePicker_SelectedDateChanged"/>
                                 </Border>
 
-                                <!-- Delivery Date -->
                                 <Border Grid.Row="2"
                                         Grid.Column="1"
                                         Background="#66FFFFFF"
@@ -541,10 +493,6 @@
                         </Border>
 
 
-
-                        <!-- ================================================= -->
-                        <!-- SECTION: WEIGHT DETAILS                           -->
-                        <!-- ================================================= -->
 
                         <TextBlock Text="Weight Details"
                                    FontSize="26"
@@ -573,7 +521,6 @@
                                     <RowDefinition Height="78"/>
                                 </Grid.RowDefinitions>
 
-                                <!-- Invoice Weight (optional) -->
                                 <StackPanel Grid.Row="0"
                                             Orientation="Horizontal"
                                             VerticalAlignment="Center">
@@ -588,7 +535,6 @@
                                                VerticalAlignment="Center"/>
                                 </StackPanel>
 
-                                <!-- Before Unloading * -->
                                 <StackPanel Grid.Row="1"
                                             Orientation="Horizontal"
                                             VerticalAlignment="Center">
@@ -600,7 +546,6 @@
                                     <TextBlock Style="{StaticResource RequiredStarStyle}"/>
                                 </StackPanel>
 
-                                <!-- Carrier Weight * -->
                                 <StackPanel Grid.Row="2"
                                             Orientation="Horizontal"
                                             VerticalAlignment="Center">
@@ -612,7 +557,6 @@
                                     <TextBlock Style="{StaticResource RequiredStarStyle}"/>
                                 </StackPanel>
 
-                                <!-- No. of Bags (optional) -->
                                 <StackPanel Grid.Row="3"
                                             Orientation="Horizontal"
                                             VerticalAlignment="Center">
@@ -627,7 +571,6 @@
                                                VerticalAlignment="Center"/>
                                 </StackPanel>
 
-                                <!-- Calculated DRC * -->
                                 <StackPanel Grid.Row="4"
                                             Orientation="Horizontal"
                                             VerticalAlignment="Center">
@@ -675,10 +618,6 @@
 
 
 
-                        <!-- ================================================= -->
-                        <!-- SECTION: RATES & CHARGES                          -->
-                        <!-- ================================================= -->
-
                         <TextBlock Text="Rates &amp; Charges"
                                    FontSize="26"
                                    FontWeight="Bold"
@@ -704,7 +643,6 @@
                                     <RowDefinition Height="78"/>
                                 </Grid.RowDefinitions>
 
-                                <!-- GST * -->
                                 <StackPanel Grid.Row="0"
                                             Orientation="Horizontal"
                                             VerticalAlignment="Center">
@@ -716,7 +654,6 @@
                                     <TextBlock Style="{StaticResource RequiredStarStyle}"/>
                                 </StackPanel>
 
-                                <!-- TDS * -->
                                 <StackPanel Grid.Row="1"
                                             Orientation="Horizontal"
                                             VerticalAlignment="Center">
@@ -728,7 +665,6 @@
                                     <TextBlock Style="{StaticResource RequiredStarStyle}"/>
                                 </StackPanel>
 
-                                <!-- Unloading Charge (optional) -->
                                 <StackPanel Grid.Row="2"
                                             Orientation="Horizontal"
                                             VerticalAlignment="Center">
@@ -768,10 +704,6 @@
                         </Border>
 
 
-
-                        <!-- ================================================= -->
-                        <!-- BUTTONS -->
-                        <!-- ================================================= -->
 
                         <StackPanel Orientation="Horizontal"
                                     HorizontalAlignment="Right"

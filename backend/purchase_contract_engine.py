@@ -45,6 +45,27 @@ def safe_percent(value):
     return min(number, 100.0)
 
 
+def safe_bool(value, default=False):
+    if value is None:
+        return default
+
+    if isinstance(value, bool):
+        return value
+
+    if isinstance(value, (int, float)):
+        return value != 0
+
+    text = safe_string(value).casefold()
+
+    if text in {"1", "true", "yes", "y", "on"}:
+        return True
+
+    if text in {"0", "false", "no", "n", "off", ""}:
+        return False
+
+    return default
+
+
 def parse_date(value):
     if not value:
         return None
@@ -252,11 +273,16 @@ def calculate_completion_percent(agreed_qty, qty_delivered_so_far):
 # BREACH / RATE / REMEDY
 # =========================================================
 
-def calculate_breach_detected(end_date, remaining_qty):
+def calculate_breach_detected(end_date, remaining_qty, ignore_remaining_qty=False):
     """
     Breach = YES if:
         today > end_date AND remaining_qty > 0
+
+    If ignore_remaining_qty is enabled, breach is suppressed entirely.
     """
+    if safe_bool(ignore_remaining_qty, False):
+        return False
+
     end_date = parse_date(end_date)
     if end_date is None:
         return False
@@ -267,7 +293,12 @@ def calculate_breach_detected(end_date, remaining_qty):
     return today > end_date and remaining_qty > 0
 
 
-def calculate_revised_rate(base_price, breach_responsibility, penalty_discount_percent, breach_detected=True):
+def calculate_revised_rate(
+    base_price,
+    breach_responsibility,
+    penalty_discount_percent,
+    breach_detected=True
+):
     """
     Vendor fault -> penalty added.
     Company fault -> discount subtracted.
@@ -302,7 +333,10 @@ def calculate_remedy_deadline(end_date, remedy_days):
     return deadline.strftime("%d-%m-%Y")
 
 
-def calculate_remedy_status(remedy_deadline):
+def calculate_remedy_status(remedy_deadline, breach_detected=True):
+    if not breach_detected:
+        return ""
+
     deadline = parse_date(remedy_deadline)
     if deadline is None:
         return ""
@@ -318,7 +352,13 @@ def calculate_remedy_status(remedy_deadline):
 def build_contract_summary(contract, purchase_records):
     """
     Returns a complete contract object with calculated values added.
-    Status is intentionally not handled here.
+
+    Important behavior:
+    - ignore_remaining_qty = True means the contract is treated as completed
+      for breach/completion purposes.
+    - remaining_qty becomes 0 in that case.
+    - completion_percent becomes 100 in that case.
+    - breach_detected becomes False in that case.
     """
     vendor_name = safe_string(contract.get("vendor_name"))
     vendor_id = safe_string(contract.get("vendor_id"))
@@ -334,14 +374,28 @@ def build_contract_summary(contract, purchase_records):
     penalty_discount_percent = safe_percent(contract.get("penalty_discount_percent"))
     remedy_days = int(max(safe_float(contract.get("remedy_days"), 0.0), 0.0))
     renewal_reference = safe_string(contract.get("renewal_reference"))
+    ignore_remaining_qty = safe_bool(contract.get("ignore_remaining_qty"), False)
 
     days_remaining = calculate_days_remaining(end_date)
     deliveries_so_far = calculate_deliveries_so_far(contract_id, purchase_records)
     recent_delivery_date = calculate_recent_delivery_date(contract_id, purchase_records)
     qty_delivered_so_far = calculate_qty_delivered_so_far(contract_id, purchase_records)
-    remaining_qty = calculate_remaining_qty(agreed_qty, qty_delivered_so_far)
-    completion_percent = calculate_completion_percent(agreed_qty, qty_delivered_so_far)
-    breach_detected = calculate_breach_detected(end_date, remaining_qty)
+
+    actual_remaining_qty = calculate_remaining_qty(agreed_qty, qty_delivered_so_far)
+    actual_completion_percent = calculate_completion_percent(agreed_qty, qty_delivered_so_far)
+
+    if ignore_remaining_qty:
+        remaining_qty = 0.0
+        completion_percent = 100.0 if agreed_qty > 0 else 0.0
+    else:
+        remaining_qty = actual_remaining_qty
+        completion_percent = actual_completion_percent
+
+    breach_detected = calculate_breach_detected(
+        end_date,
+        remaining_qty,
+        ignore_remaining_qty=ignore_remaining_qty
+    )
 
     revised_rate = calculate_revised_rate(
         base_price,
@@ -351,7 +405,10 @@ def build_contract_summary(contract, purchase_records):
     )
 
     remedy_deadline = calculate_remedy_deadline(end_date, remedy_days)
-    remedy_status = calculate_remedy_status(remedy_deadline) if breach_detected else ""
+    remedy_status = calculate_remedy_status(
+        remedy_deadline,
+        breach_detected=breach_detected
+    )
 
     return {
         "vendor_name": vendor_name,
@@ -367,12 +424,15 @@ def build_contract_summary(contract, purchase_records):
         "penalty_discount_percent": penalty_discount_percent,
         "remedy_days": remedy_days,
         "renewal_reference": renewal_reference,
+        "ignore_remaining_qty": ignore_remaining_qty,
         "days_remaining": days_remaining,
         "deliveries_so_far": deliveries_so_far,
         "recent_delivery_date": recent_delivery_date,
-        "qty_delivered_so_far": qty_delivered_so_far,
-        "remaining_qty": remaining_qty,
-        "completion_percent": completion_percent,
+        "qty_delivered_so_far": round(qty_delivered_so_far, 2),
+        "actual_remaining_qty": round(actual_remaining_qty, 2),
+        "remaining_qty": round(remaining_qty, 2),
+        "actual_completion_percent": round(actual_completion_percent, 2),
+        "completion_percent": round(completion_percent, 2),
         "breach_detected": breach_detected,
         "revised_rate": revised_rate,
         "remedy_deadline": remedy_deadline,

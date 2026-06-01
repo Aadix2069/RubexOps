@@ -15,16 +15,18 @@
 
 	</PropertyGroup>
 
+	<ItemGroup>
+	  <Content Include=".vscode\settings.json" />
+	</ItemGroup>
+
 
 	
 
 	<ItemGroup>
 
-		<PackageReference Include="MaterialDesignColors"
-						  Version="5.3.2" />
+		<PackageReference Include="MaterialDesignColors" Version="5.3.2" />
 
-		<PackageReference Include="MaterialDesignThemes"
-						  Version="5.3.2" />
+		<PackageReference Include="MaterialDesignThemes" Version="5.3.2" />
 
 	</ItemGroup>
 

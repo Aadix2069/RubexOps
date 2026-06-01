@@ -6,7 +6,7 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
         Title="Edit Contract"
-        Height="760"
+        Height="820"
         Width="760"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
@@ -34,8 +34,6 @@
                     Value="#111827"/>
         </Style>
 
-
-
         <Style x:Key="InputTextBoxStyle"
                TargetType="TextBox">
 
@@ -61,9 +59,51 @@
                     Value="1"/>
         </Style>
 
+        <Style x:Key="InputDatePickerStyle"
+               TargetType="DatePicker">
+
+            <Setter Property="Height"
+                    Value="46"/>
+
+            <Setter Property="FontSize"
+                    Value="15"/>
+
+            <Setter Property="Padding"
+                    Value="10,5"/>
+
+            <Setter Property="Background"
+                    Value="#70FFFFFF"/>
+
+            <Setter Property="BorderBrush"
+                    Value="#99FFFFFF"/>
+
+            <Setter Property="BorderThickness"
+                    Value="1"/>
+
+            <Setter Property="VerticalContentAlignment"
+                    Value="Center"/>
+        </Style>
+
+        <Style x:Key="GlassCheckBoxStyle"
+               TargetType="CheckBox">
+
+            <Setter Property="FontSize"
+                    Value="14"/>
+
+            <Setter Property="FontWeight"
+                    Value="SemiBold"/>
+
+            <Setter Property="Foreground"
+                    Value="#111827"/>
+
+            <Setter Property="Cursor"
+                    Value="Hand"/>
+
+            <Setter Property="VerticalAlignment"
+                    Value="Center"/>
+        </Style>
+
     </Window.Resources>
-
-
 
     <!-- ================================================= -->
     <!-- ROOT CONTAINER -->
@@ -85,8 +125,6 @@
                IsHitTestVisible="False"
                Panel.ZIndex="0"/>
 
-
-
         <!-- ================================================= -->
         <!-- MAIN CONTENT -->
         <!-- ================================================= -->
@@ -103,8 +141,6 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-
-
             <!-- ================================================= -->
             <!-- HEADER -->
             <!-- ================================================= -->
@@ -112,7 +148,6 @@
             <StackPanel Orientation="Horizontal">
 
                 <!-- GLASS ICON -->
-
                 <Border Width="58"
                         Height="58"
                         CornerRadius="29"
@@ -134,10 +169,7 @@
                                              VerticalAlignment="Center"/>
                 </Border>
 
-
-
                 <!-- TITLE -->
-
                 <StackPanel Margin="18,0,0,0"
                             VerticalAlignment="Center">
 
@@ -153,8 +185,6 @@
                 </StackPanel>
 
             </StackPanel>
-
-
 
             <!-- ================================================= -->
             <!-- MAIN GLASS CARD -->
@@ -176,18 +206,13 @@
                 <Grid>
 
                     <!-- INNER GLASS LAYER -->
-
                     <Border CornerRadius="24"
                             Background="#30FFFFFF"
                             Margin="-14"/>
 
-
-
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
 
                         <StackPanel>
-
-
 
                             <!-- ================================================= -->
                             <!-- STATUS SUMMARY -->
@@ -226,10 +251,7 @@
                                                    Margin="0,4,0,0"/>
                                     </StackPanel>
 
-
-
                                     <!-- STATUS BADGE -->
-
                                     <Border Grid.Column="1"
                                             x:Name="StatusBadge"
                                             Padding="14,7"
@@ -246,8 +268,6 @@
 
                             </Border>
 
-
-
                             <!-- ================================================= -->
                             <!-- BASIC EDITS -->
                             <!-- ================================================= -->
@@ -257,8 +277,6 @@
                                        FontWeight="Bold"
                                        Foreground="#0B8A8F"
                                        Margin="0,0,0,28"/>
-
-
 
                             <Grid>
 
@@ -272,12 +290,11 @@
                                     <RowDefinition Height="70"/>
                                     <RowDefinition Height="70"/>
                                     <RowDefinition Height="70"/>
+                                    <RowDefinition Height="70"/>
+                                    <RowDefinition Height="70"/>
                                 </Grid.RowDefinitions>
 
-
-
                                 <!-- LABELS -->
-
                                 <TextBlock Text="Vendor Name"
                                            Grid.Row="0"
                                            Style="{StaticResource FieldLabelStyle}"/>
@@ -286,18 +303,23 @@
                                            Grid.Row="1"
                                            Style="{StaticResource FieldLabelStyle}"/>
 
-                                <TextBlock Text="Base Price"
+                                <TextBlock Text="Start Date"
                                            Grid.Row="2"
                                            Style="{StaticResource FieldLabelStyle}"/>
 
-                                <TextBlock Text="Agreed Quantity"
+                                <TextBlock Text="End Date"
                                            Grid.Row="3"
                                            Style="{StaticResource FieldLabelStyle}"/>
 
+                                <TextBlock Text="Base Price"
+                                           Grid.Row="4"
+                                           Style="{StaticResource FieldLabelStyle}"/>
 
+                                <TextBlock Text="Agreed Quantity"
+                                           Grid.Row="5"
+                                           Style="{StaticResource FieldLabelStyle}"/>
 
                                 <!-- INPUTS -->
-
                                 <TextBox x:Name="VendorNameBox"
                                          Grid.Row="0"
                                          Grid.Column="1"
@@ -308,19 +330,31 @@
                                          Grid.Column="1"
                                          Style="{StaticResource InputTextBoxStyle}"/>
 
+                                <DatePicker x:Name="StartDatePicker"
+                                            Grid.Row="2"
+                                            Grid.Column="1"
+                                            Style="{StaticResource InputDatePickerStyle}"
+                                            SelectedDateFormat="Long"
+                                            HorizontalContentAlignment="Stretch"/>
+
+                                <DatePicker x:Name="EndDatePicker"
+                                            Grid.Row="3"
+                                            Grid.Column="1"
+                                            Style="{StaticResource InputDatePickerStyle}"
+                                            SelectedDateFormat="Long"
+                                            HorizontalContentAlignment="Stretch"/>
+
                                 <TextBox x:Name="BasePriceBox"
-                                         Grid.Row="2"
+                                         Grid.Row="4"
                                          Grid.Column="1"
                                          Style="{StaticResource InputTextBoxStyle}"/>
 
                                 <TextBox x:Name="AgreedQtyBox"
-                                         Grid.Row="3"
+                                         Grid.Row="5"
                                          Grid.Column="1"
                                          Style="{StaticResource InputTextBoxStyle}"/>
 
                             </Grid>
-
-
 
                             <!-- ================================================= -->
                             <!-- BREACH LOGIC -->
@@ -332,17 +366,14 @@
                                        Foreground="#0B8A8F"
                                        Margin="0,40,0,28"/>
 
-
-
                             <!-- BREACH INFO CARD -->
-
                             <Border x:Name="BreachInfoCard"
                                     Background="#70FFFFFF"
                                     CornerRadius="18"
                                     BorderBrush="#99FFFFFF"
                                     BorderThickness="1"
                                     Padding="16"
-                                    Margin="0,0,0,24">
+                                    Margin="0,0,0,18">
 
                                 <Border.Effect>
                                     <DropShadowEffect BlurRadius="16"
@@ -365,10 +396,28 @@
                                 </StackPanel>
                             </Border>
 
+                            <!-- IGNORE REMAINING QTY -->
+                            <Border Background="#70FFFFFF"
+                                    CornerRadius="16"
+                                    Padding="14"
+                                    BorderBrush="#99FFFFFF"
+                                    BorderThickness="1"
+                                    Margin="0,0,0,24">
 
+                                <StackPanel>
+                                    <CheckBox x:Name="IgnoreRemainingQtyCheckBox"
+                                              Content="Ignore small remaining quantity and treat contract as completed"
+                                              Style="{StaticResource GlassCheckBoxStyle}"/>
+
+                                    <TextBlock Text="Use this only when the remaining quantity is intentionally left unpurchased near contract end."
+                                               FontSize="12.5"
+                                               Foreground="#6B7280"
+                                               Margin="28,6,0,0"
+                                               TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Border>
 
                             <!-- BREACH GRID -->
-
                             <Grid x:Name="BreachGrid">
 
                                 <Grid.ColumnDefinitions>
@@ -384,10 +433,7 @@
                                     <RowDefinition Height="70"/>
                                 </Grid.RowDefinitions>
 
-
-
                                 <!-- LABELS -->
-
                                 <TextBlock Text="Penalty Percentage"
                                            Grid.Row="0"
                                            Style="{StaticResource FieldLabelStyle}"/>
@@ -408,10 +454,7 @@
                                            Grid.Row="4"
                                            Style="{StaticResource FieldLabelStyle}"/>
 
-
-
                                 <!-- INPUTS -->
-
                                 <TextBox x:Name="PenaltyPercentBox"
                                          Grid.Row="0"
                                          Grid.Column="1"
@@ -422,10 +465,7 @@
                                          Grid.Column="1"
                                          Style="{StaticResource InputTextBoxStyle}"/>
 
-
-
                                 <!-- GLASS COMBOBOX -->
-
                                 <Border Grid.Row="2"
                                         Grid.Column="1"
                                         Background="#70FFFFFF"
@@ -450,10 +490,7 @@
                                     </ComboBox>
                                 </Border>
 
-
-
                                 <!-- READ ONLY -->
-
                                 <TextBox x:Name="RevisedRateBox"
                                          Grid.Row="3"
                                          Grid.Column="1"
@@ -478,8 +515,6 @@
 
             </Border>
 
-
-
             <!-- ================================================= -->
             <!-- BUTTONS -->
             <!-- ================================================= -->
@@ -489,7 +524,6 @@
                         HorizontalAlignment="Right">
 
                 <!-- CANCEL -->
-
                 <Button Content="Cancel"
                         Width="140"
                         Height="50"
@@ -509,10 +543,7 @@
                     </Button.Effect>
                 </Button>
 
-
-
                 <!-- SAVE -->
-
                 <Button x:Name="SaveButton"
                         Content="Save Changes"
                         Width="190"

@@ -3,7 +3,7 @@ import sys
 import warnings
 from datetime import date
 
-from contract_engine import (
+from purchase_contract_engine import (
     ITEM_CODE,
     ITEM_NAME,
     build_contract_summary,
@@ -18,6 +18,7 @@ from database import (
     load_database,
     read_purchase,
     row_is_empty,
+    safe_bool,
     safe_cell,
     safe_int,
     safe_number,
@@ -72,6 +73,7 @@ def read_pcon_with_rows():
                     "penalty_discount_percent": safe_number(safe_cell(sheet, row, "J")),
                     "remedy_days": safe_number(safe_cell(sheet, row, "K")),
                     "renewal_reference": safe_string(safe_cell(sheet, row, "L")),
+                    "ignore_remaining_qty": safe_bool(safe_cell(sheet, row, "M")),
                 }
             )
 
@@ -125,45 +127,46 @@ def build_compat_contract(contract, summary, has_successor, successor_contract_i
     dynamic_status = calculate_status(summary, has_successor)
     status_color = STATUS_COLORS.get(dynamic_status, "#64748B")
     is_expired = dynamic_status == "Expired"
-    breach_detected = bool(summary["breach_detected"])
-    base_price = safe_float(summary["base_price"], 0.0)
-    revised_rate = safe_float(summary["revised_rate"], 0.0)
+    breach_detected = bool(summary.get("breach_detected"))
+    base_price = safe_float(summary.get("base_price"), 0.0)
+    revised_rate = safe_float(summary.get("revised_rate"), 0.0)
     penalty_value = round(abs(revised_rate - base_price), 2) if breach_detected else 0.0
 
     compat = {
         "row": contract["row"],
         "sl_no": contract.get("sl_no", 0),
-        "vendor_name": summary["vendor_name"],
-        "vendor_id": summary["vendor_id"],
-        "contract_id": summary["contract_id"],
-        "ContractID": summary["contract_id"],
+        "vendor_name": summary.get("vendor_name", ""),
+        "vendor_id": summary.get("vendor_id", ""),
+        "contract_id": summary.get("contract_id", ""),
+        "ContractID": summary.get("contract_id", ""),
         "item_name": ITEM_NAME,
         "item_code": ITEM_CODE,
-        "start_date": summary["start_date"],
-        "end_date": summary["end_date"],
-        "days_remaining": str(summary["days_remaining"]),
-        "days_remaining_value": summary["days_remaining"],
-        "deliveries_so_far": str(summary["deliveries_so_far"]),
-        "deliveries_so_far_value": summary["deliveries_so_far"],
-        "recent_delivery": summary["recent_delivery_date"],
-        "recent_delivery_date": summary["recent_delivery_date"],
-        "base_price": summary["base_price"],
-        "agreed_qty": summary["agreed_qty"],
-        "delivered_qty": summary["qty_delivered_so_far"],
-        "qty_delivered_so_far": summary["qty_delivered_so_far"],
-        "remaining_qty": summary["remaining_qty"],
-        "completion_percent": summary["completion_percent"],
+        "start_date": summary.get("start_date", ""),
+        "end_date": summary.get("end_date", ""),
+        "days_remaining": str(summary.get("days_remaining", 0)),
+        "days_remaining_value": summary.get("days_remaining", 0),
+        "deliveries_so_far": str(summary.get("deliveries_so_far", 0)),
+        "deliveries_so_far_value": summary.get("deliveries_so_far", 0),
+        "recent_delivery": summary.get("recent_delivery_date", ""),
+        "recent_delivery_date": summary.get("recent_delivery_date", ""),
+        "base_price": summary.get("base_price", 0.0),
+        "agreed_qty": summary.get("agreed_qty", 0.0),
+        "delivered_qty": summary.get("qty_delivered_so_far", 0.0),
+        "qty_delivered_so_far": summary.get("qty_delivered_so_far", 0.0),
+        "remaining_qty": summary.get("remaining_qty", 0.0),
+        "completion_percent": summary.get("completion_percent", 0.0),
+        "ignore_remaining_qty": bool(summary.get("ignore_remaining_qty", False)),
         "breach": "YES" if breach_detected else "NO",
         "breach_detected": breach_detected,
-        "breach_responsibility": summary["breach_responsibility"],
-        "penalty_percent": summary["penalty_discount_percent"],
-        "penalty_discount_percent": summary["penalty_discount_percent"],
-        "revised_rate": summary["revised_rate"],
+        "breach_responsibility": summary.get("breach_responsibility", ""),
+        "penalty_percent": summary.get("penalty_discount_percent", 0.0),
+        "penalty_discount_percent": summary.get("penalty_discount_percent", 0.0),
+        "revised_rate": summary.get("revised_rate", 0.0),
         "penalty_value": penalty_value,
-        "remedy_days": summary["remedy_days"],
-        "remedy_deadline": summary["remedy_deadline"],
-        "remedy_status": summary["remedy_status"],
-        "renewal_reference": summary["renewal_reference"],
+        "remedy_days": summary.get("remedy_days", 0.0),
+        "remedy_deadline": summary.get("remedy_deadline", ""),
+        "remedy_status": summary.get("remedy_status", ""),
+        "renewal_reference": summary.get("renewal_reference", ""),
         "renewed_contract_id": successor_contract_id,
         "status": dynamic_status,
         "dynamic_status": dynamic_status,
@@ -172,7 +175,7 @@ def build_compat_contract(contract, summary, has_successor, successor_contract_i
         "can_edit": not is_expired,
         "can_renew": (
             not has_successor
-            and dynamic_status in {"Completed", "Violated"}
+            and dynamic_status in {"Completed", "Expired"}
         ),
         "is_breach_detected": breach_detected,
         "show_responsibility": breach_detected,

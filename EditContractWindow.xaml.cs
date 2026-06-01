@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
+using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -13,17 +16,31 @@ namespace RubexOps
     {
         private readonly PurchaseContract currentContract;
 
-        private readonly string pythonExe =
-            "python";
+        private readonly string pythonExe = "python";
 
-        public EditContractWindow(
-            PurchaseContract contract)
+        public EditContractWindow(PurchaseContract contract)
         {
             InitializeComponent();
 
             currentContract = contract;
 
             LoadContractData();
+
+            // Listen for the Enter key across the entire window to trigger a save
+            this.KeyDown += EditContractWindow_KeyDown;
+        }
+
+        // New event handler for the Enter key
+        private void EditContractWindow_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                // Prevent the key event from propagating further
+                e.Handled = true;
+
+                // Trigger the existing save logic
+                SaveButton_Click(this, new RoutedEventArgs());
+            }
         }
 
         private void LoadContractData()
@@ -49,7 +66,8 @@ namespace RubexOps
             VendorIDBox.Text =
                 currentContract.vendor_id ?? "";
 
-            VendorIDBox.IsReadOnly = true;
+            // Vendor ID must now be editable.
+            VendorIDBox.IsReadOnly = false;
 
             BasePriceBox.Text =
                 FormatNumberForInput(
@@ -76,6 +94,18 @@ namespace RubexOps
                 string.IsNullOrWhiteSpace(currentContract.remedy_deadline)
                     ? "Not calculated"
                     : currentContract.remedy_deadline;
+
+            StartDatePicker.SelectedDate =
+                TryParseContractDate(currentContract.start_date, out DateTime startDate)
+                    ? startDate
+                    : null;
+
+            EndDatePicker.SelectedDate =
+                TryParseContractDate(currentContract.end_date, out DateTime endDate)
+                    ? endDate
+                    : null;
+
+            IgnoreRemainingQtyCheckBox.IsChecked = false;
 
             SelectResponsibility(
                 currentContract.breach_responsibility);
@@ -145,7 +175,6 @@ namespace RubexOps
             if (!IsBreachDetected())
             {
                 SelectResponsibility("Pending");
-
                 return;
             }
 
@@ -185,7 +214,6 @@ namespace RubexOps
                 if (sender is Button button)
                 {
                     button.IsEnabled = false;
-
                     button.Content = "Saving...";
                 }
 
@@ -193,8 +221,21 @@ namespace RubexOps
                         out double basePrice,
                         out double agreedQty,
                         out double penaltyPercent,
-                        out int remedyDays))
+                        out int remedyDays,
+                        out DateTime startDate,
+                        out DateTime endDate,
+                        out string vendorId,
+                        out bool ignoreRemainingQty))
                 {
+                    return;
+                }
+
+                if (!IsVendorIdUnique(vendorId))
+                {
+                    ShowValidation(
+                        "Another contract already uses this Vendor ID. Please choose a unique Vendor ID.",
+                        VendorIDBox);
+
                     return;
                 }
 
@@ -213,8 +254,7 @@ namespace RubexOps
                 if (!File.Exists(pythonScript))
                 {
                     MessageBox.Show(
-                        "Backend Python file not found.\n\n" +
-                        pythonScript,
+                        "Backend Python file not found.\n\n" + pythonScript,
                         "File Error",
                         MessageBoxButton.OK,
                         MessageBoxImage.Error
@@ -227,15 +267,10 @@ namespace RubexOps
                     new()
                     {
                         FileName = pythonExe,
-
                         UseShellExecute = false,
-
                         RedirectStandardOutput = true,
-
                         RedirectStandardError = true,
-
                         CreateNoWindow = true,
-
                         WorkingDirectory =
                             Path.Combine(
                                 AppDomain.CurrentDomain.BaseDirectory,
@@ -244,20 +279,25 @@ namespace RubexOps
                     };
 
                 start.ArgumentList.Add(pythonScript);
+
+                // Existing row identifier
                 start.ArgumentList.Add(currentContract.row.ToString(CultureInfo.InvariantCulture));
+
+                // Editable fields
                 start.ArgumentList.Add(VendorNameBox.Text.Trim());
-                start.ArgumentList.Add(VendorIDBox.Text.Trim());
+                start.ArgumentList.Add(vendorId);
+                start.ArgumentList.Add(startDate.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture));
+                start.ArgumentList.Add(endDate.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture));
                 start.ArgumentList.Add(basePrice.ToString(CultureInfo.InvariantCulture));
                 start.ArgumentList.Add(agreedQty.ToString(CultureInfo.InvariantCulture));
                 start.ArgumentList.Add(penaltyPercent.ToString(CultureInfo.InvariantCulture));
                 start.ArgumentList.Add(remedyDays.ToString(CultureInfo.InvariantCulture));
                 start.ArgumentList.Add(responsibility);
+                start.ArgumentList.Add(ignoreRemainingQty ? "1" : "0");
 
                 using Process process =
                     Process.Start(start)
-                    ?? throw new Exception(
-                        "Failed to start backend process."
-                    );
+                    ?? throw new Exception("Failed to start backend process.");
 
                 string output =
                     process.StandardOutput.ReadToEnd();
@@ -324,7 +364,6 @@ namespace RubexOps
                 );
 
                 DialogResult = true;
-
                 Close();
             }
             catch (Exception ex)
@@ -347,7 +386,6 @@ namespace RubexOps
                 if (sender is Button button)
                 {
                     button.IsEnabled = true;
-
                     button.Content = originalContent ?? "Save Changes";
                 }
             }
@@ -357,15 +395,22 @@ namespace RubexOps
             out double basePrice,
             out double agreedQty,
             out double penaltyPercent,
-            out int remedyDays)
+            out int remedyDays,
+            out DateTime startDate,
+            out DateTime endDate,
+            out string vendorId,
+            out bool ignoreRemainingQty)
         {
             basePrice = 0;
             agreedQty = 0;
             penaltyPercent = 0;
             remedyDays = 0;
+            startDate = default;
+            endDate = default;
+            vendorId = "";
+            ignoreRemainingQty = IgnoreRemainingQtyCheckBox.IsChecked == true;
 
-            if (string.IsNullOrWhiteSpace(
-                    VendorNameBox.Text))
+            if (string.IsNullOrWhiteSpace(VendorNameBox.Text))
             {
                 ShowValidation(
                     "Vendor Name is required.",
@@ -374,8 +419,7 @@ namespace RubexOps
                 return false;
             }
 
-            if (string.IsNullOrWhiteSpace(
-                    VendorIDBox.Text))
+            if (string.IsNullOrWhiteSpace(VendorIDBox.Text))
             {
                 ShowValidation(
                     "Vendor ID is required.",
@@ -384,16 +428,29 @@ namespace RubexOps
                 return false;
             }
 
-            string currentVendorId =
-                currentContract.vendor_id ?? "";
+            vendorId = VendorIDBox.Text.Trim();
 
-            if (!VendorIDBox.Text.Trim().Equals(
-                    currentVendorId,
-                    StringComparison.OrdinalIgnoreCase))
+            if (!TryReadDateFromPicker(
+                    StartDatePicker,
+                    "Start Date",
+                    out startDate))
+            {
+                return false;
+            }
+
+            if (!TryReadDateFromPicker(
+                    EndDatePicker,
+                    "End Date",
+                    out endDate))
+            {
+                return false;
+            }
+
+            if (endDate < startDate)
             {
                 ShowValidation(
-                    "Vendor ID cannot be changed after Contract ID has been generated.",
-                    VendorIDBox);
+                    "End Date cannot be earlier than Start Date.",
+                    EndDatePicker);
 
                 return false;
             }
@@ -438,8 +495,11 @@ namespace RubexOps
                 return false;
             }
 
+            string penaltyText =
+                PenaltyPercentBox.Text.Replace("%", "").Trim();
+
             if (!TryReadDouble(
-                    PenaltyPercentBox.Text.Replace("%", ""),
+                    penaltyText,
                     out penaltyPercent))
             {
                 ShowValidation(
@@ -496,6 +556,141 @@ namespace RubexOps
             }
 
             return true;
+        }
+
+        private bool IsVendorIdUnique(string newVendorId)
+        {
+            if (string.IsNullOrWhiteSpace(newVendorId))
+            {
+                return false;
+            }
+
+            try
+            {
+                List<PurchaseContract> contracts =
+                    LoadAllContractsForValidation();
+
+                string newKey =
+                    newVendorId.Trim().ToUpperInvariant();
+
+                string currentKey =
+                    (currentContract.vendor_id ?? "")
+                        .Trim()
+                        .ToUpperInvariant();
+
+                foreach (PurchaseContract contract in contracts)
+                {
+                    string contractVendorId =
+                        (contract.vendor_id ?? "")
+                            .Trim()
+                            .ToUpperInvariant();
+
+                    if (contractVendorId == "")
+                    {
+                        continue;
+                    }
+
+                    // Allow the current vendor chain to keep its own ID.
+                    if (contractVendorId == currentKey)
+                    {
+                        continue;
+                    }
+
+                    if (contractVendorId == newKey)
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+            catch
+            {
+                // If validation lookup fails, stop the save rather than risking duplication.
+                return false;
+            }
+        }
+
+        private List<PurchaseContract> LoadAllContractsForValidation()
+        {
+            string pythonScript =
+                Path.Combine(
+                    AppDomain.CurrentDomain.BaseDirectory,
+                    "backend",
+                    "read_purchase_contract.py"
+                );
+
+            if (!File.Exists(pythonScript))
+            {
+                throw new FileNotFoundException(
+                    "Backend Python file not found.",
+                    pythonScript);
+            }
+
+            ProcessStartInfo start =
+                new()
+                {
+                    FileName = pythonExe,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true,
+                    WorkingDirectory =
+                        Path.Combine(
+                            AppDomain.CurrentDomain.BaseDirectory,
+                            "backend"
+                        )
+                };
+
+            start.ArgumentList.Add(pythonScript);
+
+            using Process process =
+                Process.Start(start)
+                ?? throw new Exception("Failed to start backend process.");
+
+            string output =
+                process.StandardOutput.ReadToEnd();
+
+            string error =
+                process.StandardError.ReadToEnd();
+
+            process.WaitForExit();
+
+            if (process.ExitCode != 0)
+            {
+                string message =
+                    !string.IsNullOrWhiteSpace(error)
+                        ? error.Trim()
+                        : output.Trim();
+
+                throw new Exception(
+                    string.IsNullOrWhiteSpace(message)
+                        ? $"Backend process failed with exit code {process.ExitCode}."
+                        : message);
+            }
+
+            if (!string.IsNullOrWhiteSpace(error))
+            {
+                throw new Exception(error.Trim());
+            }
+
+            if (output.TrimStart().StartsWith(
+                    "ERROR",
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                throw new Exception(output.Trim());
+            }
+
+            JsonSerializerOptions options =
+                new()
+                {
+                    PropertyNameCaseInsensitive = true
+                };
+
+            return JsonSerializer.Deserialize<List<PurchaseContract>>(
+                       output,
+                       options)
+                   ?? new List<PurchaseContract>();
         }
 
         private bool IsBreachDetected()
@@ -555,6 +750,73 @@ namespace RubexOps
                 out value);
         }
 
+        private static bool TryParseContractDate(
+            string? text,
+            out DateTime date)
+        {
+            date = default;
+
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return false;
+            }
+
+            string[] formats =
+            {
+                "dd-MM-yyyy",
+                "d-M-yyyy",
+                "dd/MM/yyyy",
+                "d/M/yyyy",
+                "yyyy-MM-dd",
+                "d MMM yyyy",
+                "dd MMM yyyy",
+                "d MMMM yyyy",
+                "dd MMMM yyyy"
+            };
+
+            return DateTime.TryParseExact(
+                       text.Trim(),
+                       formats,
+                       CultureInfo.InvariantCulture,
+                       DateTimeStyles.AllowWhiteSpaces,
+                       out date)
+                   || DateTime.TryParse(
+                       text.Trim(),
+                       CultureInfo.CurrentCulture,
+                       DateTimeStyles.AllowWhiteSpaces,
+                       out date);
+        }
+
+        private static bool TryReadDateFromPicker(
+            DatePicker picker,
+            string fieldName,
+            out DateTime date)
+        {
+            date = default;
+
+            if (picker.SelectedDate.HasValue)
+            {
+                date = picker.SelectedDate.Value.Date;
+                return true;
+            }
+
+            if (!string.IsNullOrWhiteSpace(picker.Text) &&
+                TryParseContractDate(picker.Text, out date))
+            {
+                return true;
+            }
+
+            MessageBox.Show(
+                $"{fieldName} is required and must be a valid date.",
+                "Validation Error",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+
+            picker.Focus();
+
+            return false;
+        }
+
         private static string FormatNumberForInput(
             double? value)
         {
@@ -568,8 +830,7 @@ namespace RubexOps
                 CultureInfo.InvariantCulture);
         }
 
-        private static SolidColorBrush BrushFromHex(
-    string hex)
+        private static SolidColorBrush BrushFromHex(string hex)
         {
             object? converted =
                 new BrushConverter().ConvertFromString(hex);

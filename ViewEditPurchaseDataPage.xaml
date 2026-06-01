@@ -6,7 +6,7 @@
       xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
       mc:Ignorable="d"
       Background="#F5F7F8">
-    
+
 
     <Page.Resources>
 
@@ -39,15 +39,7 @@
 
     </Page.Resources>
 
-    <!-- ================================================= -->
-    <!-- ROOT GRID -->
-    <!-- ================================================= -->
-
     <Grid>
-
-        <!-- ================================================= -->
-        <!-- FIXED WATERMARK -->
-        <!-- ================================================= -->
 
         <Image Source="Images/Rubex_logo.png"
                Width="500"
@@ -61,17 +53,9 @@
 
 
 
-        <!-- ================================================= -->
-        <!-- MAIN CONTENT -->
-        <!-- ================================================= -->
-
         <Grid x:Name="MainGrid"
               Margin="24"
               Panel.ZIndex="1">
-
-            <!-- ================================================= -->
-            <!-- PAGE STRUCTURE -->
-            <!-- ================================================= -->
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -81,10 +65,6 @@
 
 
 
-            <!-- ================================================= -->
-            <!-- PAGE HEADER -->
-            <!-- ================================================= -->
-
             <Grid Grid.Row="0">
 
                 <Grid.ColumnDefinitions>
@@ -93,8 +73,6 @@
                 </Grid.ColumnDefinitions>
 
 
-
-                <!-- ICON -->
 
                 <Border Width="68"
                         Height="68"
@@ -119,8 +97,6 @@
 
 
 
-                <!-- TITLE -->
-
                 <StackPanel Grid.Column="1"
                             Margin="18,0,0,0"
                             VerticalAlignment="Center">
@@ -141,10 +117,6 @@
             </Grid>
 
 
-
-            <!-- ================================================= -->
-            <!-- MAIN GLASS CARD -->
-            <!-- ================================================= -->
 
             <Border Grid.Row="2"
                     Background="#88FFFFFF"
@@ -171,10 +143,6 @@
 
 
 
-                    <!-- ================================================= -->
-                    <!-- CONTROLS -->
-                    <!-- ================================================= -->
-
                     <Border Grid.Row="0"
                             Background="#55FFFFFF"
                             CornerRadius="18"
@@ -194,8 +162,6 @@
                             </Grid.ColumnDefinitions>
 
 
-
-                            <!-- SEARCH -->
 
                             <StackPanel Grid.Column="0"
                                         Margin="0,0,16,0">
@@ -227,8 +193,6 @@
 
 
 
-                            <!-- DATE MODE -->
-
                             <StackPanel Grid.Column="1"
                                         Margin="0,0,16,0">
 
@@ -258,8 +222,6 @@
 
 
 
-                            <!-- FROM DATE -->
-
                             <StackPanel Grid.Column="2"
                                         Margin="0,0,16,0">
 
@@ -284,8 +246,6 @@
 
 
 
-                            <!-- TO DATE -->
-
                             <StackPanel Grid.Column="3"
                                         Margin="0,0,16,0">
 
@@ -309,8 +269,6 @@
                             </StackPanel>
 
 
-
-                            <!-- SORT -->
 
                             <StackPanel Grid.Column="4"
                                         Margin="0,0,16,0">
@@ -350,8 +308,6 @@
                             </StackPanel>
 
 
-
-                            <!-- ACTION BUTTONS -->
 
                             <StackPanel Grid.Column="5"
                                         Orientation="Horizontal"
@@ -408,10 +364,6 @@
 
 
 
-                    <!-- ================================================= -->
-                    <!-- PURCHASE DATA GRID -->
-                    <!-- ================================================= -->
-
                     <Border Grid.Row="2"
                             Background="#55FFFFFF"
                             BorderBrush="#99FFFFFF"
@@ -434,8 +386,6 @@
                                   SelectionMode="Single"
                                   SelectionChanged="PurchaseDataGrid_SelectionChanged">
 
-                            <!-- ROW STYLE -->
-
                             <DataGrid.RowStyle>
 
                                 <Style TargetType="DataGridRow">
@@ -454,8 +404,6 @@
                             </DataGrid.RowStyle>
 
 
-
-                            <!-- HEADER STYLE -->
 
                             <DataGrid.ColumnHeaderStyle>
 
@@ -480,8 +428,6 @@
                             </DataGrid.ColumnHeaderStyle>
 
 
-
-                            <!-- COLUMNS -->
 
                             <DataGrid.Columns>
 
@@ -548,7 +494,7 @@
                                                     Width="120"/>
 
                                 <DataGridTextColumn Header="Net Weight"
-                                                    Binding="{Binding NetWeight}"
+                                                    Binding="{Binding NetWeight, StringFormat='{}{0:#,##0.##} Kg'}"
                                                     Width="105"/>
 
                                 <DataGridTextColumn Header="DRC (%)"
@@ -572,7 +518,7 @@
                                                     Width="105"/>
 
                                 <DataGridTextColumn Header="Taxable Amount"
-                                                    Binding="{Binding TaxableAmount}"
+                                                    Binding="{Binding TaxableAmount, StringFormat='₹ {0:#,##0.##}'}"
                                                     Width="125"/>
 
                                 <DataGridTextColumn Header="Unloading"
@@ -580,7 +526,7 @@
                                                     Width="95"/>
 
                                 <DataGridTextColumn Header="Net Payable"
-                                                    Binding="{Binding NetPayable}"
+                                                    Binding="{Binding NetPayable, StringFormat='₹ {0:#,##0.##}'}"
                                                     Width="120"/>
 
                             </DataGrid.Columns>
@@ -590,10 +536,6 @@
                     </Border>
 
 
-
-                    <!-- ================================================= -->
-                    <!-- SELECTED DETAILS -->
-                    <!-- ================================================= -->
 
                     <Border Grid.Row="4"
                             Background="#55FFFFFF"
@@ -617,8 +559,6 @@
                             </Grid.RowDefinitions>
 
 
-
-                            <!-- TOP SECTION -->
 
                             <Grid Grid.Row="0">
 
@@ -651,8 +591,6 @@
                             </Grid>
 
 
-
-                            <!-- DETAIL GRID -->
 
                             <Grid Grid.Row="2">
 

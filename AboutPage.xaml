@@ -10,8 +10,8 @@
     <Grid>
 
         <Image Source="Images/Rubex_logo.png"
-               Width="800"
-               Height="800"
+               Width="500"
+               Height="500"
                Opacity="0.19"
                Stretch="Uniform"
                HorizontalAlignment="Center"

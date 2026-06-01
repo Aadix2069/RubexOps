@@ -1,7 +1,7 @@
 import json
 import sys
 
-from contract_engine import ITEM_CODE, ITEM_NAME, safe_string
+from purchase_contract_engine import ITEM_CODE, ITEM_NAME, safe_string
 from database import (
     PURCHASE_SHEET_NAME,
     PURCHASE_USED_COLUMNS,
@@ -13,7 +13,7 @@ from database import (
     safe_int,
     safe_number,
 )
-from inventory_engine import build_purchase_summary
+from purchase_inventory_engine import build_purchase_summary
 
 
 def fail(message):
@@ -67,10 +67,12 @@ def read_purchase_with_rows():
 
 def contract_lookup():
     lookup = {}
+
     for contract in read_pcon():
         contract_id = safe_string(contract.get("contract_id"))
         if contract_id:
             lookup[contract_id.casefold()] = contract
+
     return lookup
 
 
@@ -79,6 +81,7 @@ def as_purchase_json(record, summary, contract):
     vendor_name = safe_string(contract.get("vendor_name")) if contract else ""
 
     row_data = {
+        # Legacy / display-friendly keys
         "RowNumber": record["row"],
         "SlNo": record.get("sl_no", 0),
         "VendorName": vendor_name,
@@ -107,40 +110,37 @@ def as_purchase_json(record, summary, contract):
         "GrossAmount": summary["gross_amount"],
         "TdsAmount": summary["tds_amount"],
         "NetPayable": summary["net_payable"],
-    }
 
-    row_data.update(
-        {
-            "row": record["row"],
-            "sl_no": record.get("sl_no", 0),
-            "vendor_name": vendor_name,
-            "vendor_id": summary["vendor_id"],
-            "contract_id": summary["contract_id"],
-            "item_name": ITEM_NAME,
-            "item_code": ITEM_CODE,
-            "invoice_number": summary["invoice_number"],
-            "purchase_order_date": summary["purchase_order_date"],
-            "delivery_date": summary["delivery_date"],
-            "invoice_weight": summary["invoice_weight"],
-            "before_unloading": summary["before_unloading"],
-            "carrier_weight": summary["carrier_weight"],
-            "received_weight": summary["received_weight"],
-            "number_of_bags": summary["number_of_bags"],
-            "net_weight": summary["net_weight"],
-            "calculated_drc_percent": summary["calculated_drc_percent"],
-            "drc_weight": summary["drc_weight"],
-            "base_rate": base_rate,
-            "adjusted_rate": summary["adjusted_rate"],
-            "gst_percent": summary["gst_percent"],
-            "tds_percent": summary["tds_percent"],
-            "taxable_amount": summary["taxable_amount"],
-            "unloading_charge": summary["unloading_charge"],
-            "gst_amount": summary["gst_amount"],
-            "gross_amount": summary["gross_amount"],
-            "tds_amount": summary["tds_amount"],
-            "net_payable": summary["net_payable"],
-        }
-    )
+        # Lowercase / engine-friendly keys
+        "row": record["row"],
+        "sl_no": record.get("sl_no", 0),
+        "vendor_name": vendor_name,
+        "vendor_id": summary["vendor_id"],
+        "contract_id": summary["contract_id"],
+        "item_name": ITEM_NAME,
+        "item_code": ITEM_CODE,
+        "invoice_number": summary["invoice_number"],
+        "purchase_order_date": summary["purchase_order_date"],
+        "delivery_date": summary["delivery_date"],
+        "invoice_weight": summary["invoice_weight"],
+        "before_unloading": summary["before_unloading"],
+        "carrier_weight": summary["carrier_weight"],
+        "received_weight": summary["received_weight"],
+        "number_of_bags": summary["number_of_bags"],
+        "net_weight": summary["net_weight"],
+        "calculated_drc_percent": summary["calculated_drc_percent"],
+        "drc_weight": summary["drc_weight"],
+        "base_rate": base_rate,
+        "adjusted_rate": summary["adjusted_rate"],
+        "gst_percent": summary["gst_percent"],
+        "tds_percent": summary["tds_percent"],
+        "taxable_amount": summary["taxable_amount"],
+        "unloading_charge": summary["unloading_charge"],
+        "gst_amount": summary["gst_amount"],
+        "gross_amount": summary["gross_amount"],
+        "tds_amount": summary["tds_amount"],
+        "net_payable": summary["net_payable"],
+    }
 
     return row_data
 
@@ -153,8 +153,15 @@ def read_purchase_data():
     for record in purchases:
         contract = contracts.get(safe_string(record.get("contract_id")).casefold())
         base_rate = safe_number(contract.get("base_price")) if contract else 0.0
-        summary = build_purchase_summary(record, base_price=base_rate)
-        output.append(as_purchase_json(record, summary, contract))
+
+        summary = build_purchase_summary(
+            record,
+            base_price=base_rate,
+        )
+
+        output.append(
+            as_purchase_json(record, summary, contract)
+        )
 
     return output
 

@@ -2,7 +2,7 @@ import json
 import sys
 from datetime import date
 
-from contract_engine import ITEM_CODE, ITEM_NAME, build_contract_summary, parse_date, safe_string
+from purchase_contract_engine import ITEM_CODE, ITEM_NAME, build_contract_summary, parse_date, safe_string
 from database import read_pcon, read_purchase
 
 

@@ -195,23 +195,29 @@ namespace RubexOps
 
             if (!string.IsNullOrWhiteSpace(searchText))
             {
+                searchText = searchText.Trim();
+
                 query =
                     query.Where(row =>
-                        row.VendorName.IndexOf(
-                            searchText,
-                            StringComparison.OrdinalIgnoreCase) >= 0 ||
+                        (!string.IsNullOrWhiteSpace(row.VendorName) &&
+                         row.VendorName.Trim().StartsWith(
+                             searchText,
+                             StringComparison.OrdinalIgnoreCase)) ||
 
-                        row.VendorID.IndexOf(
-                            searchText,
-                            StringComparison.OrdinalIgnoreCase) >= 0 ||
+                        (!string.IsNullOrWhiteSpace(row.VendorID) &&
+                         row.VendorID.Trim().StartsWith(
+                             searchText,
+                             StringComparison.OrdinalIgnoreCase)) ||
 
-                        row.ContractID.IndexOf(
-                            searchText,
-                            StringComparison.OrdinalIgnoreCase) >= 0 ||
+                        (!string.IsNullOrWhiteSpace(row.ContractID) &&
+                         row.ContractID.Trim().StartsWith(
+                             searchText,
+                             StringComparison.OrdinalIgnoreCase)) ||
 
-                        row.InvoiceNumber.IndexOf(
-                            searchText,
-                            StringComparison.OrdinalIgnoreCase) >= 0);
+                        (!string.IsNullOrWhiteSpace(row.InvoiceNumber) &&
+                         row.InvoiceNumber.Trim().StartsWith(
+                             searchText,
+                             StringComparison.OrdinalIgnoreCase)));
             }
 
             query =
@@ -376,7 +382,7 @@ namespace RubexOps
                 SafeText(row.DeliveryDate);
 
             DetailNetWeightText.Text =
-                FormatDecimal(row.NetWeight);
+                FormatWeight(row.NetWeight);
 
             DetailDrcText.Text =
                 row.CalculatedDrc.HasValue
@@ -384,10 +390,10 @@ namespace RubexOps
                     : "-";
 
             DetailTaxableText.Text =
-                FormatDecimal(row.TaxableAmount);
+                FormatCurrency(row.TaxableAmount);
 
             DetailNetPayableText.Text =
-                FormatDecimal(row.NetPayable);
+                FormatCurrency(row.NetPayable);
         }
 
         private void ClearSelectedDetails()
@@ -569,6 +575,22 @@ namespace RubexOps
         {
             return value.HasValue
                 ? value.Value.ToString("0.##", CultureInfo.InvariantCulture)
+                : "-";
+        }
+
+        private string FormatWeight(
+            decimal? value)
+        {
+            return value.HasValue
+                ? $"{value.Value.ToString("#,##0.##", CultureInfo.InvariantCulture)} Kg"
+                : "-";
+        }
+
+        private string FormatCurrency(
+            decimal? value)
+        {
+            return value.HasValue
+                ? $"₹ {value.Value.ToString("#,##0.##", CultureInfo.InvariantCulture)}"
                 : "-";
         }
 

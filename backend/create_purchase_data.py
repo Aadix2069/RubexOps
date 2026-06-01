@@ -1,9 +1,9 @@
 import sys
 from datetime import date, datetime
 
-from contract_engine import build_contract_summary, parse_date, safe_string
+from purchase_contract_engine import build_contract_summary, parse_date, safe_string
 from database import append_purchase, read_pcon, read_purchase
-from inventory_engine import build_purchase_summary, normalize_percent_value
+from purchase_inventory_engine import build_purchase_summary
 
 
 DATE_FORMAT = "%d-%m-%Y"
@@ -21,6 +21,7 @@ def looks_like_contract_id(value):
 
 def parse_date_text(value, field_name, required=True):
     text = safe_string(value)
+
     if text == "":
         if required:
             raise ValueError(f"{field_name} is required.")
@@ -38,6 +39,7 @@ def clean_number(value):
 
 def parse_required_number(value, field_name, allow_zero=True):
     text = clean_number(value)
+
     if text == "":
         raise ValueError(f"{field_name} is required.")
 
@@ -49,14 +51,16 @@ def parse_required_number(value, field_name, allow_zero=True):
     if allow_zero:
         if number < 0:
             raise ValueError(f"{field_name} cannot be negative.")
-    elif number <= 0:
-        raise ValueError(f"{field_name} must be greater than zero.")
+    else:
+        if number <= 0:
+            raise ValueError(f"{field_name} must be greater than zero.")
 
     return number
 
 
 def parse_optional_number(value, field_name):
     text = clean_number(value)
+
     if text == "":
         return 0.0
 
@@ -71,6 +75,46 @@ def parse_optional_number(value, field_name):
     return number
 
 
+def parse_percent_number(value, field_name):
+    """
+    Accepts:
+        55   -> 55
+        0.55 -> 55
+    Rejects anything outside 0..100 after normalization.
+    """
+    number = parse_required_number(value, field_name, allow_zero=True)
+
+    if 0 < number <= 1:
+        number *= 100
+
+    if number < 0 or number > 100:
+        raise ValueError(f"{field_name} must be between 0 and 100.")
+
+    return number
+
+def parse_tds_percent(value, field_name="TDS 194Q"):
+    """
+    TDS is entered literally.
+
+    Examples:
+        0.1 = 0.1%
+        1   = 1%
+        5   = 5%
+    """
+
+    number = parse_required_number(
+        value,
+        field_name,
+        allow_zero=True,
+    )
+
+    if number < 0 or number > 100:
+        raise ValueError(
+            f"{field_name} must be between 0 and 100."
+        )
+
+    return number
+
 def parse_purchase_args(args):
     if len(args) == 12:
         vendor_id = safe_string(args[0])
@@ -83,6 +127,7 @@ def parse_purchase_args(args):
         else:
             vendor_id = safe_string(args[0])
             contract_id = safe_string(args[1])
+
         values = args[2:]
     else:
         raise ValueError(
@@ -122,6 +167,7 @@ def parse_purchase_args(args):
 
 def find_contract_by_id(contracts, contract_id):
     key = safe_string(contract_id).casefold()
+
     if key == "":
         return None
 
@@ -134,16 +180,19 @@ def find_contract_by_id(contracts, contract_id):
 
 def find_contract_for_vendor(contracts, vendor_id, purchase_order_date):
     vendor_key = safe_string(vendor_id).casefold()
+
     if vendor_key == "":
         return None
 
     matches = []
+
     for contract in contracts:
         if safe_string(contract.get("vendor_id")).casefold() != vendor_key:
             continue
 
         start_date = parse_date(contract.get("start_date"))
         end_date = parse_date(contract.get("end_date"))
+
         if start_date is None or end_date is None:
             continue
 
@@ -160,11 +209,13 @@ def find_contract_for_vendor(contracts, vendor_id, purchase_order_date):
         ),
         reverse=True,
     )
+
     return matches[0]
 
 
 def invoice_exists(purchases, invoice_number):
     invoice_key = safe_string(invoice_number).casefold()
+
     if invoice_key == "":
         return False
 
@@ -195,6 +246,7 @@ def validate_contract(contract, purchases, purchase_order_date):
         )
 
     today = date.today()
+
     if today < start_date:
         raise ValueError(
             f"The selected contract has not started yet (Start Date: {start_date.strftime(DATE_FORMAT)})."
@@ -228,6 +280,7 @@ def create_purchase_data(args):
         "Purchase Order Date",
         required=True,
     )
+
     delivery_date = parse_date_text(
         data["delivery_date"],
         "Delivery Date",
@@ -241,15 +294,9 @@ def create_purchase_data(args):
     before_unloading = parse_required_number(data["before_unloading"], "Before Unloading", allow_zero=False)
     carrier_weight = parse_required_number(data["carrier_weight"], "Carrier Weight", allow_zero=True)
     number_of_bags = parse_optional_number(data["number_of_bags"], "Number Of Bags")
-    calculated_drc_percent = normalize_percent_value(
-        parse_required_number(data["calculated_drc_percent"], "Calculated DRC", allow_zero=True)
-    )
-    gst_percent = normalize_percent_value(
-        parse_required_number(data["gst_percent"], "GST", allow_zero=True)
-    )
-    tds_percent = normalize_percent_value(
-        parse_required_number(data["tds_percent"], "TDS 194Q", allow_zero=True)
-    )
+    calculated_drc_percent = parse_percent_number(data["calculated_drc_percent"], "Calculated DRC")
+    gst_percent = parse_percent_number(data["gst_percent"], "GST")
+    tds_percent = parse_tds_percent(data["tds_percent"],"TDS 194Q")
     unloading_charge = parse_optional_number(data["unloading_charge"], "Unloading Charge")
 
     if carrier_weight > before_unloading:
@@ -263,6 +310,7 @@ def create_purchase_data(args):
         contract = find_contract_for_vendor(contracts, data["vendor_id"], purchase_order_date)
 
     summary = validate_contract(contract, purchases, purchase_order_date)
+
     contract_vendor_id = safe_string(contract.get("vendor_id"))
 
     if data["vendor_id"] and data["vendor_id"].casefold() != contract_vendor_id.casefold():
@@ -287,16 +335,43 @@ def create_purchase_data(args):
         "unloading_charge": unloading_charge,
     }
 
-    build_purchase_summary(
+    purchase_summary = build_purchase_summary(
         purchase_record,
         base_price=summary["base_price"],
     )
 
-    sl_no = append_purchase(purchase_record)
+    received_weight = float(purchase_summary["received_weight"])
+    net_weight = float(purchase_summary["net_weight"])
+    remaining_qty = float(summary["remaining_qty"])
+
+    if received_weight <= 0:
+        raise ValueError("Received Weight must be greater than zero.")
+
+    if net_weight <= 0:
+        raise ValueError("Net Weight must be greater than zero.")
+
+    if net_weight > remaining_qty:
+        raise ValueError(
+            f"Net Weight ({net_weight:,.2f}) exceeds the remaining contract quantity "
+            f"({remaining_qty:,.2f})."
+        )
+
+    if invoice_weight > 0 and net_weight > 0:
+        difference = abs(invoice_weight - net_weight)
+        if difference > 2000 and difference > (invoice_weight * 0.25):
+            raise ValueError(
+                f"Invoice Weight and Net Weight differ significantly.\n\n"
+                f"Invoice Weight: {invoice_weight:,.2f} kg\n"
+                f"Calculated Net Weight: {net_weight:,.2f} kg\n"
+                f"Difference: {difference:,.2f} kg\n\n"
+                f"Please verify the values before saving."
+            )
+
+    append_purchase(purchase_record)
 
     return (
-        f"Purchase entry saved successfully. Sl.No: {sl_no}. "
-        f"Vendor ID: {contract_vendor_id} | Contract ID: {purchase_record['contract_id']} "
+        f"Purchase entry saved successfully. "
+        f"Contract ID: {purchase_record['contract_id']} "
         f"| Invoice: {data['invoice_number']} | PO Date: {purchase_order_date.strftime(DATE_FORMAT)}"
     )
 
