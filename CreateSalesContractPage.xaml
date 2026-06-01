@@ -1,0 +1,437 @@
+﻿<Page x:Class="RubexOps.CreateSalesContractPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+      mc:Ignorable="d"
+      Background="#F5F7F8">
+
+    <Page.Resources>
+
+        <Style TargetType="Button">
+            <Setter Property="SnapsToDevicePixels"
+                    Value="True"/>
+        </Style>
+
+
+
+        <Style x:Key="ModernInputBoxStyle"
+               TargetType="TextBox">
+
+            <Setter Property="Height"
+                    Value="52"/>
+
+            <Setter Property="FontSize"
+                    Value="15"/>
+
+            <Setter Property="Padding"
+                    Value="16,5"/>
+
+            <Setter Property="VerticalContentAlignment"
+                    Value="Center"/>
+
+            <Setter Property="Background"
+                    Value="#95FFFFFF"/>
+
+            <Setter Property="BorderBrush"
+                    Value="#D7DEE3"/>
+
+            <Setter Property="BorderThickness"
+                    Value="1.3"/>
+
+            <Setter Property="Foreground"
+                    Value="#111827"/>
+
+        </Style>
+
+
+
+        <Style x:Key="ModernDatePickerStyle"
+               TargetType="DatePicker">
+
+            <Setter Property="Height"
+                    Value="54"/>
+
+            <Setter Property="FontSize"
+                    Value="15"/>
+
+            <Setter Property="Padding"
+                    Value="12,0"/>
+
+            <Setter Property="Background"
+                    Value="#95FFFFFF"/>
+
+            <Setter Property="BorderBrush"
+                    Value="#D7DEE3"/>
+
+            <Setter Property="BorderThickness"
+                    Value="1.3"/>
+
+            <Setter Property="VerticalContentAlignment"
+                    Value="Center"/>
+
+        </Style>
+
+    </Page.Resources>
+
+
+
+    <Grid>
+
+        <Image Source="Images/Rubex_logo.png"
+               Width="500"
+               Height="500"
+               Opacity="0.2"
+               Stretch="Uniform"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"
+               IsHitTestVisible="False"
+               Panel.ZIndex="0"/>
+
+
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled"
+                      PanningMode="VerticalOnly"
+                      CanContentScroll="True"
+                      Focusable="False"
+                      Panel.ZIndex="1">
+
+            <Grid x:Name="MainGrid"
+                  Margin="24"
+                  PreviewKeyDown="MainGrid_PreviewKeyDown">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="24"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+
+
+                <Grid Grid.Row="0">
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+
+
+                    <Border Width="68"
+                            Height="68"
+                            CornerRadius="34"
+                            Background="#AAFFFFFF"
+                            BorderBrush="#DDE3E7"
+                            BorderThickness="1.2">
+
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="18"
+                                              ShadowDepth="0"
+                                              Opacity="0.10"/>
+                        </Border.Effect>
+
+                        <materialDesign:PackIcon Kind="FileDocumentEdit"
+                                                 Width="32"
+                                                 Height="32"
+                                                 Foreground="#0B8A8F"
+                                                 HorizontalAlignment="Center"
+                                                 VerticalAlignment="Center"/>
+                    </Border>
+
+
+
+                    <StackPanel Grid.Column="1"
+                                Margin="18,0,0,0"
+                                VerticalAlignment="Center">
+
+                        <TextBlock Text="Create Sales Contract"
+                                   FontSize="38"
+                                   FontWeight="Bold"
+                                   Foreground="#111827"/>
+
+                        <Border Width="451"
+                                Height="4"
+                                Background="#F59E42"
+                                CornerRadius="2"
+                                Margin="0,8,0,0"
+                                HorizontalAlignment="Left"/>
+                    </StackPanel>
+
+                </Grid>
+
+
+
+                <Border Grid.Row="2"
+                        CornerRadius="28"
+                        Padding="36"
+                        Background="#90FFFFFF"
+                        BorderBrush="#DDE3E7"
+                        BorderThickness="1.2">
+
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="32"
+                                          ShadowDepth="0"
+                                          Opacity="0.12"/>
+                    </Border.Effect>
+
+                    <StackPanel>
+
+
+
+                        <TextBlock Text="Contract Details"
+                                   FontSize="26"
+                                   FontWeight="Bold"
+                                   Foreground="#0B8A8F"
+                                   Margin="0,0,0,30"/>
+
+
+
+                        <Grid>
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="240"/>
+                                <ColumnDefinition Width="24"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="78"/>
+                                <RowDefinition Height="78"/>
+                                <RowDefinition Height="78"/>
+                                <RowDefinition Height="78"/>
+                                <RowDefinition Height="78"/>
+                                <RowDefinition Height="78"/>
+                                <RowDefinition Height="78"/>
+                            </Grid.RowDefinitions>
+
+
+
+                            <TextBlock Grid.Row="0"
+                                       Grid.Column="0"
+                                       VerticalAlignment="Center"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Foreground="#111827">
+                                <Run Text="Customer Name"/>
+                                <Run Text=" *" Foreground="#DC2626"/>
+                            </TextBlock>
+
+                            <TextBlock Grid.Row="1"
+                                       Grid.Column="0"
+                                       VerticalAlignment="Center"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Foreground="#111827">
+                                <Run Text="Customer ID"/>
+                                <Run Text=" *" Foreground="#DC2626"/>
+                            </TextBlock>
+
+                            <TextBlock Text="Item Code"
+                                       Grid.Row="2"
+                                       Grid.Column="0"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       VerticalAlignment="Center"
+                                       Foreground="#111827"/>
+
+                            <TextBlock Grid.Row="3"
+                                       Grid.Column="0"
+                                       VerticalAlignment="Center"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Foreground="#111827">
+                                <Run Text="Start Date"/>
+                                <Run Text=" *" Foreground="#DC2626"/>
+                            </TextBlock>
+
+                            <TextBlock Grid.Row="4"
+                                       Grid.Column="0"
+                                       VerticalAlignment="Center"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Foreground="#111827">
+                                <Run Text="End Date"/>
+                                <Run Text=" *" Foreground="#DC2626"/>
+                            </TextBlock>
+
+                            <TextBlock Grid.Row="5"
+                                       Grid.Column="0"
+                                       VerticalAlignment="Center"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Foreground="#111827">
+                                <Run Text="Base Price"/>
+                                <Run Text=" *" Foreground="#DC2626"/>
+                            </TextBlock>
+
+                            <TextBlock Grid.Row="6"
+                                       Grid.Column="0"
+                                       VerticalAlignment="Center"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Foreground="#111827">
+                                <Run Text="Agreed Quantity"/>
+                                <Run Text=" *" Foreground="#DC2626"/>
+                            </TextBlock>
+
+
+
+                            <TextBox x:Name="CustomerNameBox"
+                                     Grid.Row="0"
+                                     Grid.Column="2"
+                                     Style="{StaticResource ModernInputBoxStyle}"/>
+
+                            <TextBox x:Name="CustomerIDBox"
+                                     Grid.Row="1"
+                                     Grid.Column="2"
+                                     Style="{StaticResource ModernInputBoxStyle}"/>
+
+                            <TextBox x:Name="ItemCodeBox"
+                                     Grid.Row="2"
+                                     Grid.Column="2"
+                                     Style="{StaticResource ModernInputBoxStyle}"
+                                     Text="ISNR20"
+                                     IsReadOnly="True"
+                                     Background="#EEF2F4"/>
+
+                            <DatePicker x:Name="StartDatePicker"
+                                        Grid.Row="3"
+                                        Grid.Column="2"
+                                        Style="{StaticResource ModernDatePickerStyle}"/>
+
+                            <DatePicker x:Name="EndDatePicker"
+                                        Grid.Row="4"
+                                        Grid.Column="2"
+                                        Style="{StaticResource ModernDatePickerStyle}"/>
+
+                            <TextBox x:Name="BasePriceBox"
+                                     Grid.Row="5"
+                                     Grid.Column="2"
+                                     Style="{StaticResource ModernInputBoxStyle}"/>
+
+                            <TextBox x:Name="AgreedQuantityBox"
+                                     Grid.Row="6"
+                                     Grid.Column="2"
+                                     Style="{StaticResource ModernInputBoxStyle}"/>
+
+                        </Grid>
+
+
+
+                        <TextBlock Text="Breach Logic (Optional)"
+                                   FontSize="26"
+                                   FontWeight="Bold"
+                                   Foreground="#0B8A8F"
+                                   Margin="0,46,0,30"/>
+
+
+
+                        <Grid>
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="240"/>
+                                <ColumnDefinition Width="24"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="78"/>
+                                <RowDefinition Height="78"/>
+                            </Grid.RowDefinitions>
+
+
+
+                            <TextBlock Text="Penalty / Discount Rate"
+                                       Grid.Row="0"
+                                       Grid.Column="0"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       VerticalAlignment="Center"
+                                       Foreground="#111827"/>
+
+                            <TextBlock Text="Remedy Days"
+                                       Grid.Row="1"
+                                       Grid.Column="0"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       VerticalAlignment="Center"
+                                       Foreground="#111827"/>
+
+
+
+                            <TextBox x:Name="PenaltyRateBox"
+                                     Grid.Row="0"
+                                     Grid.Column="2"
+                                     Style="{StaticResource ModernInputBoxStyle}"/>
+
+                            <TextBox x:Name="RemedyDaysBox"
+                                     Grid.Row="1"
+                                     Grid.Column="2"
+                                     Style="{StaticResource ModernInputBoxStyle}"/>
+
+                        </Grid>
+
+
+
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Right"
+                                    Margin="0,45,0,0">
+
+                            <Button Content="Clear Form"
+                                    Width="160"
+                                    Height="54"
+                                    Margin="0,0,18,0"
+                                    Background="#E5E7EB"
+                                    Foreground="#111827"
+                                    FontSize="15"
+                                    FontWeight="SemiBold"
+                                    BorderThickness="0"
+                                    Cursor="Hand"
+                                    Click="ClearForm_Click">
+
+                                <Button.Effect>
+                                    <DropShadowEffect BlurRadius="10"
+                                                      ShadowDepth="0"
+                                                      Opacity="0.10"/>
+                                </Button.Effect>
+
+                            </Button>
+
+
+
+                            <Button x:Name="CreateContractButton"
+                                    Content="Create Contract"
+                                    Width="210"
+                                    Height="54"
+                                    Background="#0EA5A8"
+                                    Foreground="White"
+                                    FontSize="16"
+                                    FontWeight="Bold"
+                                    BorderThickness="0"
+                                    Cursor="Hand"
+                                    IsDefault="True"
+                                    Click="CreateContract_Click">
+
+                                <Button.Effect>
+                                    <DropShadowEffect BlurRadius="14"
+                                                      ShadowDepth="0"
+                                                      Opacity="0.16"/>
+                                </Button.Effect>
+
+                            </Button>
+
+                        </StackPanel>
+
+                    </StackPanel>
+
+                </Border>
+
+            </Grid>
+
+        </ScrollViewer>
+
+    </Grid>
+
+</Page>

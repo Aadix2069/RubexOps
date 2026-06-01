@@ -1,0 +1,416 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+
+namespace RubexOps
+{
+    public partial class RenewSalesContractWindow : Window
+    {
+        private readonly List<SalesContract> renewableContracts;
+        private readonly string pythonExe = "python";
+
+        public RenewSalesContractWindow(List<SalesContract> contracts)
+        {
+            InitializeComponent();
+
+            renewableContracts = contracts
+                .Where(c => c.can_renew)
+                .ToList();
+
+            ContractComboBox.ItemsSource = renewableContracts;
+
+            if (renewableContracts.Count > 0)
+            {
+                ContractComboBox.SelectedIndex = 0;
+            }
+            else
+            {
+                RenewButton.IsEnabled = false;
+
+                MessageBox.Show(
+                    "No renewable contracts are available. Only Completed or Expired contracts can be renewed.",
+                    "Renew Contract",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+            }
+        }
+
+        private void ContractComboBox_SelectionChanged(
+            object sender,
+            SelectionChangedEventArgs e)
+        {
+            if (ContractComboBox.SelectedItem is not SalesContract contract)
+            {
+                ClearDisplay();
+                return;
+            }
+
+            CustomerNameBox.Text = contract.customer_name ?? "";
+            CustomerIDBox.Text = contract.customer_id ?? "";
+            StatusBox.Text = contract.DisplayStatus;
+
+            BasePriceBox.Text =
+                contract.base_price?.ToString("0.##", CultureInfo.InvariantCulture) ?? "";
+
+            AgreedQtyBox.Text =
+                contract.agreed_qty?.ToString("0.##", CultureInfo.InvariantCulture) ?? "";
+
+            PenaltyPercentBox.Text =
+                contract.penalty_percent?.ToString("0.##", CultureInfo.InvariantCulture) ?? "";
+
+            RemedyDaysBox.Text =
+                contract.remedy_days?.ToString("0.##", CultureInfo.InvariantCulture) ?? "";
+        }
+
+        private void RenewButton_Click(
+            object sender,
+            RoutedEventArgs e)
+        {
+            object? originalContent = RenewButton.Content;
+
+            try
+            {
+                if (ContractComboBox.SelectedItem is not SalesContract contract)
+                {
+                    MessageBox.Show(
+                        "Please select a contract.",
+                        "Validation Error",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+
+                    return;
+                }
+
+                if (!ValidateForm(
+                        contract,
+                        out double basePrice,
+                        out double agreedQty,
+                        out double penaltyPercent,
+                        out int remedyDays))
+                {
+                    return;
+                }
+
+                Mouse.OverrideCursor = Cursors.Wait;
+                MainGrid.IsEnabled = false;
+                MainGrid.Opacity = 0.75;
+                RenewButton.IsEnabled = false;
+                RenewButton.Content = "Renewing...";
+
+                string pythonScript = Path.Combine(
+                    AppDomain.CurrentDomain.BaseDirectory,
+                    "backend",
+                    "renew_sales_contract.py");
+
+                if (!File.Exists(pythonScript))
+                {
+                    MessageBox.Show(
+                        "Backend Python file not found.\n\n" + pythonScript,
+                        "File Error",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+
+                    return;
+                }
+
+                string startDate =
+                    StartDatePicker.SelectedDate?
+                    .ToString("dd-MM-yyyy", CultureInfo.InvariantCulture) ?? "";
+
+                string endDate =
+                    EndDatePicker.SelectedDate?
+                    .ToString("dd-MM-yyyy", CultureInfo.InvariantCulture) ?? "";
+
+                ProcessStartInfo start = new()
+                {
+                    FileName = pythonExe,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true,
+                    WorkingDirectory = Path.Combine(
+                        AppDomain.CurrentDomain.BaseDirectory,
+                        "backend")
+                };
+
+                start.ArgumentList.Add(pythonScript);
+                start.ArgumentList.Add(contract.row.ToString(CultureInfo.InvariantCulture));
+                start.ArgumentList.Add(startDate);
+                start.ArgumentList.Add(endDate);
+                start.ArgumentList.Add(basePrice.ToString(CultureInfo.InvariantCulture));
+                start.ArgumentList.Add(agreedQty.ToString(CultureInfo.InvariantCulture));
+                start.ArgumentList.Add(penaltyPercent.ToString(CultureInfo.InvariantCulture));
+                start.ArgumentList.Add(remedyDays.ToString(CultureInfo.InvariantCulture));
+
+                using Process process = Process.Start(start)
+                    ?? throw new Exception("Failed to start backend process.");
+
+                string output = process.StandardOutput.ReadToEnd();
+                string error = process.StandardError.ReadToEnd();
+
+                process.WaitForExit();
+
+                if (process.ExitCode != 0)
+                {
+                    string message =
+                        !string.IsNullOrWhiteSpace(error)
+                            ? error.Trim()
+                            : output.Trim();
+
+                    if (string.IsNullOrWhiteSpace(message))
+                    {
+                        message =
+                            $"Backend process failed with exit code {process.ExitCode}.";
+                    }
+
+                    MessageBox.Show(
+                        message,
+                        "Backend Error",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+
+                    return;
+                }
+
+                if (!string.IsNullOrWhiteSpace(error))
+                {
+                    MessageBox.Show(
+                        error.Trim(),
+                        "Backend Error",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+
+                    return;
+                }
+
+                if (output.TrimStart().StartsWith(
+                        "ERROR",
+                        StringComparison.OrdinalIgnoreCase))
+                {
+                    MessageBox.Show(
+                        output.Trim(),
+                        "Backend Error",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+
+                    return;
+                }
+
+                MessageBox.Show(
+                    output.Trim(),
+                    "Success",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+
+                DialogResult = true;
+                Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    ex.Message,
+                    "Application Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            finally
+            {
+                Mouse.OverrideCursor = null;
+                MainGrid.IsEnabled = true;
+                MainGrid.Opacity = 1;
+                RenewButton.IsEnabled = true;
+                RenewButton.Content = originalContent ?? "Renew Contract";
+            }
+        }
+
+        private bool ValidateForm(
+            SalesContract contract,
+            out double basePrice,
+            out double agreedQty,
+            out double penaltyPercent,
+            out int remedyDays)
+        {
+            basePrice = 0;
+            agreedQty = 0;
+            penaltyPercent = 0;
+            remedyDays = 0;
+
+            if (StartDatePicker.SelectedDate == null)
+            {
+                MessageBox.Show(
+                    "Please select a new Start Date.",
+                    "Validation Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                StartDatePicker.Focus();
+                return false;
+            }
+
+            if (EndDatePicker.SelectedDate == null)
+            {
+                MessageBox.Show(
+                    "Please select a new End Date.",
+                    "Validation Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                EndDatePicker.Focus();
+                return false;
+            }
+
+            if (EndDatePicker.SelectedDate <= StartDatePicker.SelectedDate)
+            {
+                MessageBox.Show(
+                    "New End Date must be after New Start Date.",
+                    "Validation Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                EndDatePicker.Focus();
+                return false;
+            }
+
+            if (TryParseDate(contract.end_date, out DateTime oldEndDate) &&
+                StartDatePicker.SelectedDate.Value.Date <= oldEndDate.Date)
+            {
+                MessageBox.Show(
+                    "New Start Date must be after the old contract End Date.",
+                    "Validation Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                StartDatePicker.Focus();
+                return false;
+            }
+
+            if (!ReadDouble(BasePriceBox.Text, out basePrice) || basePrice <= 0)
+            {
+                MessageBox.Show(
+                    "Base Price must be greater than zero.",
+                    "Validation Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                BasePriceBox.Focus();
+                return false;
+            }
+
+            if (!ReadDouble(AgreedQtyBox.Text, out agreedQty) || agreedQty <= 0)
+            {
+                MessageBox.Show(
+                    "Agreed Quantity must be greater than zero.",
+                    "Validation Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                AgreedQtyBox.Focus();
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(PenaltyPercentBox.Text))
+            {
+                penaltyPercent = 0;
+            }
+            else if (!ReadDouble(PenaltyPercentBox.Text, out penaltyPercent) ||
+                     penaltyPercent < 0 ||
+                     penaltyPercent > 100)
+            {
+                MessageBox.Show(
+                    "Penalty Percentage must be between 0 and 100.",
+                    "Validation Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                PenaltyPercentBox.Focus();
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(RemedyDaysBox.Text))
+            {
+                remedyDays = 0;
+            }
+            else if (!int.TryParse(
+                         RemedyDaysBox.Text.Trim(),
+                         NumberStyles.Integer,
+                         CultureInfo.InvariantCulture,
+                         out remedyDays) ||
+                     remedyDays < 0)
+            {
+                MessageBox.Show(
+                    "Remedy Days must be a non-negative whole number.",
+                    "Validation Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                RemedyDaysBox.Focus();
+                return false;
+            }
+
+            return true;
+        }
+
+        private static bool ReadDouble(
+            string text,
+            out double value)
+        {
+            return double.TryParse(
+                text.Trim().Replace(",", "").Replace("%", ""),
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture,
+                out value);
+        }
+
+        private static bool TryParseDate(
+            string? text,
+            out DateTime date)
+        {
+            return DateTime.TryParseExact(
+                text ?? "",
+                new[] { "dd-MM-yyyy", "yyyy-MM-dd", "dd/MM/yyyy" },
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out date);
+        }
+
+        private void ClearDisplay()
+        {
+            CustomerNameBox.Clear();
+            CustomerIDBox.Clear();
+            StatusBox.Clear();
+            BasePriceBox.Clear();
+            AgreedQtyBox.Clear();
+            PenaltyPercentBox.Clear();
+            RemedyDaysBox.Clear();
+        }
+
+        private void CancelButton_Click(
+            object sender,
+            RoutedEventArgs e)
+        {
+            Close();
+        }
+    }
+
+    public partial class SalesContract
+    {
+        public string RenewDisplay
+        {
+            get
+            {
+                string contractId =
+                    string.IsNullOrWhiteSpace(contract_id)
+                        ? $"Row {row}"
+                        : contract_id;
+
+                return $"{customer_name} - {customer_id} | {contractId} | {DisplayStatus}";
+            }
+        }
+    }
+}

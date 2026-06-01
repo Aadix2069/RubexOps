@@ -13,13 +13,13 @@
 
 		<UseWPF>true</UseWPF>
 
+		<NoWarn>$(NoWarn);CS0414</NoWarn>
+
 	</PropertyGroup>
 
 	<ItemGroup>
 	  <Content Include=".vscode\settings.json" />
 	</ItemGroup>
-
-
 	
 
 	<ItemGroup>

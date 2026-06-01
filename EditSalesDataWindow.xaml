@@ -1,0 +1,559 @@
+﻿<Window x:Class="RubexOps.EditSalesDataWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        mc:Ignorable="d"
+        Title="Edit Sales Data"
+        Width="900"
+        Height="720"
+        WindowStartupLocation="CenterOwner"
+        Background="#F5F7F8">
+
+    <Window.Resources>
+
+        <Style TargetType="Button">
+            <Setter Property="SnapsToDevicePixels"
+                    Value="True"/>
+        </Style>
+
+
+
+        <Style x:Key="FormLabel"
+               TargetType="TextBlock">
+
+            <Setter Property="FontSize"
+                    Value="15"/>
+
+            <Setter Property="FontWeight"
+                    Value="SemiBold"/>
+
+            <Setter Property="VerticalAlignment"
+                    Value="Center"/>
+
+            <Setter Property="Foreground"
+                    Value="#111827"/>
+        </Style>
+
+
+
+        <Style x:Key="RequiredStar"
+               TargetType="TextBlock">
+
+            <Setter Property="Text"
+                    Value="*"/>
+
+            <Setter Property="FontSize"
+                    Value="17"/>
+
+            <Setter Property="FontWeight"
+                    Value="Bold"/>
+
+            <Setter Property="Foreground"
+                    Value="#DC2626"/>
+
+            <Setter Property="Margin"
+                    Value="4,-4,0,0"/>
+
+            <Setter Property="VerticalAlignment"
+                    Value="Center"/>
+        </Style>
+
+
+
+        <Style x:Key="GlassTextBoxStyle"
+               TargetType="TextBox">
+
+            <Setter Property="Height"
+                    Value="48"/>
+
+            <Setter Property="FontSize"
+                    Value="15"/>
+
+            <Setter Property="Padding"
+                    Value="14,5"/>
+
+            <Setter Property="VerticalContentAlignment"
+                    Value="Center"/>
+
+            <Setter Property="Background"
+                    Value="#70FFFFFF"/>
+
+            <Setter Property="BorderBrush"
+                    Value="#99FFFFFF"/>
+
+            <Setter Property="BorderThickness"
+                    Value="1"/>
+        </Style>
+
+    </Window.Resources>
+
+
+
+    <Grid>
+
+        <Image Source="Images/Rubex_logo.png"
+               Width="550"
+               Height="550"
+               Opacity="0.2"
+               Stretch="Uniform"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"
+               IsHitTestVisible="False"
+               Panel.ZIndex="0"/>
+
+
+
+        <Grid x:Name="MainGrid"
+              Margin="24"
+              Panel.ZIndex="1">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="18"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+
+
+            <Grid Grid.Row="0">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+
+
+                <Border Width="58"
+                        Height="58"
+                        CornerRadius="29"
+                        Background="#AAFFFFFF"
+                        BorderBrush="#80FFFFFF"
+                        BorderThickness="1">
+
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="18"
+                                          ShadowDepth="0"
+                                          Opacity="0.12"/>
+                    </Border.Effect>
+
+                    <materialDesign:PackIcon Kind="Pencil"
+                                             Width="28"
+                                             Height="28"
+                                             Foreground="#0B8A8F"
+                                             HorizontalAlignment="Center"
+                                             VerticalAlignment="Center"/>
+                </Border>
+
+
+
+                <StackPanel Grid.Column="1"
+                            Margin="16,0,0,0"
+                            VerticalAlignment="Center">
+
+                    <TextBlock Text="Edit Sales Data"
+                               FontSize="30"
+                               FontWeight="Bold"
+                               Foreground="#111827"/>
+
+                    <Border Width="320"
+                            Height="4"
+                            Background="#F59E42"
+                            CornerRadius="2"
+                            Margin="0,7,0,0"
+                            HorizontalAlignment="Left"/>
+                </StackPanel>
+
+            </Grid>
+
+
+
+            <Border Grid.Row="2"
+                    CornerRadius="28"
+                    Padding="28"
+                    Background="#88FFFFFF"
+                    BorderBrush="#99FFFFFF"
+                    BorderThickness="1">
+
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="35"
+                                      ShadowDepth="0"
+                                      Opacity="0.16"/>
+                </Border.Effect>
+
+                <Grid>
+
+                    <Border CornerRadius="24"
+                            Background="#30FFFFFF"
+                            Margin="-12"/>
+
+
+
+                    <Grid>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+
+
+                        <ScrollViewer Grid.Row="0"
+                                      VerticalScrollBarVisibility="Auto">
+
+                            <StackPanel>
+
+
+
+                                <TextBlock Text="Customer Details"
+                                           FontSize="24"
+                                           FontWeight="Bold"
+                                           Foreground="#0B8A8F"
+                                           Margin="0,0,0,22"/>
+
+                                <Grid>
+
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="210"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="70"/>
+                                        <RowDefinition Height="70"/>
+                                        <RowDefinition Height="70"/>
+                                    </Grid.RowDefinitions>
+
+
+
+                                    <StackPanel Grid.Row="0"
+                                                Orientation="Horizontal"
+                                                VerticalAlignment="Center">
+
+                                        <TextBlock Text="Customer Name"
+                                                   Style="{StaticResource FormLabel}"/>
+
+                                        <TextBlock Style="{StaticResource RequiredStar}"/>
+                                    </StackPanel>
+
+
+
+                                    <StackPanel Grid.Row="1"
+                                                Orientation="Horizontal"
+                                                VerticalAlignment="Center">
+
+                                        <TextBlock Text="Customer ID"
+                                                   Style="{StaticResource FormLabel}"/>
+
+                                        <TextBlock Style="{StaticResource RequiredStar}"/>
+                                    </StackPanel>
+
+
+
+                                    <TextBlock Text="Item Code"
+                                               Grid.Row="2"
+                                               Style="{StaticResource FormLabel}"/>
+
+
+
+                                    <TextBox x:Name="CustomerNameBox"
+                                             Grid.Row="0"
+                                             Grid.Column="1"
+                                             Style="{StaticResource GlassTextBoxStyle}"/>
+
+                                    <TextBox x:Name="CustomerIDBox"
+                                             Grid.Row="1"
+                                             Grid.Column="1"
+                                             Style="{StaticResource GlassTextBoxStyle}"/>
+
+                                    <TextBox x:Name="ItemCodeBox"
+                                             Grid.Row="2"
+                                             Grid.Column="1"
+                                             Style="{StaticResource GlassTextBoxStyle}"
+                                             IsReadOnly="True"
+                                             Background="#60F3F4F6"/>
+
+                                </Grid>
+
+
+
+                                <TextBlock Text="Sales Details"
+                                           FontSize="24"
+                                           FontWeight="Bold"
+                                           Foreground="#0B8A8F"
+                                           Margin="0,34,0,22"/>
+
+                                <Grid>
+
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="210"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="70"/>
+                                        <RowDefinition Height="70"/>
+                                        <RowDefinition Height="70"/>
+                                    </Grid.RowDefinitions>
+
+
+
+                                    <StackPanel Grid.Row="0"
+                                                Orientation="Horizontal"
+                                                VerticalAlignment="Center">
+
+                                        <TextBlock Text="Invoice Number"
+                                                   Style="{StaticResource FormLabel}"/>
+
+                                        <TextBlock Style="{StaticResource RequiredStar}"/>
+                                    </StackPanel>
+
+
+
+                                    <StackPanel Grid.Row="1"
+                                                Orientation="Horizontal"
+                                                VerticalAlignment="Center">
+
+                                        <TextBlock Text="Sales Order"
+                                                   Style="{StaticResource FormLabel}"/>
+
+                                        <TextBlock Style="{StaticResource RequiredStar}"/>
+                                    </StackPanel>
+
+
+
+                                    <StackPanel Grid.Row="2"
+                                                Orientation="Horizontal"
+                                                VerticalAlignment="Center">
+
+                                        <TextBlock Text="Dispatch"
+                                                   Style="{StaticResource FormLabel}"/>
+
+                                    </StackPanel>
+
+
+
+                                    <TextBox x:Name="InvoiceNumberBox"
+                                             Grid.Row="0"
+                                             Grid.Column="1"
+                                             Style="{StaticResource GlassTextBoxStyle}"/>
+
+
+
+                                    <Border Grid.Row="1"
+                                            Grid.Column="1"
+                                            Background="#70FFFFFF"
+                                            BorderBrush="#99FFFFFF"
+                                            BorderThickness="1"
+                                            CornerRadius="14">
+
+                                        <DatePicker x:Name="SalesOrderDatePicker"
+                                                    Height="50"
+                                                    FontSize="15"
+                                                    Padding="12,0"
+                                                    VerticalContentAlignment="Center"
+                                                    Background="Transparent"
+                                                    BorderThickness="0"/>
+                                    </Border>
+
+
+
+                                    <Border Grid.Row="2"
+                                            Grid.Column="1"
+                                            Background="#70FFFFFF"
+                                            BorderBrush="#99FFFFFF"
+                                            BorderThickness="1"
+                                            CornerRadius="14">
+
+                                        <DatePicker x:Name="DispatchDatePicker"
+                                                    Height="50"
+                                                    FontSize="15"
+                                                    Padding="12,0"
+                                                    VerticalContentAlignment="Center"
+                                                    Background="Transparent"
+                                                    BorderThickness="0"/>
+                                    </Border>
+
+                                </Grid>
+
+
+
+                                <TextBlock Text="Weight Details"
+                                           FontSize="24"
+                                           FontWeight="Bold"
+                                           Foreground="#0B8A8F"
+                                           Margin="0,34,0,22"/>
+
+                                <Grid>
+
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="210"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="70"/>
+                                    </Grid.RowDefinitions>
+
+
+
+                                    <StackPanel Grid.Row="0"
+                                                Orientation="Horizontal"
+                                                VerticalAlignment="Center">
+
+                                        <TextBlock Text="Weight"
+                                                   Style="{StaticResource FormLabel}"/>
+
+                                        <TextBlock Style="{StaticResource RequiredStar}"/>
+                                    </StackPanel>
+
+
+
+                                    <TextBox x:Name="WeightBox"
+                                             Grid.Row="0"
+                                             Grid.Column="1"
+                                             Style="{StaticResource GlassTextBoxStyle}"/>
+
+                                </Grid>
+
+
+
+                                <TextBlock Text="Tax and Charge Details"
+                                           FontSize="24"
+                                           FontWeight="Bold"
+                                           Foreground="#0B8A8F"
+                                           Margin="0,34,0,22"/>
+
+                                <Grid>
+
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="210"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="70"/>
+                                        <RowDefinition Height="70"/>
+                                        <RowDefinition Height="70"/>
+                                    </Grid.RowDefinitions>
+
+
+
+                                    <StackPanel Grid.Row="0"
+                                                Orientation="Horizontal"
+                                                VerticalAlignment="Center">
+
+                                        <TextBlock Text="GST (%)"
+                                                   Style="{StaticResource FormLabel}"/>
+
+                                        <TextBlock Style="{StaticResource RequiredStar}"/>
+                                    </StackPanel>
+
+
+
+                                    <StackPanel Grid.Row="1"
+                                                Orientation="Horizontal"
+                                                VerticalAlignment="Center">
+
+                                        <TextBlock Text="TCS 194Q (%)"
+                                                   Style="{StaticResource FormLabel}"/>
+
+                                        <TextBlock Style="{StaticResource RequiredStar}"/>
+                                    </StackPanel>
+
+
+
+                                    <StackPanel Grid.Row="2"
+                                                Orientation="Horizontal"
+                                                VerticalAlignment="Center">
+
+                                        <TextBlock Text="Loading Charge"
+                                                   Style="{StaticResource FormLabel}"/>
+
+                                    </StackPanel>
+
+
+
+                                    <TextBox x:Name="GstBox"
+                                             Grid.Row="0"
+                                             Grid.Column="1"
+                                             Style="{StaticResource GlassTextBoxStyle}"/>
+
+                                    <TextBox x:Name="Tcs194QBox"
+                                             Grid.Row="1"
+                                             Grid.Column="1"
+                                             Style="{StaticResource GlassTextBoxStyle}"/>
+
+                                    <TextBox x:Name="LoadingChargeBox"
+                                             Grid.Row="2"
+                                             Grid.Column="1"
+                                             Style="{StaticResource GlassTextBoxStyle}"/>
+
+                                </Grid>
+
+                            </StackPanel>
+
+                        </ScrollViewer>
+
+
+
+                        <StackPanel Grid.Row="1"
+                                    Orientation="Horizontal"
+                                    HorizontalAlignment="Right"
+                                    Margin="0,24,0,0">
+
+                            <Button Content="Cancel"
+                                    Width="140"
+                                    Height="50"
+                                    Margin="0,0,16,0"
+                                    Background="#DDE5E7EB"
+                                    Foreground="#111827"
+                                    FontSize="15"
+                                    FontWeight="SemiBold"
+                                    BorderThickness="0"
+                                    Cursor="Hand"
+                                    Click="Cancel_Click">
+
+                                <Button.Effect>
+                                    <DropShadowEffect BlurRadius="12"
+                                                      ShadowDepth="0"
+                                                      Opacity="0.10"/>
+                                </Button.Effect>
+                            </Button>
+
+
+
+                            <Button x:Name="SaveButton"
+                                    Content="Save Changes"
+                                    Width="180"
+                                    Height="50"
+                                    Background="#0EA5A8"
+                                    Foreground="White"
+                                    FontSize="15"
+                                    FontWeight="Bold"
+                                    BorderThickness="0"
+                                    Cursor="Hand"
+                                    Click="Save_Click">
+
+                                <Button.Effect>
+                                    <DropShadowEffect BlurRadius="14"
+                                                      ShadowDepth="0"
+                                                      Opacity="0.18"/>
+                                </Button.Effect>
+                            </Button>
+
+                        </StackPanel>
+
+                    </Grid>
+
+                </Grid>
+
+            </Border>
+
+        </Grid>
+
+    </Grid>
+
+</Window>

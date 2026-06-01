@@ -6,15 +6,7 @@
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
 
-        <!-- ================================================= -->
-        <!-- MAIN CONTAINER -->
-        <!-- ================================================= -->
-
         <Grid Margin="35">
-
-            <!-- ================================================= -->
-            <!-- WATERMARK -->
-            <!-- ================================================= -->
 
             <Image Source="Images/Rubex_logo.png"
                    Width="500"
@@ -26,20 +18,12 @@
                    IsHitTestVisible="False"
                    Panel.ZIndex="0"/>
 
-            <!-- ================================================= -->
-            <!-- MAIN CONTENT -->
-            <!-- ================================================= -->
-
             <Grid Panel.ZIndex="1">
 
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-
-                <!-- ================================================= -->
-                <!-- PAGE HEADER -->
-                <!-- ================================================= -->
 
                 <StackPanel Orientation="Horizontal">
 
@@ -80,10 +64,6 @@
                 </StackPanel>
 
 
-                <!-- ================================================= -->
-                <!-- CONTENT AREA -->
-                <!-- ================================================= -->
-
                 <Grid Grid.Row="1"
                       Margin="0,40,0,0">
 
@@ -93,10 +73,6 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-
-                    <!-- ================================================= -->
-                    <!-- CONTRACT MANAGEMENT -->
-                    <!-- ================================================= -->
 
                     <Border Grid.Column="0"
                             CornerRadius="28"
@@ -113,8 +89,6 @@
 
                         <Grid>
 
-                            <!-- INNER GLASS LAYER -->
-
                             <Border CornerRadius="24"
                                     Background="#30FFFFFF"
                                     Margin="-16"/>
@@ -125,8 +99,6 @@
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
-
-                                <!-- HEADER -->
 
                                 <StackPanel Orientation="Horizontal">
 
@@ -161,8 +133,6 @@
                                 </StackPanel>
 
 
-                                <!-- BUTTONS -->
-
                                 <StackPanel Grid.Row="1"
                                             Margin="0,40,0,0">
 
@@ -174,7 +144,7 @@
                                             Foreground="White"
                                             BorderThickness="0"
                                             Cursor="Hand"
-                                         >
+                                            Click="CreateContract_Click">
 
                                         <Button.Effect>
                                             <DropShadowEffect BlurRadius="14"
@@ -190,7 +160,7 @@
                                             Foreground="White"
                                             BorderThickness="0"
                                             Cursor="Hand"
-                                            >
+                                            Click="ViewContracts_Click">
 
                                         <Button.Effect>
                                             <DropShadowEffect BlurRadius="14"
@@ -207,10 +177,6 @@
                     </Border>
 
 
-                    <!-- ================================================= -->
-                    <!-- DATA MANAGEMENT -->
-                    <!-- ================================================= -->
-
                     <Border Grid.Column="2"
                             CornerRadius="28"
                             Padding="35"
@@ -226,8 +192,6 @@
 
                         <Grid>
 
-                            <!-- INNER GLASS LAYER -->
-
                             <Border CornerRadius="24"
                                     Background="#30FFFFFF"
                                     Margin="-16"/>
@@ -238,8 +202,6 @@
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
-
-                                <!-- HEADER -->
 
                                 <StackPanel Orientation="Horizontal">
 
@@ -274,8 +236,6 @@
                                 </StackPanel>
 
 
-                                <!-- BUTTONS -->
-
                                 <StackPanel Grid.Row="1"
                                             Margin="0,40,0,0">
 
@@ -287,7 +247,7 @@
                                             Foreground="White"
                                             BorderThickness="0"
                                             Cursor="Hand"
-                                            >
+                                            Click="EnterSalesData_Click">
 
                                         <Button.Effect>
                                             <DropShadowEffect BlurRadius="14"
@@ -303,7 +263,7 @@
                                             Foreground="White"
                                             BorderThickness="0"
                                             Cursor="Hand"
-                                            >
+                                            Click="ViewEditSalesData_Click">
 
                                         <Button.Effect>
                                             <DropShadowEffect BlurRadius="14"
@@ -317,6 +277,7 @@
                             </Grid>
 
                         </Grid>
+
                     </Border>
 
                 </Grid>

@@ -11,14 +11,14 @@ using System.Windows.Input;
 
 namespace RubexOps
 {
-    public partial class EnterPurchaseDataPage : Page
+    public partial class EnterSalesDataPage : Page
     {
-        private const string DefaultItemCode = "NRFC";
+        private const string DefaultItemCode = "ISNR20";
 
         private sealed class ContractOption
         {
-            public string VendorName { get; set; } = "";
-            public string VendorID { get; set; } = "";
+            public string CustomerName { get; set; } = "";
+            public string CustomerID { get; set; } = "";
             public string ContractID { get; set; } = "";
             public string ItemCode { get; set; } = "";
             public string BaseRate { get; set; } = "";
@@ -31,22 +31,20 @@ namespace RubexOps
 
         private ContractOption? selectedContract = null;
 
-        private bool isSelectingVendor;
-
+        private bool isSelectingCustomer;
         private bool suppressSuggestionCommit;
-
         private int suggestionIndex = -1;
 
-        public EnterPurchaseDataPage()
+        public EnterSalesDataPage()
         {
             InitializeComponent();
 
-            Loaded += EnterPurchaseDataPage_Loaded;
+            Loaded += EnterSalesDataPage_Loaded;
 
-            PreviewKeyDown += EnterPurchaseDataPage_PreviewKeyDown;
+            PreviewKeyDown += EnterSalesDataPage_PreviewKeyDown;
         }
 
-        private async void EnterPurchaseDataPage_Loaded(
+        private async void EnterSalesDataPage_Loaded(
             object sender,
             RoutedEventArgs e)
         {
@@ -55,12 +53,12 @@ namespace RubexOps
             UpdateSearchPlaceholder();
         }
 
-        private void EnterPurchaseDataPage_PreviewKeyDown(
+        private void EnterSalesDataPage_PreviewKeyDown(
             object sender,
             KeyEventArgs e)
         {
-            if (VendorSuggestionPopup.IsOpen &&
-                VendorSuggestionList.Items.Count > 0)
+            if (CustomerSuggestionPopup.IsOpen &&
+                CustomerSuggestionList.Items.Count > 0)
             {
                 if (e.Key == Key.Down)
                 {
@@ -85,7 +83,7 @@ namespace RubexOps
 
                 if (e.Key == Key.Escape)
                 {
-                    VendorSuggestionPopup.IsOpen = false;
+                    CustomerSuggestionPopup.IsOpen = false;
                     e.Handled = true;
                     return;
                 }
@@ -95,10 +93,10 @@ namespace RubexOps
             {
                 e.Handled = true;
 
-                if (SavePurchaseButton.IsEnabled)
+                if (SaveSalesButton.IsEnabled)
                 {
-                    SavePurchase_Click(
-                        SavePurchaseButton,
+                    SaveSales_Click(
+                        SaveSalesButton,
                         new RoutedEventArgs());
                 }
             }
@@ -111,13 +109,13 @@ namespace RubexOps
                 string pythonScript = Path.Combine(
                     AppDomain.CurrentDomain.BaseDirectory,
                     "backend",
-                    "read_purchase_vendors.py"
+                    "read_sales_customers.py"
                 );
 
                 if (!File.Exists(pythonScript))
                 {
                     MessageBox.Show(
-                        "Vendor suggestion backend file not found.\n\n" + pythonScript,
+                        "Customer suggestion backend file not found.\n\n" + pythonScript,
                         "File Error",
                         MessageBoxButton.OK,
                         MessageBoxImage.Error);
@@ -161,18 +159,18 @@ namespace RubexOps
             }
 
             SearchPlaceholder.Visibility =
-                string.IsNullOrEmpty(VendorSearchBox.Text)
+                string.IsNullOrEmpty(CustomerSearchBox.Text)
                     ? Visibility.Visible
                     : Visibility.Collapsed;
         }
 
-        private void VendorSearchBox_TextChanged(
+        private void CustomerSearchBox_TextChanged(
             object sender,
             TextChangedEventArgs e)
         {
             UpdateSearchPlaceholder();
 
-            if (isSelectingVendor)
+            if (isSelectingCustomer)
             {
                 return;
             }
@@ -183,12 +181,12 @@ namespace RubexOps
             }
 
             string searchText =
-                VendorSearchBox.Text.Trim();
+                CustomerSearchBox.Text.Trim();
 
             if (searchText.Length == 0)
             {
-                VendorSuggestionPopup.IsOpen = false;
-                VendorSuggestionList.ItemsSource = null;
+                CustomerSuggestionPopup.IsOpen = false;
+                CustomerSuggestionList.ItemsSource = null;
                 suggestionIndex = -1;
                 return;
             }
@@ -196,15 +194,15 @@ namespace RubexOps
             List<ContractOption> matches =
      contractOptions.FindAll(c =>
 
-         (!string.IsNullOrWhiteSpace(c.VendorName) &&
-          c.VendorName.Trim().StartsWith(
+         (!string.IsNullOrWhiteSpace(c.CustomerName) &&
+          c.CustomerName.Trim().StartsWith(
               searchText,
               StringComparison.OrdinalIgnoreCase))
 
          ||
 
-         (!string.IsNullOrWhiteSpace(c.VendorID) &&
-          c.VendorID.Trim().StartsWith(
+         (!string.IsNullOrWhiteSpace(c.CustomerID) &&
+          c.CustomerID.Trim().StartsWith(
               searchText,
               StringComparison.OrdinalIgnoreCase))
 
@@ -215,7 +213,7 @@ namespace RubexOps
               searchText,
               StringComparison.OrdinalIgnoreCase)));
 
-            VendorSuggestionList.ItemsSource =
+            CustomerSuggestionList.ItemsSource =
                 matches;
 
             if (matches.Count > 0)
@@ -225,12 +223,12 @@ namespace RubexOps
                 suppressSuggestionCommit = true;
                 try
                 {
-                    VendorSuggestionList.SelectedIndex = suggestionIndex;
+                    CustomerSuggestionList.SelectedIndex = suggestionIndex;
 
-                    if (VendorSuggestionList.SelectedItem != null)
+                    if (CustomerSuggestionList.SelectedItem != null)
                     {
-                        VendorSuggestionList.ScrollIntoView(
-                            VendorSuggestionList.SelectedItem);
+                        CustomerSuggestionList.ScrollIntoView(
+                            CustomerSuggestionList.SelectedItem);
                     }
                 }
                 finally
@@ -241,15 +239,14 @@ namespace RubexOps
             else
             {
                 suggestionIndex = -1;
-                VendorSuggestionList.SelectedItem = null;
+                CustomerSuggestionList.SelectedItem = null;
             }
 
-            VendorSuggestionPopup.IsOpen =
+            CustomerSuggestionPopup.IsOpen =
                 matches.Count > 0;
         }
 
-        // Fired when the user explicitly clicks a suggestion with the mouse
-        private void VendorSuggestionItem_PreviewMouseLeftButtonUp(
+        private void CustomerSuggestionItem_PreviewMouseLeftButtonUp(
             object sender,
             MouseButtonEventArgs e)
         {
@@ -264,7 +261,7 @@ namespace RubexOps
             int direction)
         {
             int itemCount =
-                VendorSuggestionList.Items.Count;
+                CustomerSuggestionList.Items.Count;
 
             if (itemCount <= 0)
             {
@@ -292,12 +289,12 @@ namespace RubexOps
             suppressSuggestionCommit = true;
             try
             {
-                VendorSuggestionList.SelectedIndex = suggestionIndex;
+                CustomerSuggestionList.SelectedIndex = suggestionIndex;
 
-                if (VendorSuggestionList.SelectedItem != null)
+                if (CustomerSuggestionList.SelectedItem != null)
                 {
-                    VendorSuggestionList.ScrollIntoView(
-                        VendorSuggestionList.SelectedItem);
+                    CustomerSuggestionList.ScrollIntoView(
+                        CustomerSuggestionList.SelectedItem);
                 }
             }
             finally
@@ -305,19 +302,19 @@ namespace RubexOps
                 suppressSuggestionCommit = false;
             }
 
-            VendorSuggestionPopup.IsOpen = true;
+            CustomerSuggestionPopup.IsOpen = true;
         }
 
         private void CommitSelectedSuggestion()
         {
-            if (VendorSuggestionList.SelectedItem is ContractOption contract)
+            if (CustomerSuggestionList.SelectedItem is ContractOption contract)
             {
                 SelectContract(contract);
                 return;
             }
 
-            if (VendorSuggestionList.Items.Count > 0 &&
-                VendorSuggestionList.Items[0] is ContractOption firstContract)
+            if (CustomerSuggestionList.Items.Count > 0 &&
+                CustomerSuggestionList.Items[0] is ContractOption firstContract)
             {
                 SelectContract(firstContract);
             }
@@ -326,7 +323,7 @@ namespace RubexOps
         private void SelectContract(
             ContractOption contract)
         {
-            isSelectingVendor = true;
+            isSelectingCustomer = true;
 
             selectedContract = contract;
 
@@ -335,14 +332,14 @@ namespace RubexOps
                     ? ""
                     : $"  —  {contract.ContractID}";
 
-            VendorSearchBox.Text =
-                $"{contract.VendorName}{contractText}";
+            CustomerSearchBox.Text =
+                $"{contract.CustomerName}{contractText}";
 
-            VendorNameBox.Text =
-                contract.VendorName;
+            CustomerNameBox.Text =
+                contract.CustomerName;
 
-            VendorIDBox.Text =
-                contract.VendorID;
+            CustomerIDBox.Text =
+                contract.CustomerID;
 
             ItemCodeBox.Text =
                 string.IsNullOrWhiteSpace(contract.ItemCode)
@@ -369,12 +366,12 @@ namespace RubexOps
                     Visibility.Collapsed;
             }
 
-            VendorSuggestionPopup.IsOpen = false;
+            CustomerSuggestionPopup.IsOpen = false;
 
             suppressSuggestionCommit = true;
             try
             {
-                VendorSuggestionList.SelectedItem = null;
+                CustomerSuggestionList.SelectedItem = null;
             }
             finally
             {
@@ -383,7 +380,7 @@ namespace RubexOps
 
             suggestionIndex = -1;
 
-            isSelectingVendor = false;
+            isSelectingCustomer = false;
 
             InvoiceNumberBox.Focus();
 
@@ -394,8 +391,8 @@ namespace RubexOps
         {
             selectedContract = null;
 
-            VendorNameBox.Text = "";
-            VendorIDBox.Text = "";
+            CustomerNameBox.Text = "";
+            CustomerIDBox.Text = "";
             ItemCodeBox.Text = "";
             BaseRateBox.Text = "";
 
@@ -403,12 +400,12 @@ namespace RubexOps
                 Visibility.Collapsed;
         }
 
-        private void PurchaseOrderDatePicker_SelectedDateChanged(
+        private void SalesOrderDatePicker_SelectedDateChanged(
             object sender,
             SelectionChangedEventArgs e)
         {
             if (selectedContract == null ||
-                PurchaseOrderDatePicker.SelectedDate == null)
+                SalesOrderDatePicker.SelectedDate == null)
             {
                 return;
             }
@@ -422,7 +419,7 @@ namespace RubexOps
             }
 
             DateTime poDate =
-                PurchaseOrderDatePicker.SelectedDate.Value;
+                SalesOrderDatePicker.SelectedDate.Value;
 
             if (poDate < contractStart ||
                 poDate > contractEnd)
@@ -461,7 +458,7 @@ namespace RubexOps
             }
         }
 
-        private async void SavePurchase_Click(
+        private async void SaveSales_Click(
             object sender,
             RoutedEventArgs e)
         {
@@ -490,8 +487,8 @@ namespace RubexOps
                     return;
                 }
 
-                string vendorID =
-                    VendorIDBox.Text.Trim();
+                string customerID =
+                    CustomerIDBox.Text.Trim();
 
                 string contractID =
                     selectedContract?.ContractID?.Trim() ?? "";
@@ -499,42 +496,30 @@ namespace RubexOps
                 string invoiceNumber =
                     InvoiceNumberBox.Text.Trim();
 
-                string purchaseOrderDate =
-                    PurchaseOrderDatePicker.SelectedDate?
+                string salesOrderDate =
+                    SalesOrderDatePicker.SelectedDate?
                     .ToString("dd-MM-yyyy", CultureInfo.InvariantCulture) ?? "";
 
-                string deliveryDate =
-                    DeliveryDatePicker.SelectedDate?
+                string dispatchDate =
+                    DispatchDatePicker.SelectedDate?
                     .ToString("dd-MM-yyyy", CultureInfo.InvariantCulture) ?? "";
 
-                string invoiceWeight =
-                    GetOptionalDecimalArgument(InvoiceWeightBox);
-
-                string beforeUnloading =
-                    GetRequiredDecimalArgument(BeforeUnloadingBox);
-
-                string carrierWeight =
-                    GetRequiredDecimalArgument(CarrierWeightBox);
-
-                string noOfBags =
-                    GetOptionalWholeNumberArgument(NoOfBagsBox);
-
-                string calculatedDrc =
-                    GetRequiredPercentArgument(CalculatedDrcBox);
+                string weight =
+                    GetRequiredDecimalArgument(WeightBox);
 
                 string gst =
                     GetRequiredPercentArgument(GstBox);
 
-                string tds =
-                    GetRequiredPercentArgument(TdsBox);
+                string tcs =
+                    GetRequiredPercentArgument(TcsBox);
 
-                string unloadingCharge =
-                    GetOptionalDecimalArgument(UnloadingChargeBox);
+                string loadingCharge =
+                    GetOptionalDecimalArgument(LoadingChargeBox);
 
                 string pythonScript = Path.Combine(
                     AppDomain.CurrentDomain.BaseDirectory,
                     "backend",
-                    "create_purchase_data.py"
+                    "create_sales_data.py"
                 );
 
                 if (!File.Exists(pythonScript))
@@ -551,19 +536,15 @@ namespace RubexOps
                 string output =
                     await RunPythonScript(
                         pythonScript,
-                        vendorID,
+                        customerID,
                         contractID,
                         invoiceNumber,
-                        purchaseOrderDate,
-                        deliveryDate,
-                        invoiceWeight,
-                        beforeUnloading,
-                        carrierWeight,
-                        noOfBags,
-                        calculatedDrc,
+                        salesOrderDate,
+                        dispatchDate,
+                        weight,
                         gst,
-                        tds,
-                        unloadingCharge);
+                        tcs,
+                        loadingCharge);
 
                 if (output.TrimStart().StartsWith(
                         "ERROR",
@@ -602,12 +583,12 @@ namespace RubexOps
 
                 MainGrid.Opacity = 1;
 
-                if (SavePurchaseButton != null)
+                if (SaveSalesButton != null)
                 {
-                    SavePurchaseButton.IsEnabled = true;
+                    SaveSalesButton.IsEnabled = true;
 
-                    SavePurchaseButton.Content =
-                        originalContent ?? "Save Purchase";
+                    SaveSalesButton.Content =
+                        originalContent ?? "Save Sales";
                 }
             }
         }
@@ -615,7 +596,7 @@ namespace RubexOps
         private bool ValidateForm()
         {
             if (selectedContract == null ||
-                string.IsNullOrWhiteSpace(VendorIDBox.Text))
+                string.IsNullOrWhiteSpace(CustomerIDBox.Text))
             {
                 MessageBox.Show(
                     "Please search and select an active contract before saving.",
@@ -623,7 +604,7 @@ namespace RubexOps
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
 
-                VendorSearchBox.Focus();
+                CustomerSearchBox.Focus();
 
                 return false;
             }
@@ -636,7 +617,7 @@ namespace RubexOps
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
 
-                VendorSearchBox.Focus();
+                CustomerSearchBox.Focus();
 
                 return false;
             }
@@ -654,15 +635,15 @@ namespace RubexOps
                 return false;
             }
 
-            if (PurchaseOrderDatePicker.SelectedDate == null)
+            if (SalesOrderDatePicker.SelectedDate == null)
             {
                 MessageBox.Show(
-                    "Purchase Order Date is required.",
+                    "Sales Order Date is required.",
                     "Validation Error",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
 
-                PurchaseOrderDatePicker.Focus();
+                SalesOrderDatePicker.Focus();
 
                 return false;
             }
@@ -673,117 +654,42 @@ namespace RubexOps
                     out DateTime contractEnd))
             {
                 DateTime poDate =
-                    PurchaseOrderDatePicker.SelectedDate.Value;
+                    SalesOrderDatePicker.SelectedDate.Value;
 
                 if (poDate < contractStart ||
                     poDate > contractEnd)
                 {
                     MessageBox.Show(
-                        $"Purchase Order Date ({poDate:dd-MM-yyyy}) is outside the contract period.",
+                        $"Sales Order Date ({poDate:dd-MM-yyyy}) is outside the contract period.",
                         "Contract Date Mismatch",
                         MessageBoxButton.OK,
                         MessageBoxImage.Warning);
 
-                    PurchaseOrderDatePicker.Focus();
+                    SalesOrderDatePicker.Focus();
 
                     return false;
                 }
             }
 
-            if (DeliveryDatePicker.SelectedDate != null &&
-                DeliveryDatePicker.SelectedDate < PurchaseOrderDatePicker.SelectedDate)
+            if (DispatchDatePicker.SelectedDate != null &&
+                DispatchDatePicker.SelectedDate < SalesOrderDatePicker.SelectedDate)
             {
                 MessageBox.Show(
-                    "Delivery Date cannot be before the Purchase Order Date.",
+                    "Dispatch Date cannot be before the Sales Order Date.",
                     "Date Validation",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
 
-                DeliveryDatePicker.Focus();
+                DispatchDatePicker.Focus();
 
                 return false;
             }
 
             if (!ValidatePositiveDecimal(
-                    BeforeUnloadingBox,
-                    "Before Unloading",
+                    WeightBox,
+                    "Weight",
                     required: true))
             {
-                return false;
-            }
-
-            if (!ValidatePositiveDecimal(
-                    CarrierWeightBox,
-                    "Carrier Weight",
-                    required: true))
-            {
-                return false;
-            }
-
-            decimal beforeUnloading =
-                GetDecimalValue(BeforeUnloadingBox);
-
-            decimal carrierWeight =
-                GetDecimalValue(CarrierWeightBox);
-
-            if (carrierWeight >= beforeUnloading)
-            {
-                MessageBox.Show(
-                    "Carrier Weight must be strictly less than Before Unloading weight.",
-                    "Validation Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-
-                CarrierWeightBox.Focus();
-
-                return false;
-            }
-
-            if (!string.IsNullOrWhiteSpace(InvoiceWeightBox.Text) &&
-                !ValidatePositiveDecimal(
-                    InvoiceWeightBox,
-                    "Invoice Weight",
-                    required: false))
-            {
-                return false;
-            }
-
-            if (!string.IsNullOrWhiteSpace(NoOfBagsBox.Text))
-            {
-                if (!int.TryParse(
-                        NoOfBagsBox.Text.Trim(),
-                        NumberStyles.Integer,
-                        CultureInfo.InvariantCulture,
-                        out int bags) ||
-                    bags < 0)
-                {
-                    MessageBox.Show(
-                        "No. of Bags must be a valid non-negative whole number.",
-                        "Validation Error",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Warning);
-
-                    NoOfBagsBox.Focus();
-
-                    return false;
-                }
-            }
-
-            if (string.IsNullOrWhiteSpace(CalculatedDrcBox.Text) ||
-                !TryParseDecimalText(
-                    CalculatedDrcBox.Text.Trim().Replace("%", ""),
-                    out decimal drc) ||
-                drc < 0 ||
-                drc > 100)
-            {
-                MessageBox.Show(
-                    "Calculated DRC must be a valid percentage between 0 and 100.",
-                    "Validation Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-
-                CalculatedDrcBox.Focus();
-
                 return false;
             }
 
@@ -805,28 +711,28 @@ namespace RubexOps
                 return false;
             }
 
-            if (string.IsNullOrWhiteSpace(TdsBox.Text) ||
+            if (string.IsNullOrWhiteSpace(TcsBox.Text) ||
                 !TryParseDecimalText(
-                    TdsBox.Text.Trim().Replace("%", ""),
-                    out decimal tds) ||
-                tds < 0 ||
-                tds > 100)
+                    TcsBox.Text.Trim().Replace("%", ""),
+                    out decimal tcs) ||
+                tcs < 0 ||
+                tcs > 100)
             {
                 MessageBox.Show(
-                    "TDS 194Q (%) must be a valid percentage between 0 and 100.",
+                    "TCS 194Q (%) must be a valid percentage between 0 and 100.",
                     "Validation Error",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
 
-                TdsBox.Focus();
+                TcsBox.Focus();
 
                 return false;
             }
 
-            if (!string.IsNullOrWhiteSpace(UnloadingChargeBox.Text) &&
+            if (!string.IsNullOrWhiteSpace(LoadingChargeBox.Text) &&
                 !ValidatePositiveDecimal(
-                    UnloadingChargeBox,
-                    "Unloading Charge",
+                    LoadingChargeBox,
+                    "Loading Charge",
                     required: false))
             {
                 return false;
@@ -864,10 +770,10 @@ namespace RubexOps
             if (!TryParseDecimalText(
                     text,
                     out decimal value) ||
-                value < 0)
+                value <= 0)
             {
                 MessageBox.Show(
-                    $"{fieldName} must be a valid non-negative number.",
+                    $"{fieldName} must be a valid positive number.",
                     "Validation Error",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
@@ -981,23 +887,6 @@ namespace RubexOps
             return value.ToString(CultureInfo.InvariantCulture);
         }
 
-        private string GetOptionalWholeNumberArgument(
-            TextBox textBox)
-        {
-            if (string.IsNullOrWhiteSpace(textBox.Text))
-            {
-                return "";
-            }
-
-            int value =
-                int.Parse(
-                    textBox.Text.Trim(),
-                    NumberStyles.Integer,
-                    CultureInfo.InvariantCulture);
-
-            return value.ToString(CultureInfo.InvariantCulture);
-        }
-
         private async Task<string> RunPythonScript(
             string pythonScript,
             params string[] arguments)
@@ -1084,42 +973,34 @@ namespace RubexOps
 
         private void ClearForm()
         {
-            isSelectingVendor = false;
+            isSelectingCustomer = false;
 
-            VendorSearchBox.Clear();
+            CustomerSearchBox.Clear();
 
             ClearAutoFill();
 
             InvoiceNumberBox.Clear();
 
-            PurchaseOrderDatePicker.SelectedDate = null;
+            SalesOrderDatePicker.SelectedDate = null;
 
-            DeliveryDatePicker.SelectedDate = null;
+            DispatchDatePicker.SelectedDate = null;
 
-            InvoiceWeightBox.Clear();
-
-            BeforeUnloadingBox.Clear();
-
-            CarrierWeightBox.Clear();
-
-            NoOfBagsBox.Clear();
-
-            CalculatedDrcBox.Clear();
+            WeightBox.Clear();
 
             GstBox.Text = "5";
 
-            TdsBox.Text = "0.1";
+            TcsBox.Text = "0.1";
 
-            UnloadingChargeBox.Clear();
+            LoadingChargeBox.Clear();
 
-            VendorSuggestionPopup.IsOpen = false;
+            CustomerSuggestionPopup.IsOpen = false;
 
             suggestionIndex = -1;
             suppressSuggestionCommit = false;
 
             UpdateSearchPlaceholder();
 
-            VendorSearchBox.Focus();
+            CustomerSearchBox.Focus();
         }
     }
 }
