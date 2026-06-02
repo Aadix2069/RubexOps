@@ -1,0 +1,992 @@
+﻿<Page x:Class="RubexOps.EnterProductionDataPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      mc:Ignorable="d"
+      Title="Enter Production Data"
+      Background="#F4F7F8"
+      Loaded="Page_Loaded"
+      KeyDown="Page_KeyDown"
+      d:DesignHeight="900"
+      d:DesignWidth="1440">
+
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+
+        <SolidColorBrush x:Key="SoftTealBrush" Color="#188F86" />
+        <SolidColorBrush x:Key="SoftTealDarkBrush" Color="#0D625E" />
+        <SolidColorBrush x:Key="SoftTealLightBrush" Color="#E8F7F4" />
+        <SolidColorBrush x:Key="BurntOrangeBrush" Color="#D66A2D" />
+        <SolidColorBrush x:Key="BurntOrangeLightBrush" Color="#FFF1E7" />
+        <SolidColorBrush x:Key="PageBackgroundBrush" Color="#F4F7F8" />
+        <SolidColorBrush x:Key="CardBorderBrush" Color="#DDE7E8" />
+        <SolidColorBrush x:Key="MutedTextBrush" Color="#667085" />
+        <SolidColorBrush x:Key="BodyTextBrush" Color="#1F2937" />
+        <SolidColorBrush x:Key="SoftBlueBrush" Color="#3159C9" />
+        <SolidColorBrush x:Key="DangerBrush" Color="#C93A3A" />
+
+        <Style x:Key="CardStyle" TargetType="Border">
+            <Setter Property="Background" Value="White" />
+            <Setter Property="BorderBrush" Value="{StaticResource CardBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="Padding" Value="18" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="18"
+                                      ShadowDepth="1"
+                                      Direction="270"
+                                      Opacity="0.08"
+                                      Color="#243B3E" />
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SoftInputStyle" TargetType="TextBox">
+            <Setter Property="Height" Value="42" />
+            <Setter Property="Padding" Value="12,0,12,0" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Background" Value="White" />
+            <Setter Property="BorderBrush" Value="#D6E0E2" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Foreground" Value="{StaticResource BodyTextBrush}" />
+            <Setter Property="CaretBrush" Value="{StaticResource SoftTealBrush}" />
+        </Style>
+
+        <Style x:Key="FieldLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+
+        <Style x:Key="FieldValueStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{StaticResource BodyTextBrush}" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="TextAlignment" Value="Right" />
+        </Style>
+
+        <Style x:Key="SectionTitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{StaticResource SoftTealDarkBrush}" />
+        </Style>
+
+        <Style x:Key="SectionCaptionStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Foreground" Value="{StaticResource MutedTextBrush}" />
+            <Setter Property="Margin" Value="0,4,0,0" />
+        </Style>
+
+        <Style x:Key="StepBadgeStyle" TargetType="Border">
+            <Setter Property="Width" Value="24" />
+            <Setter Property="Height" Value="24" />
+            <Setter Property="CornerRadius" Value="7" />
+            <Setter Property="Background" Value="{StaticResource SoftTealBrush}" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="Margin" Value="0,0,8,0" />
+        </Style>
+
+        <Style x:Key="PrimaryButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="42" />
+            <Setter Property="MinWidth" Value="138" />
+            <Setter Property="Padding" Value="16,0" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Background" Value="{StaticResource SoftTealBrush}" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.55" />
+                    <Setter Property="Cursor" Value="Arrow" />
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource SoftTealDarkBrush}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="SecondaryButtonStyle" TargetType="Button" BasedOn="{StaticResource PrimaryButtonStyle}">
+            <Setter Property="Background" Value="White" />
+            <Setter Property="Foreground" Value="{StaticResource SoftTealDarkBrush}" />
+            <Setter Property="BorderBrush" Value="#CFE0E1" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource SoftTealLightBrush}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="MetricTileStyle" TargetType="Border">
+            <Setter Property="Background" Value="#FAFCFC" />
+            <Setter Property="BorderBrush" Value="#DDE7E8" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="14" />
+            <Setter Property="MinHeight" Value="92" />
+        </Style>
+
+        <Style x:Key="SummaryBlockStyle" TargetType="Border">
+            <Setter Property="Background" Value="#FBFDFD" />
+            <Setter Property="BorderBrush" Value="#DDE7E8" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="14" />
+            <Setter Property="Margin" Value="0,0,0,10" />
+        </Style>
+    </Page.Resources>
+
+    <Grid Background="{StaticResource PageBackgroundBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0"
+                Background="White"
+                BorderBrush="#E1EAEC"
+                BorderThickness="0,0,0,1"
+                Padding="20,14">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Style="{StaticResource SecondaryButtonStyle}"
+                            MinWidth="72"
+                            Width="72"
+                            Height="36"
+                            Padding="0"
+                            Content="Back"
+                            Click="BackButton_Click" />
+                    <TextBlock Text="Production - Enter Production Data"
+                               Margin="12,0,0,0"
+                               FontSize="21"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource BodyTextBrush}"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+
+                <Border Grid.Column="1"
+                        Background="{StaticResource SoftTealLightBrush}"
+                        BorderBrush="#C8E9E5"
+                        BorderThickness="1"
+                        CornerRadius="9"
+                        Padding="14,8"
+                        VerticalAlignment="Center">
+                    <TextBlock Text="Production Module"
+                               Foreground="{StaticResource SoftTealDarkBrush}"
+                               FontWeight="SemiBold"
+                               FontSize="12" />
+                </Border>
+            </Grid>
+        </Border>
+
+        <ScrollViewer Grid.Row="1"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="20">
+                <Border Style="{StaticResource CardStyle}" Padding="26">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1.3*" />
+                            <ColumnDefinition Width="120" />
+                            <ColumnDefinition Width="0.7*" />
+                            <ColumnDefinition Width="120" />
+                            <ColumnDefinition Width="1.3*" />
+                            <ColumnDefinition Width="260" />
+                        </Grid.ColumnDefinitions>
+
+                        <Grid Grid.Column="0" VerticalAlignment="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="96" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid Width="88" Height="88">
+                                <Ellipse Fill="{StaticResource SoftTealLightBrush}"
+                                         Stroke="{StaticResource SoftTealBrush}"
+                                         StrokeThickness="2" />
+                                <Canvas Margin="18">
+                                    <Ellipse Canvas.Left="2" Canvas.Top="24" Width="18" Height="14" Fill="#8B5A2B" />
+                                    <Ellipse Canvas.Left="18" Canvas.Top="12" Width="22" Height="17" Fill="#A96A33" />
+                                    <Ellipse Canvas.Left="38" Canvas.Top="26" Width="20" Height="15" Fill="#7A4924" />
+                                    <Ellipse Canvas.Left="24" Canvas.Top="34" Width="26" Height="18" Fill="#9A6131" />
+                                    <Ellipse Canvas.Left="8" Canvas.Top="42" Width="22" Height="15" Fill="#6F4120" />
+                                </Canvas>
+                                <Border Width="28"
+                                        Height="28"
+                                        CornerRadius="14"
+                                        Background="White"
+                                        BorderBrush="{StaticResource SoftTealBrush}"
+                                        BorderThickness="2"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Bottom">
+                                    <Path Data="M8,14 L12,18 L20,9"
+                                          Stroke="{StaticResource SoftTealBrush}"
+                                          StrokeThickness="2"
+                                          StrokeStartLineCap="Round"
+                                          StrokeEndLineCap="Round" />
+                                </Border>
+                            </Grid>
+                            <StackPanel Grid.Column="1"
+                                        VerticalAlignment="Center"
+                                        Margin="14,0,0,0">
+                                <TextBlock Text="Natural Rubber"
+                                           Foreground="{StaticResource SoftTealDarkBrush}"
+                                           FontSize="17"
+                                           FontWeight="SemiBold" />
+                                <TextBlock Text="Field Coagulum"
+                                           Foreground="{StaticResource SoftTealDarkBrush}"
+                                           FontSize="17"
+                                           FontWeight="SemiBold" />
+                                <TextBlock Text="(NRFC)"
+                                           Foreground="{StaticResource SoftTealBrush}"
+                                           FontSize="17"
+                                           FontWeight="Bold" />
+                                <TextBlock Text="Raw Material"
+                                           Foreground="{StaticResource MutedTextBrush}"
+                                           FontSize="12"
+                                           Margin="0,8,0,0" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid Grid.Column="1" VerticalAlignment="Center">
+                            <Line X1="0" Y1="42" X2="86" Y2="42"
+                                  Stroke="#AEBCC1"
+                                  StrokeThickness="2"
+                                  StrokeDashArray="4 4" />
+                            <Path Data="M86,34 L106,42 L86,50 Z"
+                                  Fill="{StaticResource BodyTextBrush}" />
+                        </Grid>
+
+                        <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <Border Width="74"
+                                    Height="74"
+                                    CornerRadius="37"
+                                    Background="{StaticResource BurntOrangeLightBrush}"
+                                    BorderBrush="{StaticResource BurntOrangeBrush}"
+                                    BorderThickness="2">
+                                <Grid>
+                                    <Ellipse Width="36" Height="36"
+                                             Stroke="{StaticResource BurntOrangeBrush}"
+                                             StrokeThickness="6" />
+                                    <Path Data="M37,16 L37,26 M37,48 L37,58 M16,37 L26,37 M48,37 L58,37"
+                                          Stroke="{StaticResource BurntOrangeBrush}"
+                                          StrokeThickness="4"
+                                          StrokeStartLineCap="Round"
+                                          StrokeEndLineCap="Round" />
+                                </Grid>
+                            </Border>
+                            <TextBlock Text="Processing"
+                                       Foreground="{StaticResource BodyTextBrush}"
+                                       FontSize="13"
+                                       FontWeight="SemiBold"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,10,0,0" />
+                            <TextBlock Text="Batch"
+                                       Foreground="{StaticResource BodyTextBrush}"
+                                       FontSize="13"
+                                       FontWeight="SemiBold"
+                                       HorizontalAlignment="Center" />
+                        </StackPanel>
+
+                        <Grid Grid.Column="3" VerticalAlignment="Center">
+                            <Line X1="0" Y1="42" X2="86" Y2="42"
+                                  Stroke="#AEBCC1"
+                                  StrokeThickness="2"
+                                  StrokeDashArray="4 4" />
+                            <Path Data="M86,34 L106,42 L86,50 Z"
+                                  Fill="{StaticResource BodyTextBrush}" />
+                        </Grid>
+
+                        <Grid Grid.Column="4" VerticalAlignment="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="96" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid Width="88" Height="88">
+                                <Ellipse Fill="#F5FBFA"
+                                         Stroke="{StaticResource SoftTealBrush}"
+                                         StrokeThickness="2" />
+                                <Canvas Margin="20">
+                                    <Rectangle Canvas.Left="4" Canvas.Top="34" Width="48" Height="11" RadiusX="2" RadiusY="2" Fill="#D8BA94" />
+                                    <Rectangle Canvas.Left="8" Canvas.Top="24" Width="48" Height="11" RadiusX="2" RadiusY="2" Fill="#E3C9A9" />
+                                    <Rectangle Canvas.Left="12" Canvas.Top="14" Width="48" Height="11" RadiusX="2" RadiusY="2" Fill="#EBD8BF" />
+                                    <Line X1="15" Y1="19" X2="55" Y2="19" Stroke="#C9A67A" StrokeThickness="1" />
+                                    <Line X1="11" Y1="29" X2="51" Y2="29" Stroke="#C09B6E" StrokeThickness="1" />
+                                </Canvas>
+                                <Border Width="28"
+                                        Height="28"
+                                        CornerRadius="14"
+                                        Background="{StaticResource BurntOrangeBrush}"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Bottom">
+                                    <Path Data="M9,10 L14,7 L19,10 L19,17 L14,20 L9,17 Z M9,10 L14,13 L19,10 M14,13 L14,20"
+                                          Stroke="White"
+                                          StrokeThickness="1.6"
+                                          StrokeLineJoin="Round" />
+                                </Border>
+                            </Grid>
+                            <StackPanel Grid.Column="1"
+                                        VerticalAlignment="Center"
+                                        Margin="14,0,0,0">
+                                <TextBlock Text="Indian Standard"
+                                           Foreground="{StaticResource BurntOrangeBrush}"
+                                           FontSize="17"
+                                           FontWeight="SemiBold" />
+                                <TextBlock Text="Natural Rubber 20"
+                                           Foreground="{StaticResource BurntOrangeBrush}"
+                                           FontSize="17"
+                                           FontWeight="SemiBold" />
+                                <TextBlock Text="(ISNR20)"
+                                           Foreground="{StaticResource BurntOrangeBrush}"
+                                           FontSize="17"
+                                           FontWeight="Bold" />
+                                <TextBlock Text="Finished Product"
+                                           Foreground="{StaticResource MutedTextBrush}"
+                                           FontSize="12"
+                                           Margin="0,8,0,0" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Border Grid.Column="5"
+                                Background="#F8FBFB"
+                                BorderBrush="#DDE7E8"
+                                BorderThickness="1"
+                                CornerRadius="9"
+                                Padding="16"
+                                Margin="20,0,0,0"
+                                VerticalAlignment="Center">
+                            <StackPanel>
+                                <TextBlock Text="Transformation"
+                                           Foreground="{StaticResource SoftTealDarkBrush}"
+                                           FontWeight="SemiBold"
+                                           FontSize="14" />
+                                <TextBlock Text="Selected purchase NRFC is converted into ISNR20 through one controlled production batch."
+                                           Foreground="{StaticResource MutedTextBrush}"
+                                           TextWrapping="Wrap"
+                                           Margin="0,8,0,0"
+                                           LineHeight="18" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <Grid Margin="0,18,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="0.95*" MinWidth="330" />
+                        <ColumnDefinition Width="1.25*" MinWidth="410" />
+                        <ColumnDefinition Width="0.95*" MinWidth="350" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                        <Border Style="{StaticResource CardStyle}">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <Border Style="{StaticResource StepBadgeStyle}">
+                                        <TextBlock Text="1"
+                                                   Foreground="White"
+                                                   FontWeight="Bold"
+                                                   FontSize="12"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" />
+                                    </Border>
+                                    <StackPanel>
+                                        <TextBlock Text="Select Purchase Invoice"
+                                                   Style="{StaticResource SectionTitleStyle}" />
+                                        <TextBlock Text="Purchase source for this production batch"
+                                                   Style="{StaticResource SectionCaptionStyle}" />
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <Grid Margin="0,18,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="8" />
+                                        <ColumnDefinition Width="96" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Grid>
+                                        <TextBox x:Name="SearchInvoiceTextBox"
+                                                 Style="{StaticResource SoftInputStyle}"
+                                                 TextChanged="SearchInvoiceTextBox_TextChanged"
+                                                 KeyDown="SearchInvoiceTextBox_KeyDown" />
+                                        <Button x:Name="ClearInvoiceButton"
+                                                Width="30"
+                                                Height="30"
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Center"
+                                                Margin="0,0,6,0"
+                                                Style="{StaticResource SecondaryButtonStyle}"
+                                                MinWidth="30"
+                                                Padding="0"
+                                                Content="X"
+                                                Click="ClearInvoiceButton_Click" />
+                                        <Popup x:Name="SuggestionPopup"
+                                               Placement="Bottom"
+                                               PlacementTarget="{Binding ElementName=SearchInvoiceTextBox}"
+                                               AllowsTransparency="True"
+                                               StaysOpen="False"
+                                               PopupAnimation="Fade">
+                                            <Border Width="{Binding ActualWidth, ElementName=SearchInvoiceTextBox}"
+                                                    Background="White"
+                                                    BorderBrush="#CFE0E1"
+                                                    BorderThickness="1"
+                                                    CornerRadius="8"
+                                                    Margin="0,4,0,0"
+                                                    SnapsToDevicePixels="True">
+                                                <ListBox x:Name="SuggestionListBox"
+                                                         MaxHeight="260"
+                                                         BorderThickness="0"
+                                                         Background="White"
+                                                         MouseLeftButtonUp="SuggestionListBox_MouseLeftButtonUp"
+                                                         MouseDoubleClick="SuggestionListBox_MouseDoubleClick"
+                                                         KeyDown="SuggestionListBox_KeyDown">
+                                                    <ListBox.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Grid Margin="4,6">
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="*" />
+                                                                    <ColumnDefinition Width="Auto" />
+                                                                </Grid.ColumnDefinitions>
+                                                                <StackPanel>
+                                                                    <TextBlock Text="{Binding InvoiceNumber}"
+                                                                               FontWeight="SemiBold"
+                                                                               Foreground="{StaticResource BodyTextBrush}" />
+                                                                    <TextBlock Text="{Binding SuggestionSubText}"
+                                                                               Foreground="{StaticResource MutedTextBrush}"
+                                                                               FontSize="11"
+                                                                               Margin="0,3,0,0" />
+                                                                </StackPanel>
+                                                                <Border Grid.Column="1"
+                                                                        Background="{StaticResource SoftTealLightBrush}"
+                                                                        CornerRadius="10"
+                                                                        Padding="8,3"
+                                                                        VerticalAlignment="Center">
+                                                                    <TextBlock Text="{Binding NetWeightDisplay}"
+                                                                               Foreground="{StaticResource SoftTealDarkBrush}"
+                                                                               FontWeight="SemiBold"
+                                                                               FontSize="11" />
+                                                                </Border>
+                                                            </Grid>
+                                                        </DataTemplate>
+                                                    </ListBox.ItemTemplate>
+                                                </ListBox>
+                                            </Border>
+                                        </Popup>
+                                    </Grid>
+
+                                    <Button Grid.Column="2"
+                                            Style="{StaticResource PrimaryButtonStyle}"
+                                            MinWidth="96"
+                                            Content="Search"
+                                            Click="SearchButton_Click" />
+                                </Grid>
+
+                                <Border x:Name="InvoiceStatusBorder"
+                                        Background="{StaticResource SoftTealLightBrush}"
+                                        BorderBrush="#C8E9E5"
+                                        BorderThickness="1"
+                                        CornerRadius="8"
+                                        Padding="12"
+                                        Margin="0,14,0,0"
+                                        Visibility="Collapsed">
+                                    <TextBlock x:Name="InvoiceStatusText"
+                                               Foreground="{StaticResource SoftTealDarkBrush}"
+                                               FontWeight="SemiBold"
+                                               TextWrapping="Wrap" />
+                                </Border>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardStyle}" Margin="0,16,0,0">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <Border Style="{StaticResource StepBadgeStyle}" Background="{StaticResource BurntOrangeBrush}">
+                                        <TextBlock Text="2"
+                                                   Foreground="White"
+                                                   FontWeight="Bold"
+                                                   FontSize="12"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" />
+                                    </Border>
+                                    <StackPanel>
+                                        <TextBlock Text="Purchase Source Details"
+                                                   Style="{StaticResource SectionTitleStyle}" />
+                                        <TextBlock Text="Fetched from purchase records"
+                                                   Style="{StaticResource SectionCaptionStyle}" />
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <Grid Margin="0,18,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="34" />
+                                        <RowDefinition Height="34" />
+                                        <RowDefinition Height="34" />
+                                        <RowDefinition Height="34" />
+                                        <RowDefinition Height="34" />
+                                        <RowDefinition Height="34" />
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0" Text="Vendor Name" Style="{StaticResource FieldLabelStyle}" />
+                                    <TextBlock Grid.Row="0" Grid.Column="1" x:Name="VendorNameText" Text="-" Style="{StaticResource FieldValueStyle}" />
+                                    <TextBlock Grid.Row="1" Text="Vendor ID" Style="{StaticResource FieldLabelStyle}" />
+                                    <TextBlock Grid.Row="1" Grid.Column="1" x:Name="VendorIdText" Text="-" Style="{StaticResource FieldValueStyle}" />
+                                    <TextBlock Grid.Row="2" Text="Contract ID" Style="{StaticResource FieldLabelStyle}" />
+                                    <TextBlock Grid.Row="2" Grid.Column="1" x:Name="ContractIdText" Text="-" Style="{StaticResource FieldValueStyle}" />
+                                    <TextBlock Grid.Row="3" Text="Purchase Invoice" Style="{StaticResource FieldLabelStyle}" />
+                                    <TextBlock Grid.Row="3" Grid.Column="1" x:Name="PurchaseInvoiceText" Text="-" Style="{StaticResource FieldValueStyle}" />
+                                    <TextBlock Grid.Row="4" Text="Purchase Date" Style="{StaticResource FieldLabelStyle}" />
+                                    <TextBlock Grid.Row="4" Grid.Column="1" x:Name="PurchaseDateText" Text="-" Style="{StaticResource FieldValueStyle}" />
+                                    <TextBlock Grid.Row="5" Text="Input Quantity" Style="{StaticResource FieldLabelStyle}" />
+                                    <TextBlock Grid.Row="5" Grid.Column="1" x:Name="SourceInputQuantityText" Text="-" Style="{StaticResource FieldValueStyle}" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Margin="0,0,16,0">
+                        <Border Style="{StaticResource CardStyle}">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <Border Style="{StaticResource StepBadgeStyle}">
+                                        <TextBlock Text="3"
+                                                   Foreground="White"
+                                                   FontWeight="Bold"
+                                                   FontSize="12"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" />
+                                    </Border>
+                                    <StackPanel>
+                                        <TextBlock Text="Generated Batch Information"
+                                                   Style="{StaticResource SectionTitleStyle}" />
+                                        <TextBlock Text="Batch ID comes from the Python production backend"
+                                                   Style="{StaticResource SectionCaptionStyle}" />
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <Border Background="#F6FBFA"
+                                        BorderBrush="{StaticResource SoftTealBrush}"
+                                        BorderThickness="1.5"
+                                        CornerRadius="9"
+                                        Padding="18"
+                                        Margin="0,18,0,0">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="58" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Width="46"
+                                                Height="46"
+                                                CornerRadius="23"
+                                                Background="{StaticResource SoftTealBrush}">
+                                            <Path Data="M15,24 L21,30 L32,17"
+                                                  Stroke="White"
+                                                  StrokeThickness="3"
+                                                  StrokeStartLineCap="Round"
+                                                  StrokeEndLineCap="Round" />
+                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock Text="Production Batch ID"
+                                                       Foreground="{StaticResource MutedTextBrush}"
+                                                       FontSize="12"
+                                                       FontWeight="SemiBold" />
+                                            <TextBlock x:Name="BatchIdText"
+                                                       Text="Select invoice"
+                                                       Foreground="{StaticResource SoftTealDarkBrush}"
+                                                       FontSize="28"
+                                                       FontWeight="Bold"
+                                                       Margin="0,2,0,0" />
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardStyle}" Margin="0,16,0,0">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <Border Style="{StaticResource StepBadgeStyle}" Background="{StaticResource BurntOrangeBrush}">
+                                        <TextBlock Text="4"
+                                                   Foreground="White"
+                                                   FontWeight="Bold"
+                                                   FontSize="12"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" />
+                                    </Border>
+                                    <StackPanel>
+                                        <TextBlock Text="Production Input"
+                                                   Style="{StaticResource SectionTitleStyle}" />
+                                        <TextBlock Text="Only production date and ISNR20 output are entered here"
+                                                   Style="{StaticResource SectionCaptionStyle}" />
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <Grid Margin="0,18,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="14" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="Production Date"
+                                                   Style="{StaticResource FieldLabelStyle}"
+                                                   Margin="0,0,0,6" />
+                                        <DatePicker x:Name="ProductionDatePicker"
+                                                    Height="42"
+                                                    SelectedDateChanged="ProductionDatePicker_SelectedDateChanged" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Output Weight (ISNR20)"
+                                                   Style="{StaticResource FieldLabelStyle}"
+                                                   Margin="0,0,0,6" />
+                                        <Grid>
+                                            <TextBox x:Name="OutputTextBox"
+                                                     Style="{StaticResource SoftInputStyle}"
+                                                     Padding="12,0,48,0"
+                                                     TextChanged="OutputTextBox_TextChanged"
+                                                     KeyDown="OutputTextBox_KeyDown" />
+                                            <Border Background="#F8FAFA"
+                                                    BorderBrush="#DDE7E8"
+                                                    BorderThickness="1,0,0,0"
+                                                    Width="42"
+                                                    HorizontalAlignment="Right">
+                                                <TextBlock Text="kgs"
+                                                           Foreground="{StaticResource MutedTextBrush}"
+                                                           FontSize="12"
+                                                           HorizontalAlignment="Center"
+                                                           VerticalAlignment="Center" />
+                                            </Border>
+                                        </Grid>
+                                    </StackPanel>
+                                </Grid>
+
+                                <TextBlock x:Name="InputValidationText"
+                                           Text=""
+                                           Foreground="{StaticResource DangerBrush}"
+                                           FontSize="12"
+                                           TextWrapping="Wrap"
+                                           Margin="0,12,0,0" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardStyle}" Margin="0,16,0,0">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <Border Style="{StaticResource StepBadgeStyle}">
+                                        <TextBlock Text="5"
+                                                   Foreground="White"
+                                                   FontWeight="Bold"
+                                                   FontSize="12"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" />
+                                    </Border>
+                                    <StackPanel>
+                                        <TextBlock Text="Live Production Calculations"
+                                                   Style="{StaticResource SectionTitleStyle}" />
+                                        <TextBlock Text="Calculated from the selected purchase and output"
+                                                   Style="{StaticResource SectionCaptionStyle}" />
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <UniformGrid Columns="3" Rows="2" Margin="0,18,0,0">
+                                    <Border Style="{StaticResource MetricTileStyle}" Margin="0,0,10,10">
+                                        <StackPanel>
+                                            <TextBlock Text="Input (NRFC)" Foreground="{StaticResource MutedTextBrush}" FontSize="12" FontWeight="SemiBold" />
+                                            <TextBlock x:Name="MetricInputText" Text="-" Foreground="{StaticResource BodyTextBrush}" FontSize="22" FontWeight="Bold" Margin="0,14,0,0" />
+                                        </StackPanel>
+                                    </Border>
+                                    <Border Style="{StaticResource MetricTileStyle}" Background="#F4FBF8" Margin="0,0,10,10">
+                                        <StackPanel>
+                                            <TextBlock Text="Output (ISNR20)" Foreground="{StaticResource MutedTextBrush}" FontSize="12" FontWeight="SemiBold" />
+                                            <TextBlock x:Name="MetricOutputText" Text="-" Foreground="{StaticResource SoftTealBrush}" FontSize="22" FontWeight="Bold" Margin="0,14,0,0" />
+                                        </StackPanel>
+                                    </Border>
+                                    <Border Style="{StaticResource MetricTileStyle}" Background="#FFF7F3" BorderBrush="#F0D6C6" Margin="0,0,0,10">
+                                        <StackPanel>
+                                            <TextBlock Text="Production Loss" Foreground="{StaticResource MutedTextBrush}" FontSize="12" FontWeight="SemiBold" />
+                                            <TextBlock x:Name="MetricLossText" Text="-" Foreground="{StaticResource BurntOrangeBrush}" FontSize="22" FontWeight="Bold" Margin="0,14,0,0" />
+                                        </StackPanel>
+                                    </Border>
+                                    <Border Style="{StaticResource MetricTileStyle}" Margin="0,0,10,0">
+                                        <StackPanel>
+                                            <TextBlock Text="Initial DRC" Foreground="{StaticResource MutedTextBrush}" FontSize="12" FontWeight="SemiBold" />
+                                            <TextBlock x:Name="MetricInitialDrcText" Text="-" Foreground="{StaticResource SoftBlueBrush}" FontSize="22" FontWeight="Bold" Margin="0,14,0,0" />
+                                        </StackPanel>
+                                    </Border>
+                                    <Border Style="{StaticResource MetricTileStyle}" Background="#F4FBF8" Margin="0,0,10,0">
+                                        <StackPanel>
+                                            <TextBlock Text="Actual DRC" Foreground="{StaticResource MutedTextBrush}" FontSize="12" FontWeight="SemiBold" />
+                                            <TextBlock x:Name="MetricActualDrcText" Text="-" Foreground="{StaticResource SoftTealBrush}" FontSize="22" FontWeight="Bold" Margin="0,14,0,0" />
+                                        </StackPanel>
+                                    </Border>
+                                    <Border Style="{StaticResource MetricTileStyle}" Background="#F7FBF8">
+                                        <StackPanel>
+                                            <TextBlock Text="DRC Variance" Foreground="{StaticResource MutedTextBrush}" FontSize="12" FontWeight="SemiBold" />
+                                            <TextBlock x:Name="MetricVarianceText" Text="-" Foreground="{StaticResource SoftTealDarkBrush}" FontSize="22" FontWeight="Bold" Margin="0,14,0,0" />
+                                        </StackPanel>
+                                    </Border>
+                                </UniformGrid>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <Border Grid.Column="2" Style="{StaticResource CardStyle}">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Border Style="{StaticResource StepBadgeStyle}" Background="{StaticResource BurntOrangeBrush}">
+                                    <TextBlock Text="6"
+                                               Foreground="White"
+                                               FontWeight="Bold"
+                                               FontSize="12"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center" />
+                                </Border>
+                                <StackPanel>
+                                    <TextBlock Text="Production Summary"
+                                               Style="{StaticResource SectionTitleStyle}" />
+                                    <TextBlock Text="Final review before saving"
+                                               Style="{StaticResource SectionCaptionStyle}" />
+                                </StackPanel>
+                            </StackPanel>
+
+                            <Border Style="{StaticResource SummaryBlockStyle}" Margin="0,18,0,10">
+                                <StackPanel>
+                                    <TextBlock Text="Source From Purchase"
+                                               Foreground="{StaticResource SoftTealDarkBrush}"
+                                               FontWeight="SemiBold" />
+                                    <Grid Margin="0,12,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="30" />
+                                            <RowDefinition Height="30" />
+                                            <RowDefinition Height="30" />
+                                            <RowDefinition Height="30" />
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Row="0" Text="Invoice Number" Style="{StaticResource FieldLabelStyle}" />
+                                        <TextBlock Grid.Row="0" Grid.Column="1" x:Name="SummaryInvoiceText" Text="-" Style="{StaticResource FieldValueStyle}" />
+                                        <TextBlock Grid.Row="1" Text="Vendor" Style="{StaticResource FieldLabelStyle}" />
+                                        <TextBlock Grid.Row="1" Grid.Column="1" x:Name="SummaryVendorText" Text="-" Style="{StaticResource FieldValueStyle}" />
+                                        <TextBlock Grid.Row="2" Text="Contract ID" Style="{StaticResource FieldLabelStyle}" />
+                                        <TextBlock Grid.Row="2" Grid.Column="1" x:Name="SummaryContractText" Text="-" Style="{StaticResource FieldValueStyle}" />
+                                        <TextBlock Grid.Row="3" Text="Input Quantity" Style="{StaticResource FieldLabelStyle}" />
+                                        <TextBlock Grid.Row="3" Grid.Column="1" x:Name="SummaryInputText" Text="-" Style="{StaticResource FieldValueStyle}" />
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource SummaryBlockStyle}">
+                                <StackPanel>
+                                    <TextBlock Text="Production Details"
+                                               Foreground="{StaticResource BurntOrangeBrush}"
+                                               FontWeight="SemiBold" />
+                                    <Grid Margin="0,12,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="30" />
+                                            <RowDefinition Height="30" />
+                                            <RowDefinition Height="30" />
+                                            <RowDefinition Height="30" />
+                                            <RowDefinition Height="30" />
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Row="0" Text="Batch ID" Style="{StaticResource FieldLabelStyle}" />
+                                        <TextBlock Grid.Row="0" Grid.Column="1" x:Name="SummaryBatchText" Text="-" Style="{StaticResource FieldValueStyle}" />
+                                        <TextBlock Grid.Row="1" Text="Production Date" Style="{StaticResource FieldLabelStyle}" />
+                                        <TextBlock Grid.Row="1" Grid.Column="1" x:Name="SummaryDateText" Text="-" Style="{StaticResource FieldValueStyle}" />
+                                        <TextBlock Grid.Row="2" Text="Input (NRFC)" Style="{StaticResource FieldLabelStyle}" />
+                                        <TextBlock Grid.Row="2" Grid.Column="1" x:Name="SummaryProductionInputText" Text="-" Style="{StaticResource FieldValueStyle}" />
+                                        <TextBlock Grid.Row="3" Text="Output (ISNR20)" Style="{StaticResource FieldLabelStyle}" />
+                                        <TextBlock Grid.Row="3" Grid.Column="1" x:Name="SummaryOutputText" Text="-" Style="{StaticResource FieldValueStyle}" />
+                                        <TextBlock Grid.Row="4" Text="Production Loss" Style="{StaticResource FieldLabelStyle}" />
+                                        <TextBlock Grid.Row="4" Grid.Column="1" x:Name="SummaryLossText" Text="-" Style="{StaticResource FieldValueStyle}" />
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource SummaryBlockStyle}" Background="#F6FBF8">
+                                <StackPanel>
+                                    <TextBlock Text="Quality (DRC)"
+                   Foreground="{StaticResource SoftTealDarkBrush}"
+                   FontWeight="SemiBold" />
+
+                                    <Grid Margin="0,12,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="30" />
+                                            <RowDefinition Height="30" />
+                                            <RowDefinition Height="30" />
+                                        </Grid.RowDefinitions>
+
+                                        <TextBlock Grid.Row="0" Text="Initial DRC" Style="{StaticResource FieldLabelStyle}" />
+                                        <TextBlock Grid.Row="0" Grid.Column="1" x:Name="SummaryInitialDrcText" Text="-" Style="{StaticResource FieldValueStyle}" />
+
+                                        <TextBlock Grid.Row="1" Text="Actual DRC" Style="{StaticResource FieldLabelStyle}" />
+                                        <TextBlock Grid.Row="1" Grid.Column="1" x:Name="SummaryActualDrcText" Text="-" Style="{StaticResource FieldValueStyle}" />
+
+                                        <TextBlock Grid.Row="2" Text="DRC Variance" Style="{StaticResource FieldLabelStyle}" />
+                                        <TextBlock Grid.Row="2" Grid.Column="1" x:Name="SummaryVarianceText" Text="-" Style="{StaticResource FieldValueStyle}" />
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Background="{StaticResource BurntOrangeLightBrush}"
+                                    BorderBrush="#F0D6C6"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="14">
+                                <StackPanel>
+                                    <TextBlock Text="Inventory Impact"
+                                               Foreground="{StaticResource BurntOrangeBrush}"
+                                               FontWeight="SemiBold" />
+                                    <Grid Margin="0,12,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="50" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Background="White"
+                                                BorderBrush="#DDE7E8"
+                                                BorderThickness="1"
+                                                CornerRadius="7"
+                                                Padding="10">
+                                            <StackPanel>
+                                                <TextBlock Text="NRFC Inventory"
+                                                           Foreground="{StaticResource MutedTextBrush}"
+                                                           FontSize="11"
+                                                           FontWeight="SemiBold" />
+                                                <TextBlock x:Name="ImpactInputText"
+                                                           Text="-"
+                                                           Foreground="{StaticResource BodyTextBrush}"
+                                                           FontWeight="Bold"
+                                                           Margin="0,6,0,0" />
+                                            </StackPanel>
+                                        </Border>
+                                        <TextBlock Grid.Column="1"
+                                                   Text="to"
+                                                   Foreground="{StaticResource BodyTextBrush}"
+                                                   FontWeight="Bold"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" />
+                                        <Border Grid.Column="2"
+                                                Background="White"
+                                                BorderBrush="#C8E9E5"
+                                                BorderThickness="1"
+                                                CornerRadius="7"
+                                                Padding="10">
+                                            <StackPanel>
+                                                <TextBlock Text="ISNR20 Inventory"
+                                                           Foreground="{StaticResource MutedTextBrush}"
+                                                           FontSize="11"
+                                                           FontWeight="SemiBold" />
+                                                <TextBlock x:Name="ImpactOutputText"
+                                                           Text="-"
+                                                           Foreground="{StaticResource SoftTealDarkBrush}"
+                                                           FontWeight="Bold"
+                                                           Margin="0,6,0,0" />
+                                            </StackPanel>
+                                        </Border>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </StackPanel>
+        </ScrollViewer>
+
+        <Border Grid.Row="2"
+                Background="White"
+                BorderBrush="#DDE7E8"
+                BorderThickness="0,1,0,0"
+                Padding="20,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <CheckBox x:Name="ReviewCheckBox"
+                              VerticalAlignment="Center"
+                              Checked="ReviewCheckBox_CheckedChanged"
+                              Unchecked="ReviewCheckBox_CheckedChanged" />
+                    <TextBlock Text="I have reviewed the selected invoice, production quantities, DRC values, and final batch summary."
+                               Foreground="{StaticResource SoftTealDarkBrush}"
+                               TextWrapping="Wrap"
+                               Margin="10,0,0,0"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+
+                <TextBlock x:Name="FooterStatusText"
+                           Grid.Column="1"
+                           Foreground="{StaticResource MutedTextBrush}"
+                           VerticalAlignment="Center"
+                           Margin="14,0,14,0" />
+
+                <Button Grid.Column="2"
+                        Style="{StaticResource SecondaryButtonStyle}"
+                        Content="Preview Batch"
+                        Margin="0,0,10,0"
+                        Click="PreviewButton_Click" />
+
+                <Button x:Name="ConfirmProductionButton"
+                        Grid.Column="3"
+                        Style="{StaticResource PrimaryButtonStyle}"
+                        Background="{StaticResource BurntOrangeBrush}"
+                        Content="Confirm Production"
+                        Click="ConfirmProductionButton_Click" />
+            </Grid>
+        </Border>
+    </Grid>
+</Page>

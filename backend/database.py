@@ -1,6 +1,7 @@
 import json
+from datetime import date, datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from openpyxl import load_workbook
 
@@ -14,25 +15,31 @@ CONFIG_FILE = CONFIG_FOLDER / "database_config.json"
 
 PCON_SHEET_NAME = "pcon"
 PURCHASE_SHEET_NAME = "purchase"
+SCON_SHEET_NAME = "scon"
+SALES_SHEET_NAME = "sales"
+PRODUCTION_SHEET_CANDIDATES = ("production", "prod", "production_data")
+
 START_ROW = 5
 
 # pcon columns (A:M)
 PCON_USED_COLUMNS = tuple("BCDEFGHIJKLM")
 PCON_REQUIRED_COLUMNS = ("B", "C", "D")
 
-# purchase columns (A:N)
-PURCHASE_USED_COLUMNS = tuple("BCDEFGHIJKLMN")
+# purchase columns (A:N) + net weight in O if present
+PURCHASE_USED_COLUMNS = tuple("BCDEFGHIJKLMNO")
 PURCHASE_REQUIRED_COLUMNS = ("B", "C", "D", "F")
 
 # sales contract columns (A:M)
-SCON_SHEET_NAME = "scon"
 SCON_USED_COLUMNS = tuple("BCDEFGHIJKLM")
 SCON_REQUIRED_COLUMNS = ("B", "C", "D")
 
 # sales data columns (A:J)
-SALES_SHEET_NAME = "sales"
 SALES_USED_COLUMNS = tuple("BCDEFGHIJ")
 SALES_REQUIRED_COLUMNS = ("B", "C", "D", "E", "F", "G")
+
+# production columns (A:J)
+PRODUCTION_USED_COLUMNS = tuple("BCDEFGHIJ")
+PRODUCTION_REQUIRED_COLUMNS = ("B", "C", "D", "E", "F")
 
 
 # =========================================================
@@ -86,15 +93,24 @@ def safe_bool(value: Any, default: bool = False) -> bool:
     return default
 
 
+def safe_date(value: Any, default: str = "") -> str:
+    if value is None:
+        return default
+
+    if isinstance(value, datetime):
+        return value.strftime("%d-%m-%Y")
+
+    if isinstance(value, date):
+        return value.strftime("%d-%m-%Y")
+
+    return safe_string(value)
+
+
 def safe_cell(sheet, row: int, col: str) -> Any:
     return sheet[f"{col}{row}"].value
 
 
 def row_has_data(sheet, row: int, columns: tuple[str, ...]) -> bool:
-    """
-    Treat a row as active if any tracked column contains a value.
-    This makes manual row deletion and blank-row gaps safe.
-    """
     for col in columns:
         value = safe_cell(sheet, row, col)
         if value not in (None, ""):
@@ -107,10 +123,6 @@ def row_is_empty(sheet, row: int, columns: tuple[str, ...]) -> bool:
 
 
 def next_serial_no(sheet, used_columns: tuple[str, ...], serial_col: str = "A") -> int:
-    """
-    Generates a simple monotonically increasing serial number based on the
-    maximum numeric serial already present in the sheet.
-    """
     highest = 0
 
     for row in range(START_ROW, sheet.max_row + 1):
@@ -132,15 +144,29 @@ def next_serial_no(sheet, used_columns: tuple[str, ...], serial_col: str = "A") 
 
 
 def first_available_row(sheet, used_columns: tuple[str, ...]) -> int:
-    """
-    Finds the first fully empty row within the used area.
-    If there are gaps created by manual deletes, the gap is reused.
-    """
     for row in range(START_ROW, sheet.max_row + 1):
         if row_is_empty(sheet, row, used_columns):
             return row
 
     return sheet.max_row + 1 if sheet.max_row >= START_ROW else START_ROW
+
+
+def _pick(data: Dict[str, Any], *keys: str, default: Any = "") -> Any:
+    for key in keys:
+        value = data.get(key)
+        if value not in (None, ""):
+            return value
+    return default
+
+
+def _get_sheet_by_candidates(workbook, candidates: tuple[str, ...], label: str):
+    for name in candidates:
+        if name in workbook.sheetnames:
+            return workbook[name]
+
+    raise ValueError(
+        f"Sheet not found: {label}\nTried: {', '.join(candidates)}"
+    )
 
 
 # =========================================================
@@ -213,8 +239,8 @@ def read_pcon() -> List[Dict[str, Any]]:
                     "vendor_name": safe_string(safe_cell(sheet, row, "B")),
                     "vendor_id": safe_string(safe_cell(sheet, row, "C")),
                     "contract_id": contract_id,
-                    "start_date": safe_cell(sheet, row, "E"),
-                    "end_date": safe_cell(sheet, row, "F"),
+                    "start_date": safe_date(safe_cell(sheet, row, "E")),
+                    "end_date": safe_date(safe_cell(sheet, row, "F")),
                     "base_price": safe_number(safe_cell(sheet, row, "G")),
                     "agreed_qty": safe_number(safe_cell(sheet, row, "H")),
                     "breach_responsibility": safe_string(safe_cell(sheet, row, "I")),
@@ -253,8 +279,8 @@ def read_purchase() -> List[Dict[str, Any]]:
                     "vendor_id": safe_string(safe_cell(sheet, row, "B")),
                     "contract_id": safe_string(safe_cell(sheet, row, "C")),
                     "invoice_number": safe_string(safe_cell(sheet, row, "D")),
-                    "purchase_order_date": safe_cell(sheet, row, "E"),
-                    "delivery_date": safe_cell(sheet, row, "F"),
+                    "purchase_order_date": safe_date(safe_cell(sheet, row, "E")),
+                    "delivery_date": safe_date(safe_cell(sheet, row, "F")),
                     "invoice_weight": safe_number(safe_cell(sheet, row, "G")),
                     "before_unloading": safe_number(safe_cell(sheet, row, "H")),
                     "carrier_weight": safe_number(safe_cell(sheet, row, "I")),
@@ -263,6 +289,7 @@ def read_purchase() -> List[Dict[str, Any]]:
                     "gst_percent": safe_number(safe_cell(sheet, row, "L")),
                     "tds_percent": safe_number(safe_cell(sheet, row, "M")),
                     "unloading_charge": safe_number(safe_cell(sheet, row, "N")),
+                    "net_weight": safe_number(safe_cell(sheet, row, "O")),
                 }
             )
 
@@ -272,7 +299,7 @@ def read_purchase() -> List[Dict[str, Any]]:
 
 
 # =========================================================
-# READ SCON (SALES CONTRACTS)
+# READ SCON
 # =========================================================
 
 def read_scon() -> List[Dict[str, Any]]:
@@ -298,8 +325,8 @@ def read_scon() -> List[Dict[str, Any]]:
                     "customer_name": safe_string(safe_cell(sheet, row, "B")),
                     "customer_id": safe_string(safe_cell(sheet, row, "C")),
                     "contract_id": contract_id,
-                    "start_date": safe_cell(sheet, row, "E"),
-                    "end_date": safe_cell(sheet, row, "F"),
+                    "start_date": safe_date(safe_cell(sheet, row, "E")),
+                    "end_date": safe_date(safe_cell(sheet, row, "F")),
                     "base_price": safe_number(safe_cell(sheet, row, "G")),
                     "agreed_qty": safe_number(safe_cell(sheet, row, "H")),
                     "breach_responsibility": safe_string(safe_cell(sheet, row, "I")),
@@ -316,7 +343,7 @@ def read_scon() -> List[Dict[str, Any]]:
 
 
 # =========================================================
-# READ SALES (SALES DATA)
+# READ SALES
 # =========================================================
 
 def read_sales() -> List[Dict[str, Any]]:
@@ -338,8 +365,8 @@ def read_sales() -> List[Dict[str, Any]]:
                     "customer_id": safe_string(safe_cell(sheet, row, "B")),
                     "contract_id": safe_string(safe_cell(sheet, row, "C")),
                     "invoice_number": safe_string(safe_cell(sheet, row, "D")),
-                    "sales_order_date": safe_cell(sheet, row, "E"),
-                    "dispatch_date": safe_cell(sheet, row, "F"),
+                    "sales_order_date": safe_date(safe_cell(sheet, row, "E")),
+                    "dispatch_date": safe_date(safe_cell(sheet, row, "F")),
                     "weight": safe_number(safe_cell(sheet, row, "G")),
                     "gst_percent": safe_number(safe_cell(sheet, row, "H")),
                     "tcs_percent": safe_number(safe_cell(sheet, row, "I")),
@@ -348,6 +375,51 @@ def read_sales() -> List[Dict[str, Any]]:
             )
 
         return sales_data
+    finally:
+        wb.close()
+
+
+# =========================================================
+# READ PRODUCTION
+# =========================================================
+
+def read_production() -> List[Dict[str, Any]]:
+    wb = load_database()
+    try:
+        sheet = _get_sheet_by_candidates(
+            wb,
+            PRODUCTION_SHEET_CANDIDATES,
+            "production",
+        )
+
+        records: List[Dict[str, Any]] = []
+
+        for row in range(START_ROW, sheet.max_row + 1):
+            if row_is_empty(sheet, row, PRODUCTION_REQUIRED_COLUMNS):
+                continue
+
+            batch_id = safe_string(safe_cell(sheet, row, "B"))
+            invoice_number = safe_string(safe_cell(sheet, row, "D"))
+
+            if batch_id == "" and invoice_number == "":
+                continue
+
+            records.append(
+                {
+                    "sl_no": safe_int(safe_cell(sheet, row, "A")),
+                    "batch_id": batch_id,
+                    "production_date": safe_date(safe_cell(sheet, row, "C")),
+                    "invoice_number": invoice_number,
+                    "input_quantity": safe_number(safe_cell(sheet, row, "E")),
+                    "output": safe_number(safe_cell(sheet, row, "F")),
+                    "production_loss": safe_number(safe_cell(sheet, row, "G")),
+                    "initial_drc": safe_number(safe_cell(sheet, row, "H")),
+                    "actual_drc": safe_number(safe_cell(sheet, row, "I")),
+                    "drc_variance": safe_number(safe_cell(sheet, row, "J")),
+                }
+            )
+
+        return records
     finally:
         wb.close()
 
@@ -416,6 +488,8 @@ def append_purchase(purchase_data: Dict[str, Any]) -> int:
         sheet[f"L{row}"] = purchase_data.get("gst_percent", 0)
         sheet[f"M{row}"] = purchase_data.get("tds_percent", 0)
         sheet[f"N{row}"] = purchase_data.get("unloading_charge", 0)
+        if "net_weight" in purchase_data:
+            sheet[f"O{row}"] = purchase_data.get("net_weight", 0)
 
         save_database(wb)
         return sl_no
@@ -424,7 +498,7 @@ def append_purchase(purchase_data: Dict[str, Any]) -> int:
 
 
 # =========================================================
-# APPEND SCON (SALES CONTRACTS)
+# APPEND SCON
 # =========================================================
 
 def append_scon(contract_data: Dict[str, Any]) -> int:
@@ -459,7 +533,7 @@ def append_scon(contract_data: Dict[str, Any]) -> int:
 
 
 # =========================================================
-# APPEND SALES (SALES DATA)
+# APPEND SALES
 # =========================================================
 
 def append_sales(sales_data: Dict[str, Any]) -> int:
@@ -491,15 +565,247 @@ def append_sales(sales_data: Dict[str, Any]) -> int:
 
 
 # =========================================================
-# OPTIONAL DELETE HELPERS (PURCHASE)
+# PRODUCTION HELPERS
+# =========================================================
+
+def get_purchase_by_invoice(invoice_number: str) -> Optional[Dict[str, Any]]:
+    invoice_key = safe_string(invoice_number).casefold()
+    if invoice_key == "":
+        return None
+
+    for purchase in read_purchase():
+        if safe_string(purchase.get("invoice_number")).casefold() == invoice_key:
+            return purchase
+
+    return None
+
+
+def get_purchase_quantity(purchase: Dict[str, Any]) -> float:
+    """
+    Production uses net weight first.
+    If the net weight cell is blank, we fall back to invoice weight.
+    """
+    net_weight = safe_number(purchase.get("net_weight"))
+    if net_weight > 0:
+        return net_weight
+
+    invoice_weight = safe_number(purchase.get("invoice_weight"))
+    if invoice_weight > 0:
+        return invoice_weight
+
+    return 0.0
+
+
+def get_purchase_initial_drc(purchase: Dict[str, Any]) -> float:
+    return safe_number(purchase.get("calculated_drc_percent"))
+
+
+def production_invoice_exists(invoice_number: str) -> bool:
+    invoice_key = safe_string(invoice_number).casefold()
+    if invoice_key == "":
+        return False
+
+    wb = load_database()
+    try:
+        sheet = _get_sheet_by_candidates(
+            wb,
+            PRODUCTION_SHEET_CANDIDATES,
+            "production",
+        )
+
+        for row in range(START_ROW, sheet.max_row + 1):
+            current_invoice = safe_string(safe_cell(sheet, row, "D")).casefold()
+            if current_invoice == invoice_key:
+                return True
+
+        return False
+    finally:
+        wb.close()
+
+
+def generate_production_batch_id(contract_id: str) -> str:
+    contract_key = safe_string(contract_id)
+    if contract_key == "":
+        raise ValueError("Contract ID is required to generate a batch ID.")
+
+    wb = load_database()
+    try:
+        sheet = _get_sheet_by_candidates(
+            wb,
+            PRODUCTION_SHEET_CANDIDATES,
+            "production",
+        )
+
+        highest = 0
+        prefix = f"{contract_key}-P"
+
+        for row in range(START_ROW, sheet.max_row + 1):
+            batch_id = safe_string(safe_cell(sheet, row, "B"))
+            if not batch_id:
+                continue
+
+            if not batch_id.casefold().startswith(prefix.casefold()):
+                continue
+
+            suffix = batch_id[len(prefix):]
+            try:
+                number = int(suffix)
+            except Exception:
+                continue
+
+            if number > highest:
+                highest = number
+
+        return f"{contract_key}-P{highest + 1:03d}"
+    finally:
+        wb.close()
+
+
+def append_production(production_data: Dict[str, Any]) -> int:
+    """
+    Expects at least:
+      - invoice_number
+      - production_date
+      - output
+
+    Optional:
+      - contract_id
+      - batch_id
+      - input_quantity
+      - production_loss
+      - initial_drc
+      - actual_drc
+      - drc_variance
+    """
+    wb = load_database()
+    try:
+        sheet = _get_sheet_by_candidates(
+            wb,
+            PRODUCTION_SHEET_CANDIDATES,
+            "production",
+        )
+
+        invoice_number = safe_string(
+            _pick(production_data, "invoice_number", "invoice", "purchase_invoice")
+        )
+        if invoice_number == "":
+            raise ValueError("Invoice Number is required for production.")
+
+        if production_invoice_exists(invoice_number):
+            raise ValueError(
+                "This purchase invoice has already been used for a production batch."
+            )
+
+        purchase = get_purchase_by_invoice(invoice_number)
+
+        contract_id = safe_string(
+            _pick(production_data, "contract_id", "purchase_contract_id")
+        )
+        if contract_id == "" and purchase is not None:
+            contract_id = safe_string(purchase.get("contract_id"))
+
+        if contract_id == "":
+            raise ValueError("Contract ID could not be resolved from the selected invoice.")
+
+        batch_id = safe_string(_pick(production_data, "batch_id"))
+        if batch_id == "":
+            batch_id = generate_production_batch_id(contract_id)
+
+        production_date = _pick(production_data, "production_date")
+        if production_date in (None, ""):
+            raise ValueError("Production Date is required.")
+
+        input_quantity = safe_number(
+            _pick(production_data, "input_quantity", "quantity_available")
+        )
+        if input_quantity <= 0 and purchase is not None:
+            input_quantity = get_purchase_quantity(purchase)
+
+        if input_quantity <= 0:
+            raise ValueError("Input Quantity could not be determined from the purchase invoice.")
+
+        output_qty = safe_number(_pick(production_data, "output", "output_weight"))
+        if output_qty <= 0:
+            raise ValueError("Output must be greater than zero.")
+
+        if output_qty > input_quantity:
+            raise ValueError("Output cannot be greater than Input Quantity.")
+
+        production_loss = safe_number(
+            _pick(production_data, "production_loss", "loss")
+        )
+        if production_loss == 0:
+            production_loss = input_quantity - output_qty
+
+        initial_drc = safe_number(_pick(production_data, "initial_drc"))
+        if initial_drc == 0 and purchase is not None:
+            initial_drc = get_purchase_initial_drc(purchase)
+
+        if initial_drc < 0:
+            raise ValueError("Initial DRC cannot be negative.")
+
+        actual_drc = safe_number(_pick(production_data, "actual_drc"))
+        if actual_drc == 0:
+            actual_drc = (output_qty / input_quantity) * 100
+
+        drc_variance = safe_number(_pick(production_data, "drc_variance"))
+        if drc_variance == 0:
+            drc_variance = actual_drc - initial_drc
+
+        row = first_available_row(sheet, PRODUCTION_USED_COLUMNS)
+        sl_no = next_serial_no(sheet, PRODUCTION_USED_COLUMNS)
+
+        sheet[f"A{row}"] = sl_no
+        sheet[f"B{row}"] = batch_id
+
+        if isinstance(production_date, (datetime, date)):
+            sheet[f"C{row}"] = production_date
+        else:
+            sheet[f"C{row}"] = safe_string(production_date)
+
+        sheet[f"D{row}"] = invoice_number
+        sheet[f"E{row}"] = input_quantity
+        sheet[f"F{row}"] = output_qty
+        sheet[f"G{row}"] = production_loss
+        sheet[f"H{row}"] = initial_drc
+        sheet[f"I{row}"] = actual_drc
+        sheet[f"J{row}"] = drc_variance
+
+        save_database(wb)
+        return sl_no
+    finally:
+        wb.close()
+
+
+def read_production_by_invoice(invoice_number: str) -> Optional[Dict[str, Any]]:
+    invoice_key = safe_string(invoice_number).casefold()
+    if invoice_key == "":
+        return None
+
+    for record in read_production():
+        if safe_string(record.get("invoice_number")).casefold() == invoice_key:
+            return record
+
+    return None
+
+
+def read_production_by_batch_id(batch_id: str) -> Optional[Dict[str, Any]]:
+    batch_key = safe_string(batch_id).casefold()
+    if batch_key == "":
+        return None
+
+    for record in read_production():
+        if safe_string(record.get("batch_id")).casefold() == batch_key:
+            return record
+
+    return None
+
+
+# =========================================================
+# OPTIONAL DELETE HELPERS (PCON)
 # =========================================================
 
 def delete_pcon_by_contract_id(contract_id: str) -> int:
-    """
-    Deletes every pcon row matching the given contract_id.
-    Safe for manual-delete workflows because row scanning skips gaps.
-    Returns the number of deleted rows.
-    """
     wb = load_database()
     try:
         if PCON_SHEET_NAME not in wb.sheetnames:
@@ -523,10 +829,6 @@ def delete_pcon_by_contract_id(contract_id: str) -> int:
 
 
 def delete_purchase_by_contract_id(contract_id: str) -> int:
-    """
-    Deletes every purchase row matching the given contract_id.
-    Returns the number of deleted rows.
-    """
     wb = load_database()
     try:
         if PURCHASE_SHEET_NAME not in wb.sheetnames:
@@ -550,15 +852,10 @@ def delete_purchase_by_contract_id(contract_id: str) -> int:
 
 
 # =========================================================
-# OPTIONAL DELETE HELPERS (SALES)
+# OPTIONAL DELETE HELPERS (SCON / SALES)
 # =========================================================
 
 def delete_scon_by_contract_id(contract_id: str) -> int:
-    """
-    Deletes every scon row matching the given contract_id.
-    Safe for manual-delete workflows because row scanning skips gaps.
-    Returns the number of deleted rows.
-    """
     wb = load_database()
     try:
         if SCON_SHEET_NAME not in wb.sheetnames:
@@ -582,10 +879,6 @@ def delete_scon_by_contract_id(contract_id: str) -> int:
 
 
 def delete_sales_by_contract_id(contract_id: str) -> int:
-    """
-    Deletes every sales row matching the given contract_id.
-    Returns the number of deleted rows.
-    """
     wb = load_database()
     try:
         if SALES_SHEET_NAME not in wb.sheetnames:
