@@ -46,15 +46,14 @@ namespace RubexOps
         {
             CustomerNameBox.Text =
                 salesData.CustomerName;
+            CustomerNameBox.IsReadOnly = true;
 
             CustomerIDBox.Text =
                 salesData.CustomerID;
-
             CustomerIDBox.IsReadOnly = true;
 
             ItemCodeBox.Text =
                 DefaultItemCode;
-
             ItemCodeBox.IsReadOnly = true;
 
             InvoiceNumberBox.Text =
@@ -76,7 +75,9 @@ namespace RubexOps
                 FormatNullableDecimal(salesData.Tcs194QPercent);
 
             LoadingChargeBox.Text =
-                FormatNullableDecimal(salesData.LoadingCharge);
+                salesData.LoadingCharge.GetValueOrDefault() == 0
+                ? ""
+                : FormatNullableDecimal(salesData.LoadingCharge);
         }
 
         private async void Save_Click(
@@ -130,12 +131,13 @@ namespace RubexOps
                     DispatchDatePicker.SelectedDate?
                     .ToString("dd-MM-yyyy", CultureInfo.InvariantCulture) ?? "";
 
+                // Pass the underlying customer/item data (ignoring UI tampering)
                 string output =
                     await RunPythonScript(
                         pythonScript,
                         salesData.RowNumber.ToString(CultureInfo.InvariantCulture),
-                        CustomerNameBox.Text.Trim(),
-                        CustomerIDBox.Text.Trim(),
+                        salesData.CustomerName ?? "",
+                        salesData.CustomerID ?? "",
                         GetContractId(),
                         DefaultItemCode,
                         InvoiceNumberBox.Text.Trim(),
@@ -194,49 +196,6 @@ namespace RubexOps
 
         private bool ValidateForm()
         {
-            if (string.IsNullOrWhiteSpace(
-                    CustomerNameBox.Text))
-            {
-                MessageBox.Show(
-                    "Customer Name is required.",
-                    "Validation Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-
-                CustomerNameBox.Focus();
-
-                return false;
-            }
-
-            if (string.IsNullOrWhiteSpace(
-                    CustomerIDBox.Text))
-            {
-                MessageBox.Show(
-                    "Customer ID is required.",
-                    "Validation Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-
-                CustomerIDBox.Focus();
-
-                return false;
-            }
-
-            if (!CustomerIDBox.Text.Trim().Equals(
-                    salesData.CustomerID ?? "",
-                    StringComparison.OrdinalIgnoreCase))
-            {
-                MessageBox.Show(
-                    "Customer ID cannot be changed for an existing sales row.",
-                    "Validation Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-
-                CustomerIDBox.Focus();
-
-                return false;
-            }
-
             if (string.IsNullOrWhiteSpace(
                     InvoiceNumberBox.Text))
             {

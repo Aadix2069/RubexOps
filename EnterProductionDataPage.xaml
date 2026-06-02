@@ -851,27 +851,22 @@
                             <Border Style="{StaticResource SummaryBlockStyle}" Background="#F6FBF8">
                                 <StackPanel>
                                     <TextBlock Text="Quality (DRC)"
-                   Foreground="{StaticResource SoftTealDarkBrush}"
-                   FontWeight="SemiBold" />
-
+                                               Foreground="{StaticResource SoftTealDarkBrush}"
+                                               FontWeight="SemiBold" />
                                     <Grid Margin="0,12,0,0">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
-
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="30" />
                                             <RowDefinition Height="30" />
                                             <RowDefinition Height="30" />
                                         </Grid.RowDefinitions>
-
                                         <TextBlock Grid.Row="0" Text="Initial DRC" Style="{StaticResource FieldLabelStyle}" />
                                         <TextBlock Grid.Row="0" Grid.Column="1" x:Name="SummaryInitialDrcText" Text="-" Style="{StaticResource FieldValueStyle}" />
-
                                         <TextBlock Grid.Row="1" Text="Actual DRC" Style="{StaticResource FieldLabelStyle}" />
                                         <TextBlock Grid.Row="1" Grid.Column="1" x:Name="SummaryActualDrcText" Text="-" Style="{StaticResource FieldValueStyle}" />
-
                                         <TextBlock Grid.Row="2" Text="DRC Variance" Style="{StaticResource FieldLabelStyle}" />
                                         <TextBlock Grid.Row="2" Grid.Column="1" x:Name="SummaryVarianceText" Text="-" Style="{StaticResource FieldValueStyle}" />
                                     </Grid>

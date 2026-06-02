@@ -11,10 +11,6 @@
         WindowStartupLocation="CenterOwner"
         Background="#F5F7F8">
 
-    <!-- ================================================= -->
-    <!-- RESOURCES -->
-    <!-- ================================================= -->
-
     <Window.Resources>
 
         <Style TargetType="Button">
@@ -23,8 +19,6 @@
         </Style>
 
 
-
-        <!-- LABEL STYLE -->
 
         <Style x:Key="FormLabel"
                TargetType="TextBlock">
@@ -43,8 +37,6 @@
         </Style>
 
 
-
-        <!-- REQUIRED STAR -->
 
         <Style x:Key="RequiredStar"
                TargetType="TextBlock">
@@ -70,7 +62,20 @@
 
 
 
-        <!-- GLASS TEXTBOX STYLE -->
+        <Style x:Key="LockedFieldStyle" TargetType="TextBox">
+            <Setter Property="Height" Value="48"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="Padding" Value="14,5"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="IsReadOnly" Value="True"/>
+            <Setter Property="Background" Value="#E8ECEF"/>
+            <Setter Property="BorderBrush" Value="#C9CDD2"/>
+            <Setter Property="BorderThickness" Value="1.2"/>
+            <Setter Property="Foreground" Value="#6B7280"/>
+            <Setter Property="Cursor" Value="Arrow"/>
+        </Style>
+
+
 
         <Style x:Key="GlassTextBoxStyle"
                TargetType="TextBox">
@@ -101,15 +106,7 @@
 
 
 
-    <!-- ================================================= -->
-    <!-- ROOT GRID -->
-    <!-- ================================================= -->
-
     <Grid>
-
-        <!-- ================================================= -->
-        <!-- FIXED WATERMARK -->
-        <!-- ================================================= -->
 
         <Image Source="Images/Rubex_logo.png"
                Width="550"
@@ -123,10 +120,6 @@
 
 
 
-        <!-- ================================================= -->
-        <!-- MAIN CONTENT -->
-        <!-- ================================================= -->
-
         <Grid x:Name="MainGrid"
               Margin="24"
               Panel.ZIndex="1">
@@ -139,10 +132,6 @@
 
 
 
-            <!-- ================================================= -->
-            <!-- HEADER -->
-            <!-- ================================================= -->
-
             <Grid Grid.Row="0">
 
                 <Grid.ColumnDefinitions>
@@ -151,8 +140,6 @@
                 </Grid.ColumnDefinitions>
 
 
-
-                <!-- ICON -->
 
                 <Border Width="58"
                         Height="58"
@@ -177,8 +164,6 @@
 
 
 
-                <!-- TITLE -->
-
                 <StackPanel Grid.Column="1"
                             Margin="16,0,0,0"
                             VerticalAlignment="Center">
@@ -200,10 +185,6 @@
 
 
 
-            <!-- ================================================= -->
-            <!-- MAIN GLASS CARD -->
-            <!-- ================================================= -->
-
             <Border Grid.Row="2"
                     CornerRadius="28"
                     Padding="28"
@@ -218,8 +199,6 @@
                 </Border.Effect>
 
                 <Grid>
-
-                    <!-- INNER GLASS LAYER -->
 
                     <Border CornerRadius="24"
                             Background="#30FFFFFF"
@@ -236,20 +215,12 @@
 
 
 
-                        <!-- ================================================= -->
-                        <!-- SCROLL CONTENT -->
-                        <!-- ================================================= -->
-
                         <ScrollViewer Grid.Row="0"
                                       VerticalScrollBarVisibility="Auto">
 
                             <StackPanel>
 
 
-
-                                <!-- ================================================= -->
-                                <!-- VENDOR DETAILS -->
-                                <!-- ================================================= -->
 
                                 <TextBlock Text="Vendor Details"
                                            FontSize="24"
@@ -272,8 +243,6 @@
 
 
 
-                                    <!-- LABELS -->
-
                                     <StackPanel Grid.Row="0"
                                                 Orientation="Horizontal"
                                                 VerticalAlignment="Center">
@@ -281,7 +250,6 @@
                                         <TextBlock Text="Vendor Name"
                                                    Style="{StaticResource FormLabel}"/>
 
-                                        <TextBlock Style="{StaticResource RequiredStar}"/>
                                     </StackPanel>
 
 
@@ -293,7 +261,6 @@
                                         <TextBlock Text="Vendor ID"
                                                    Style="{StaticResource FormLabel}"/>
 
-                                        <TextBlock Style="{StaticResource RequiredStar}"/>
                                     </StackPanel>
 
 
@@ -304,32 +271,46 @@
 
 
 
-                                    <!-- INPUTS -->
+                                    <Grid Grid.Row="0" Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBox x:Name="VendorNameBox"
+                                                 Style="{StaticResource LockedFieldStyle}"/>
+                                        <materialDesign:PackIcon Kind="LockOutline"
+                                                                 Width="16" Height="16"
+                                                                 Foreground="#9CA3AF"
+                                                                 HorizontalAlignment="Right"
+                                                                 VerticalAlignment="Center"
+                                                                 Margin="0,0,12,0"
+                                                                 IsHitTestVisible="False"/>
+                                    </Grid>
 
-                                    <TextBox x:Name="VendorNameBox"
-                                             Grid.Row="0"
-                                             Grid.Column="1"
-                                             Style="{StaticResource GlassTextBoxStyle}"/>
+                                    <Grid Grid.Row="1" Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBox x:Name="VendorIDBox"
+                                                 Style="{StaticResource LockedFieldStyle}"/>
+                                        <materialDesign:PackIcon Kind="LockOutline"
+                                                                 Width="16" Height="16"
+                                                                 Foreground="#9CA3AF"
+                                                                 HorizontalAlignment="Right"
+                                                                 VerticalAlignment="Center"
+                                                                 Margin="0,0,12,0"
+                                                                 IsHitTestVisible="False"/>
+                                    </Grid>
 
-                                    <TextBox x:Name="VendorIDBox"
-                                             Grid.Row="1"
-                                             Grid.Column="1"
-                                             Style="{StaticResource GlassTextBoxStyle}"/>
-
-                                    <TextBox x:Name="ItemCodeBox"
-                                             Grid.Row="2"
-                                             Grid.Column="1"
-                                             Style="{StaticResource GlassTextBoxStyle}"
-                                             IsReadOnly="True"
-                                             Background="#60F3F4F6"/>
+                                    <Grid Grid.Row="2" Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBox x:Name="ItemCodeBox"
+                                                 Style="{StaticResource LockedFieldStyle}"
+                                                 Text="NRFC"/>
+                                        <materialDesign:PackIcon Kind="LockOutline"
+                                                                 Width="16" Height="16"
+                                                                 Foreground="#9CA3AF"
+                                                                 HorizontalAlignment="Right"
+                                                                 VerticalAlignment="Center"
+                                                                 Margin="0,0,12,0"
+                                                                 IsHitTestVisible="False"/>
+                                    </Grid>
 
                                 </Grid>
 
 
-
-                                <!-- ================================================= -->
-                                <!-- PURCHASE DETAILS -->
-                                <!-- ================================================= -->
 
                                 <TextBlock Text="Purchase Details"
                                            FontSize="24"
@@ -351,8 +332,6 @@
                                     </Grid.RowDefinitions>
 
 
-
-                                    <!-- LABELS -->
 
                                     <StackPanel Grid.Row="0"
                                                 Orientation="Horizontal"
@@ -385,12 +364,13 @@
                                         <TextBlock Text="Delivery"
                                                    Style="{StaticResource FormLabel}"/>
 
-                                        <TextBlock Style="{StaticResource RequiredStar}"/>
+                                        <TextBlock Text=" (optional)"
+                                                   FontSize="13"
+                                                   Foreground="#9CA3AF"
+                                                   VerticalAlignment="Center"/>
                                     </StackPanel>
 
 
-
-                                    <!-- INPUTS -->
 
                                     <TextBox x:Name="InvoiceNumberBox"
                                              Grid.Row="0"
@@ -398,8 +378,6 @@
                                              Style="{StaticResource GlassTextBoxStyle}"/>
 
 
-
-                                    <!-- DATE PICKERS -->
 
                                     <Border Grid.Row="1"
                                             Grid.Column="1"
@@ -439,10 +417,6 @@
 
 
 
-                                <!-- ================================================= -->
-                                <!-- WEIGHT DETAILS -->
-                                <!-- ================================================= -->
-
                                 <TextBlock Text="Weight Details"
                                            FontSize="24"
                                            FontWeight="Bold"
@@ -466,11 +440,17 @@
 
 
 
-                                    <!-- LABELS -->
+                                    <StackPanel Grid.Row="0"
+                                                Orientation="Horizontal"
+                                                VerticalAlignment="Center">
+                                        <TextBlock Text="Invoice Weight"
+                                                   Style="{StaticResource FormLabel}"/>
 
-                                    <TextBlock Text="Invoice Weight"
-                                               Grid.Row="0"
-                                               Style="{StaticResource FormLabel}"/>
+                                        <TextBlock Text=" (optional)"
+                                                   FontSize="13"
+                                                   Foreground="#9CA3AF"
+                                                   VerticalAlignment="Center"/>
+                                    </StackPanel>
 
                                     <StackPanel Grid.Row="1"
                                                 Orientation="Horizontal"
@@ -496,9 +476,17 @@
 
 
 
-                                    <TextBlock Text="No. of Bags"
-                                               Grid.Row="3"
-                                               Style="{StaticResource FormLabel}"/>
+                                    <StackPanel Grid.Row="3"
+                                                Orientation="Horizontal"
+                                                VerticalAlignment="Center">
+                                        <TextBlock Text="No. of Bags"
+                                                   Style="{StaticResource FormLabel}"/>
+
+                                        <TextBlock Text=" (optional)"
+                                                   FontSize="13"
+                                                   Foreground="#9CA3AF"
+                                                   VerticalAlignment="Center"/>
+                                    </StackPanel>
 
 
 
@@ -513,8 +501,6 @@
                                     </StackPanel>
 
 
-
-                                    <!-- INPUTS -->
 
                                     <TextBox x:Name="InvoiceWeightBox"
                                              Grid.Row="0"
@@ -545,10 +531,6 @@
 
 
 
-                                <!-- ================================================= -->
-                                <!-- TAX DETAILS -->
-                                <!-- ================================================= -->
-
                                 <TextBlock Text="Tax and Charge Details"
                                            FontSize="24"
                                            FontWeight="Bold"
@@ -569,8 +551,6 @@
                                     </Grid.RowDefinitions>
 
 
-
-                                    <!-- LABELS -->
 
                                     <StackPanel Grid.Row="0"
                                                 Orientation="Horizontal"
@@ -603,12 +583,13 @@
                                         <TextBlock Text="Unloading Charge"
                                                    Style="{StaticResource FormLabel}"/>
 
-                                        <TextBlock Style="{StaticResource RequiredStar}"/>
+                                        <TextBlock Text=" (optional)"
+                                                   FontSize="13"
+                                                   Foreground="#9CA3AF"
+                                                   VerticalAlignment="Center"/>
                                     </StackPanel>
 
 
-
-                                    <!-- INPUTS -->
 
                                     <TextBox x:Name="GstBox"
                                              Grid.Row="0"
@@ -633,16 +614,10 @@
 
 
 
-                        <!-- ================================================= -->
-                        <!-- BUTTONS -->
-                        <!-- ================================================= -->
-
                         <StackPanel Grid.Row="1"
                                     Orientation="Horizontal"
                                     HorizontalAlignment="Right"
                                     Margin="0,24,0,0">
-
-                            <!-- CANCEL -->
 
                             <Button Content="Cancel"
                                     Width="140"
@@ -664,8 +639,6 @@
                             </Button>
 
 
-
-                            <!-- SAVE -->
 
                             <Button x:Name="SaveButton"
                                     Content="Save Changes"

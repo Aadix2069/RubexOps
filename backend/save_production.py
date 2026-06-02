@@ -1,166 +1,83 @@
 import sys
-from datetime import datetime
+from datetime import date
 
 from database import (
     append_production,
-    generate_production_batch_id,
     get_purchase_by_invoice,
-    get_purchase_initial_drc,
-    get_purchase_quantity,
     production_invoice_exists,
-    safe_date,
-    safe_number,
+    get_purchase_quantity,
+    read_production_by_invoice,
     safe_string,
+    safe_number
 )
+from production_engine import parse_date
 
 
-DATE_FORMAT = "%d-%m-%Y"
-
-
-def fail(message: str) -> None:
+def fail(message):
     print(f"ERROR: {message}", file=sys.stderr)
     sys.exit(1)
 
 
-def parse_date_text(value: str, field_name: str) -> datetime.date:
-    text = safe_string(value)
-    if text == "":
-        raise ValueError(f"{field_name} is required.")
+def main(args):
+    # Expects exactly 3 arguments passed from the C# application
+    if len(args) != 3:
+        fail("Expected exactly 3 arguments: production_date, invoice_number, output_weight.")
 
-    for fmt in (DATE_FORMAT, "%Y-%m-%d", "%d/%m/%Y"):
-        try:
-            return datetime.strptime(text, fmt).date()
-        except ValueError:
-            pass
-
-    raise ValueError(f"{field_name} must be in dd-MM-yyyy format.")
-
-
-def parse_number(value: str, field_name: str, allow_zero: bool = False) -> float:
-    number = safe_number(value)
-    if allow_zero:
-        if number < 0:
-            raise ValueError(f"{field_name} cannot be negative.")
-    else:
-        if number <= 0:
-            raise ValueError(f"{field_name} must be greater than zero.")
-    return number
-
-
-def build_production_record(args: list[str]) -> dict:
-    # Expected arguments from WPF:
-    # 0: production_date
-    # 1: invoice_number
-    # 2: output
-    # Optional:
-    # 3: batch_id
-    # 4: input_quantity (override)
-    # 5: initial_drc (override)
-    if len(args) < 3:
-        raise ValueError(
-            "Expected at least 3 arguments: production_date, invoice_number, output."
-        )
-
-    production_date_text = safe_string(args[0])
+    prod_date_str = args[0]
     invoice_number = safe_string(args[1])
-    output_qty = parse_number(args[2], "Output")
-    batch_id_override = safe_string(args[3]) if len(args) >= 4 else ""
-    input_quantity_override = safe_string(args[4]) if len(args) >= 5 else ""
-    initial_drc_override = safe_string(args[5]) if len(args) >= 6 else ""
+    output_weight = safe_number(args[2])
 
-    production_date = parse_date_text(production_date_text, "Production Date")
+    if not invoice_number:
+        fail("Invoice number is required.")
 
-    if invoice_number == "":
-        raise ValueError("Invoice Number is required.")
-
+    # 1. Ensure the selected invoice actually exists in the purchase records
     purchase = get_purchase_by_invoice(invoice_number)
-    if purchase is None:
-        raise ValueError(
-            "No matching purchase invoice found. Please select a valid invoice."
-        )
+    if not purchase:
+        fail(f"Purchase invoice '{invoice_number}' could not be found.")
 
+    # 2. Block 1-to-1 duplication
     if production_invoice_exists(invoice_number):
-        raise ValueError(
-            "This purchase invoice has already been used for a production batch."
-        )
+        fail(f"Invoice '{invoice_number}' has already been processed into a production batch.")
 
-    purchase_date_text = safe_string(purchase.get("purchase_order_date"))
-    if purchase_date_text:
-        try:
-            purchase_date = parse_date_text(purchase_date_text, "Purchase Order Date")
-            if production_date < purchase_date:
-                raise ValueError(
-                    "Production Date cannot be earlier than the Purchase Order Date."
-                )
-        except ValueError:
-            # If the purchase date is not parseable, ignore the comparison and continue.
-            pass
+    # 3. Validate the production date
+    prod_date = parse_date(prod_date_str)
+    if not prod_date:
+        fail("A valid production date is required.")
 
-    contract_id = safe_string(purchase.get("contract_id"))
-    if contract_id == "":
-        raise ValueError("Contract ID could not be resolved from the selected invoice.")
+    purch_date = parse_date(purchase.get("purchase_order_date"))
+    if purch_date and prod_date < purch_date:
+        fail(f"Production Date ({prod_date.strftime('%d-%m-%Y')}) cannot be earlier than Purchase Date ({purch_date.strftime('%d-%m-%Y')}).")
 
-    batch_id = batch_id_override or generate_production_batch_id(contract_id)
+    if prod_date > date.today():
+        fail("Production Date cannot be set in the future.")
 
-    input_quantity = safe_number(input_quantity_override)
-    if input_quantity <= 0:
-        input_quantity = get_purchase_quantity(purchase)
+    # 4. Enforce mass conservation laws
+    if output_weight <= 0:
+        fail("Output weight must be greater than zero.")
 
-    if input_quantity <= 0:
-        raise ValueError(
-            "Input Quantity could not be determined from the selected purchase invoice."
-        )
+    input_qty = get_purchase_quantity(purchase)
+    if output_weight > input_qty:
+        fail(f"Output weight ({output_weight:,.2f} kg) cannot exceed the purchased Input quantity ({input_qty:,.2f} kg).")
 
-    if output_qty > input_quantity:
-        raise ValueError("Output cannot be greater than Input Quantity.")
-
-    production_loss = input_quantity - output_qty
-    if production_loss < 0:
-        raise ValueError("Production Loss cannot be negative.")
-
-    initial_drc = safe_number(initial_drc_override)
-    if initial_drc <= 0:
-        initial_drc = get_purchase_initial_drc(purchase)
-
-    if initial_drc < 0:
-        raise ValueError("Initial DRC cannot be negative.")
-
-    actual_drc = (output_qty / input_quantity) * 100
-    drc_variance = actual_drc - initial_drc
-
-    return {
-        "batch_id": batch_id,
-        "production_date": production_date,
+    # 5. Build the raw payload (database.py will auto-generate the Batch ID using the contract and sequence logic)
+    payload = {
         "invoice_number": invoice_number,
-        "input_quantity": input_quantity,
-        "output": output_qty,
-        "production_loss": production_loss,
-        "initial_drc": initial_drc,
-        "actual_drc": actual_drc,
-        "drc_variance": drc_variance,
+        "production_date": prod_date,
+        "output": output_weight
     }
 
+    # 6. Securely append to Excel
+    append_production(payload)
 
-def create_production(args: list[str]) -> str:
-    record = build_production_record(args)
+    # 7. Fetch the newly assigned Batch ID to display on the success screen
+    new_record = read_production_by_invoice(invoice_number)
+    batch_id = safe_string(new_record.get("batch_id")) if new_record else "UNKNOWN"
 
-    sl_no = append_production(record)
-
-    return (
-        "Production batch saved successfully. "
-        f"Sl.No: {sl_no} | Batch ID: {record['batch_id']} | "
-        f"Invoice: {record['invoice_number']} | "
-        f"Input: {record['input_quantity']:.2f} | "
-        f"Output: {record['output']:.2f} | "
-        f"Loss: {record['production_loss']:.2f} | "
-        f"Initial DRC: {record['initial_drc']:.2f}% | "
-        f"Actual DRC: {record['actual_drc']:.2f}% | "
-        f"Variance: {record['drc_variance']:+.2f}%"
-    )
+    print(f"Production successfully saved | Batch ID: {batch_id}")
 
 
 if __name__ == "__main__":
     try:
-        print(create_production(sys.argv[1:]))
+        main(sys.argv[1:])
     except Exception as error:
         fail(str(error))

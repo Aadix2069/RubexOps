@@ -119,65 +119,26 @@ def parse_date_text(value, field_name, required=True):
 
 def parse_args(args):
     """
-    Supports:
-    - 10 legacy arguments:
-      row_number, customer_name, customer_id, item_code, invoice_number,
-      sales_order_date, dispatch_date, weight, gst_percent, tcs_percent, loading_charge
-
-    - 11 arguments including Contract ID:
-      row_number, customer_name, customer_id, contract_id, item_code, invoice_number,
-      sales_order_date, dispatch_date, weight, gst_percent, tcs_percent, loading_charge
+    Expects exactly 12 arguments passed from C#:
+    row_number, customer_name, customer_id, contract_id, item_code, invoice_number,
+    sales_order_date, dispatch_date, weight, gst_percent, tcs_percent, loading_charge
     """
-    if len(args) not in {10, 11}:
-        raise ValueError(
-            "Expected 10 legacy arguments or 11 arguments including Contract ID."
-        )
-
-    row_number = args[0]
-    customer_name = safe_string(args[1])
-    customer_id = safe_string(args[2])
-
-    if len(args) == 11:
-        if looks_like_contract_id(args[3]):
-            contract_id = safe_string(args[3])
-            item_code = safe_string(args[4]) or ITEM_CODE
-            values = args[5:]
-        elif looks_like_contract_id(args[4]):
-            contract_id = safe_string(args[4])
-            item_code = safe_string(args[3]) or ITEM_CODE
-            values = args[5:]
-        else:
-            contract_id = safe_string(args[3])
-            item_code = safe_string(args[4]) or ITEM_CODE
-            values = args[5:]
-    else:
-        contract_id = ""
-        item_code = safe_string(args[3]) or ITEM_CODE
-        values = args[4:]
-
-    (
-        invoice_number,
-        sales_order_date,
-        dispatch_date,
-        weight,
-        gst_percent,
-        tcs_percent,
-        loading_charge,
-    ) = values
+    if len(args) != 12:
+        raise ValueError(f"Expected exactly 12 arguments, got {len(args)}.")
 
     return {
-        "row_number": row_number,
-        "customer_name": customer_name,
-        "customer_id": customer_id,
-        "contract_id": contract_id,
-        "item_code": item_code,
-        "invoice_number": safe_string(invoice_number),
-        "sales_order_date": sales_order_date,
-        "dispatch_date": dispatch_date,
-        "weight": weight,
-        "gst_percent": gst_percent,
-        "tcs_percent": tcs_percent,
-        "loading_charge": loading_charge,
+        "row_number": args[0],
+        "customer_name": safe_string(args[1]),
+        "customer_id": safe_string(args[2]),
+        "contract_id": safe_string(args[3]),
+        "item_code": safe_string(args[4]) or ITEM_CODE,
+        "invoice_number": safe_string(args[5]),
+        "sales_order_date": args[6],
+        "dispatch_date": args[7],
+        "weight": args[8],
+        "gst_percent": args[9],
+        "tcs_percent": args[10],
+        "loading_charge": args[11],
     }
 
 
@@ -338,9 +299,11 @@ def update_sales_data(args):
         raise ValueError("Dispatch date must be on or after Sales Order date.")
 
     weight = parse_required_decimal(data["weight"], "Weight", allow_zero=False)
+    
     gst_percent = normalize_percent_value(
         parse_percent_decimal(data["gst_percent"], "GST")
     )
+    
     tcs_percent = parse_tcs_percent(
         data["tcs_percent"], "TCS 194Q"
     )

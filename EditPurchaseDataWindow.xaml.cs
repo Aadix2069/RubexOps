@@ -46,15 +46,14 @@ namespace RubexOps
         {
             VendorNameBox.Text =
                 purchaseData.VendorName;
+            VendorNameBox.IsReadOnly = true;
 
             VendorIDBox.Text =
                 purchaseData.VendorID;
-
             VendorIDBox.IsReadOnly = true;
 
             ItemCodeBox.Text =
                 DefaultItemCode;
-
             ItemCodeBox.IsReadOnly = true;
 
             InvoiceNumberBox.Text =
@@ -67,7 +66,9 @@ namespace RubexOps
                 ParseDate(purchaseData.DeliveryDate);
 
             InvoiceWeightBox.Text =
-                FormatNullableDecimal(purchaseData.InvoiceWeight);
+                (purchaseData.InvoiceWeight == null || purchaseData.InvoiceWeight == 0)
+                ? ""
+                : FormatNullableDecimal(purchaseData.InvoiceWeight);
 
             BeforeUnloadingBox.Text =
                 FormatNullableDecimal(purchaseData.BeforeUnloading);
@@ -76,10 +77,9 @@ namespace RubexOps
                 FormatNullableDecimal(purchaseData.CarrierWeight);
 
             NoOfBagsBox.Text =
-                purchaseData.NoOfBags.HasValue
-                    ? purchaseData.NoOfBags.Value.ToString(
-                        CultureInfo.InvariantCulture)
-                    : "";
+                (purchaseData.NoOfBags == null || purchaseData.NoOfBags == 0)
+                    ? ""
+                    : ((int)purchaseData.NoOfBags.Value).ToString(CultureInfo.InvariantCulture);
 
             CalculatedDrcBox.Text =
                 FormatNullableDecimal(purchaseData.CalculatedDrc);
@@ -91,7 +91,9 @@ namespace RubexOps
                 FormatNullableDecimal(purchaseData.Tds194QPercent);
 
             UnloadingChargeBox.Text =
-                FormatNullableDecimal(purchaseData.UnloadingCharge);
+                purchaseData.UnloadingCharge.GetValueOrDefault() == 0
+                ? ""
+                : FormatNullableDecimal(purchaseData.UnloadingCharge);
         }
 
         private async void Save_Click(
@@ -145,12 +147,13 @@ namespace RubexOps
                     DeliveryDatePicker.SelectedDate?
                     .ToString("dd-MM-yyyy", CultureInfo.InvariantCulture) ?? "";
 
+                // Pass the underlying vendor/item data (ignoring UI tampering)
                 string output =
                     await RunPythonScript(
                         pythonScript,
                         purchaseData.RowNumber.ToString(CultureInfo.InvariantCulture),
-                        VendorNameBox.Text.Trim(),
-                        VendorIDBox.Text.Trim(),
+                        purchaseData.VendorName ?? "",
+                        purchaseData.VendorID ?? "",
                         GetContractId(),
                         DefaultItemCode,
                         InvoiceNumberBox.Text.Trim(),
@@ -163,7 +166,7 @@ namespace RubexOps
                         GetRequiredDecimalArgument(CalculatedDrcBox),
                         GetRequiredDecimalArgument(GstBox),
                         GetRequiredDecimalArgument(Tds194QBox),
-                        GetRequiredDecimalArgument(UnloadingChargeBox));
+                        GetOptionalDecimalArgument(UnloadingChargeBox));
 
                 if (output.TrimStart().StartsWith(
                         "ERROR",
@@ -214,49 +217,6 @@ namespace RubexOps
         private bool ValidateForm()
         {
             if (string.IsNullOrWhiteSpace(
-                    VendorNameBox.Text))
-            {
-                MessageBox.Show(
-                    "Vendor Name is required.",
-                    "Validation Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-
-                VendorNameBox.Focus();
-
-                return false;
-            }
-
-            if (string.IsNullOrWhiteSpace(
-                    VendorIDBox.Text))
-            {
-                MessageBox.Show(
-                    "Vendor ID is required.",
-                    "Validation Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-
-                VendorIDBox.Focus();
-
-                return false;
-            }
-
-            if (!VendorIDBox.Text.Trim().Equals(
-                    purchaseData.VendorID ?? "",
-                    StringComparison.OrdinalIgnoreCase))
-            {
-                MessageBox.Show(
-                    "Vendor ID cannot be changed for an existing purchase row.",
-                    "Validation Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-
-                VendorIDBox.Focus();
-
-                return false;
-            }
-
-            if (string.IsNullOrWhiteSpace(
                     InvoiceNumberBox.Text))
             {
                 MessageBox.Show(
@@ -283,21 +243,8 @@ namespace RubexOps
                 return false;
             }
 
-            if (DeliveryDatePicker.SelectedDate == null)
-            {
-                MessageBox.Show(
-                    "Please select a Delivery date.",
-                    "Validation Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-
-                DeliveryDatePicker.Focus();
-
-                return false;
-            }
-
-            if (PurchaseOrderDatePicker.SelectedDate >
-                DeliveryDatePicker.SelectedDate)
+            if (DeliveryDatePicker.SelectedDate != null &&
+                PurchaseOrderDatePicker.SelectedDate > DeliveryDatePicker.SelectedDate)
             {
                 MessageBox.Show(
                     "Delivery date must be on or after Purchase Order date.",
@@ -313,7 +260,7 @@ namespace RubexOps
             if (!ValidateOptionalDecimal(
                     InvoiceWeightBox,
                     "Invoice Weight",
-                    false))
+                    allowZero: true))
             {
                 return false;
             }
@@ -386,7 +333,7 @@ namespace RubexOps
                 return false;
             }
 
-            if (!ValidateRequiredDecimal(
+            if (!ValidateOptionalDecimal(
                     UnloadingChargeBox,
                     "Unloading Charge",
                     true))
@@ -596,27 +543,16 @@ namespace RubexOps
                 return true;
             }
 
-            if (!int.TryParse(
+            if (!double.TryParse(
                     textBox.Text.Trim(),
-                    NumberStyles.Integer,
+                    NumberStyles.Any,
                     CultureInfo.InvariantCulture,
-                    out int value))
+                    out double value) ||
+                value < 0 ||
+                value % 1 != 0)
             {
                 MessageBox.Show(
-                    $"{fieldName} must be a whole number.",
-                    "Validation Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-
-                textBox.Focus();
-
-                return false;
-            }
-
-            if (value < 0)
-            {
-                MessageBox.Show(
-                    $"{fieldName} cannot be negative.",
+                    $"{fieldName} must be a valid non-negative whole number.",
                     "Validation Error",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
@@ -693,14 +629,16 @@ namespace RubexOps
                 return "";
             }
 
-            int value =
-                int.Parse(
+            if (double.TryParse(
                     textBox.Text.Trim(),
-                    NumberStyles.Integer,
-                    CultureInfo.InvariantCulture);
+                    NumberStyles.Any,
+                    CultureInfo.InvariantCulture,
+                    out double value))
+            {
+                return ((int)value).ToString(CultureInfo.InvariantCulture);
+            }
 
-            return value.ToString(
-                CultureInfo.InvariantCulture);
+            return "";
         }
 
         private string GetContractId()

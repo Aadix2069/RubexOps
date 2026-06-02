@@ -364,16 +364,17 @@ namespace RubexOps
             if (purchase == null)
                 return;
 
+            // Updated this inline script to correctly pass InvoiceNumber to generate_production_batch_id
             string code =
                 "import json, sys\n" +
                 "from database import production_invoice_exists, generate_production_batch_id\n" +
                 "invoice = sys.argv[1]\n" +
-                "contract_id = sys.argv[2]\n" +
                 "used = production_invoice_exists(invoice)\n" +
-                "batch_id = '' if used else generate_production_batch_id(contract_id)\n" +
+                "batch_id = '' if used else generate_production_batch_id(invoice)\n" +
                 "print(json.dumps({'invoice_used': used, 'batch_id': batch_id}))\n";
 
-            PythonResult result = await RunPythonInlineAsync(code, purchase.InvoiceNumber, purchase.ContractId);
+            PythonResult result = await RunPythonInlineAsync(code, purchase.InvoiceNumber);
+
             if (!result.Success)
             {
                 purchase.InvoiceUsed = false;
@@ -491,8 +492,12 @@ namespace RubexOps
 
             DateTime productionDate = ProductionDatePicker.SelectedDate.Value.Date;
             DateTime purchaseDate;
+
             if (TryParseDisplayDate(_selectedPurchase.PurchaseDateText, out purchaseDate) && productionDate < purchaseDate.Date)
                 return "Production Date cannot be earlier than the Purchase Order Date.";
+
+            if (productionDate > DateTime.Today)
+                return "Production Date cannot be in the future.";
 
             double input = _selectedPurchase.InputQuantity;
             if (input <= 0)
@@ -898,6 +903,7 @@ namespace RubexOps
             {
                 string invoiceNumber = GetJsonString(row, "InvoiceNumber", "invoice_number");
                 double netWeight = GetJsonDouble(row, "NetWeight", "net_weight", "InputQuantity", "input_quantity");
+
                 if (netWeight <= 0)
                     netWeight = GetJsonDouble(row, "InvoiceWeight", "invoice_weight");
 
@@ -909,7 +915,8 @@ namespace RubexOps
                     InvoiceNumber = invoiceNumber,
                     PurchaseDateText = GetJsonString(row, "PurchaseOrderDate", "purchase_order_date"),
                     InputQuantity = netWeight,
-                    InitialDrc = GetJsonDouble(row, "CalculatedDrc", "CalculatedDRC", "calculated_drc_percent", "initial_drc")
+                    // Pulls CalculatedDrc cleanly from the JSON payload
+                    InitialDrc = GetJsonDouble(row, "CalculatedDrc", "calculated_drc_percent", "CalculatedDRC")
                 });
             }
 

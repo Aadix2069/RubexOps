@@ -236,11 +236,8 @@ def calculate_qty_delivered_so_far(contract_id, purchase_records):
         if normalize_contract_id(record.get("contract_id")) != contract_id:
             continue
 
-        if "net_weight" in record and record.get("net_weight") is not None:
-            net_weight = max(safe_float(record.get("net_weight"), 0.0), 0.0)
-        else:
-            net_weight = calculate_net_weight(record)
-
+        # Strictly calculate dynamically based on the 3 fundamental weight inputs
+        net_weight = calculate_net_weight(record)
         total += net_weight
 
     return round(total, 2)

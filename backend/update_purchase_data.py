@@ -17,7 +17,7 @@ from purchase_inventory_engine import build_purchase_summary, normalize_percent_
 
 
 DATE_FORMAT = "%d-%m-%Y"
-INVOICE_WEIGHT_WARNING_THRESHOLD = 0.30
+INVOICE_WEIGHT_WARNING_THRESHOLD = 0.25
 
 
 def fail(message):
@@ -88,6 +88,8 @@ def parse_percent_decimal(value, field_name):
         raise ValueError(f"{field_name} must be between 0 and 100.")
 
     return number
+
+
 def parse_tds_percent(value, field_name="TDS 194Q"):
     number = parse_required_decimal(
         value,
@@ -356,21 +358,18 @@ def update_purchase_data(args):
     before_unloading = parse_required_decimal(data["before_unloading"], "Before Unloading", allow_zero=False)
     carrier_weight = parse_required_decimal(data["carrier_weight"], "Carrier Weight", allow_zero=True)
     number_of_bags = parse_optional_decimal(data["number_of_bags"], "Number Of Bags")
+    
     calculated_drc_percent = normalize_percent_value(
         parse_percent_decimal(data["calculated_drc_percent"], "Calculated DRC")
     )
+    
     gst_percent = normalize_percent_value(
         parse_percent_decimal(data["gst_percent"], "GST")
     )
-    tds_percent = parse_tds_percent(
-    data(["tds_percent"],"TDS 194Q")
-    )
     
-    unloading_charge = parse_required_decimal(
-        data["unloading_charge"],
-        "Unloading Charge",
-        allow_zero=True,
-    )
+    tds_percent = parse_tds_percent(data["tds_percent"], "TDS 194Q")
+    
+    unloading_charge = parse_optional_decimal(data["unloading_charge"], "Unloading Charge")
 
     if carrier_weight > before_unloading:
         raise ValueError("Carrier Weight cannot be greater than Before Unloading weight.")
@@ -468,15 +467,16 @@ def update_purchase_data(args):
                 f"({remaining_qty:,.2f})."
             )
 
-        if (
-            invoice_weight > 0
-            and net_weight > 0
-            and abs(invoice_weight - net_weight) > (invoice_weight * INVOICE_WEIGHT_WARNING_THRESHOLD)
-        ):
-            warn(
-                "Invoice Weight and Net Weight differ significantly. "
-                "Please verify the values before continuing."
-            )
+        if invoice_weight > 0 and net_weight > 0:
+            difference = abs(invoice_weight - net_weight)
+            if difference > 2000 and difference > (invoice_weight * INVOICE_WEIGHT_WARNING_THRESHOLD):
+                raise ValueError(
+                    f"Invoice Weight and Net Weight differ significantly.\n\n"
+                    f"Invoice Weight: {invoice_weight:,.2f} kg\n"
+                    f"Calculated Net Weight: {net_weight:,.2f} kg\n"
+                    f"Difference: {difference:,.2f} kg\n\n"
+                    f"Please verify the values before saving."
+                )
 
         sheet[f"B{row_number}"] = purchase_record["vendor_id"]
         sheet[f"C{row_number}"] = purchase_record["contract_id"]

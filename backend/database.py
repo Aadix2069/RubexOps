@@ -25,8 +25,8 @@ START_ROW = 5
 PCON_USED_COLUMNS = tuple("BCDEFGHIJKLM")
 PCON_REQUIRED_COLUMNS = ("B", "C", "D")
 
-# purchase columns (A:N) + net weight in O if present
-PURCHASE_USED_COLUMNS = tuple("BCDEFGHIJKLMNO")
+# purchase columns (A:N) - net_weight dynamically calculated, not stored
+PURCHASE_USED_COLUMNS = tuple("BCDEFGHIJKLMN")
 PURCHASE_REQUIRED_COLUMNS = ("B", "C", "D", "F")
 
 # sales contract columns (A:M)
@@ -37,9 +37,9 @@ SCON_REQUIRED_COLUMNS = ("B", "C", "D")
 SALES_USED_COLUMNS = tuple("BCDEFGHIJ")
 SALES_REQUIRED_COLUMNS = ("B", "C", "D", "E", "F", "G")
 
-# production columns (A:J)
-PRODUCTION_USED_COLUMNS = tuple("BCDEFGHIJ")
-PRODUCTION_REQUIRED_COLUMNS = ("B", "C", "D", "E", "F")
+# production columns (A:E) - Strictly input only
+PRODUCTION_USED_COLUMNS = tuple("BCDE")
+PRODUCTION_REQUIRED_COLUMNS = ("B", "C", "D", "E")
 
 
 # =========================================================
@@ -289,7 +289,6 @@ def read_purchase() -> List[Dict[str, Any]]:
                     "gst_percent": safe_number(safe_cell(sheet, row, "L")),
                     "tds_percent": safe_number(safe_cell(sheet, row, "M")),
                     "unloading_charge": safe_number(safe_cell(sheet, row, "N")),
-                    "net_weight": safe_number(safe_cell(sheet, row, "O")),
                 }
             )
 
@@ -380,7 +379,7 @@ def read_sales() -> List[Dict[str, Any]]:
 
 
 # =========================================================
-# READ PRODUCTION
+# READ PRODUCTION (CLEANED)
 # =========================================================
 
 def read_production() -> List[Dict[str, Any]]:
@@ -398,24 +397,13 @@ def read_production() -> List[Dict[str, Any]]:
             if row_is_empty(sheet, row, PRODUCTION_REQUIRED_COLUMNS):
                 continue
 
-            batch_id = safe_string(safe_cell(sheet, row, "B"))
-            invoice_number = safe_string(safe_cell(sheet, row, "D"))
-
-            if batch_id == "" and invoice_number == "":
-                continue
-
             records.append(
                 {
                     "sl_no": safe_int(safe_cell(sheet, row, "A")),
-                    "batch_id": batch_id,
+                    "batch_id": safe_string(safe_cell(sheet, row, "B")),
                     "production_date": safe_date(safe_cell(sheet, row, "C")),
-                    "invoice_number": invoice_number,
-                    "input_quantity": safe_number(safe_cell(sheet, row, "E")),
-                    "output": safe_number(safe_cell(sheet, row, "F")),
-                    "production_loss": safe_number(safe_cell(sheet, row, "G")),
-                    "initial_drc": safe_number(safe_cell(sheet, row, "H")),
-                    "actual_drc": safe_number(safe_cell(sheet, row, "I")),
-                    "drc_variance": safe_number(safe_cell(sheet, row, "J")),
+                    "invoice_number": safe_string(safe_cell(sheet, row, "D")),
+                    "output": safe_number(safe_cell(sheet, row, "E")),
                 }
             )
 
@@ -488,8 +476,6 @@ def append_purchase(purchase_data: Dict[str, Any]) -> int:
         sheet[f"L{row}"] = purchase_data.get("gst_percent", 0)
         sheet[f"M{row}"] = purchase_data.get("tds_percent", 0)
         sheet[f"N{row}"] = purchase_data.get("unloading_charge", 0)
-        if "net_weight" in purchase_data:
-            sheet[f"O{row}"] = purchase_data.get("net_weight", 0)
 
         save_database(wb)
         return sl_no
@@ -580,26 +566,6 @@ def get_purchase_by_invoice(invoice_number: str) -> Optional[Dict[str, Any]]:
     return None
 
 
-def get_purchase_quantity(purchase: Dict[str, Any]) -> float:
-    """
-    Production uses net weight first.
-    If the net weight cell is blank, we fall back to invoice weight.
-    """
-    net_weight = safe_number(purchase.get("net_weight"))
-    if net_weight > 0:
-        return net_weight
-
-    invoice_weight = safe_number(purchase.get("invoice_weight"))
-    if invoice_weight > 0:
-        return invoice_weight
-
-    return 0.0
-
-
-def get_purchase_initial_drc(purchase: Dict[str, Any]) -> float:
-    return safe_number(purchase.get("calculated_drc_percent"))
-
-
 def production_invoice_exists(invoice_number: str) -> bool:
     invoice_key = safe_string(invoice_number).casefold()
     if invoice_key == "":
@@ -623,59 +589,62 @@ def production_invoice_exists(invoice_number: str) -> bool:
         wb.close()
 
 
-def generate_production_batch_id(contract_id: str) -> str:
-    contract_key = safe_string(contract_id)
-    if contract_key == "":
-        raise ValueError("Contract ID is required to generate a batch ID.")
-
-    wb = load_database()
+def _parse_date_for_sort(date_str: str) -> date:
+    if not date_str:
+        return date.min
     try:
-        sheet = _get_sheet_by_candidates(
-            wb,
-            PRODUCTION_SHEET_CANDIDATES,
-            "production",
+        return datetime.strptime(date_str, "%d-%m-%Y").date()
+    except ValueError:
+        return date.min
+
+
+def generate_production_batch_id(invoice_number: str) -> str:
+    """
+    Finds the purchase, sorts all purchases for that contract chronologically,
+    and returns a formatted Batch ID (e.g., '123617-R1-P012').
+    """
+    purchase = get_purchase_by_invoice(invoice_number)
+    if not purchase:
+        raise ValueError("Cannot generate Batch ID: Purchase invoice not found.")
+
+    contract_id = safe_string(purchase.get("contract_id"))
+    if not contract_id:
+        raise ValueError("Cannot generate Batch ID: Invoice has no Contract ID.")
+
+    all_purchases = read_purchase()
+    contract_purchases = [
+        p for p in all_purchases
+        if safe_string(p.get("contract_id")).casefold() == contract_id.casefold()
+    ]
+
+    # Sort purchases chronologically by PO Date (and fallback to sl_no for ties)
+    contract_purchases.sort(
+        key=lambda p: (
+            _parse_date_for_sort(safe_string(p.get("purchase_order_date"))),
+            safe_int(p.get("sl_no"))
         )
+    )
 
-        highest = 0
-        prefix = f"{contract_key}-P"
+    target_invoice = safe_string(invoice_number).casefold()
+    index = 0
+    for i, p in enumerate(contract_purchases, start=1):
+        if safe_string(p.get("invoice_number")).casefold() == target_invoice:
+            index = i
+            break
 
-        for row in range(START_ROW, sheet.max_row + 1):
-            batch_id = safe_string(safe_cell(sheet, row, "B"))
-            if not batch_id:
-                continue
+    # Safety fallback (should never happen if logic is intact)
+    if index == 0:
+        index = len(contract_purchases) + 1
 
-            if not batch_id.casefold().startswith(prefix.casefold()):
-                continue
-
-            suffix = batch_id[len(prefix):]
-            try:
-                number = int(suffix)
-            except Exception:
-                continue
-
-            if number > highest:
-                highest = number
-
-        return f"{contract_key}-P{highest + 1:03d}"
-    finally:
-        wb.close()
+    return f"{contract_id}-P{index:03d}"
 
 
 def append_production(production_data: Dict[str, Any]) -> int:
     """
-    Expects at least:
+    Expects strictly the user-input parameters:
       - invoice_number
       - production_date
       - output
-
-    Optional:
-      - contract_id
-      - batch_id
-      - input_quantity
-      - production_loss
-      - initial_drc
-      - actual_drc
-      - drc_variance
     """
     wb = load_database()
     try:
@@ -685,91 +654,31 @@ def append_production(production_data: Dict[str, Any]) -> int:
             "production",
         )
 
-        invoice_number = safe_string(
-            _pick(production_data, "invoice_number", "invoice", "purchase_invoice")
-        )
-        if invoice_number == "":
-            raise ValueError("Invoice Number is required for production.")
+        invoice_number = safe_string(production_data.get("invoice_number"))
+        if not invoice_number:
+            raise ValueError("Invoice Number is required.")
 
         if production_invoice_exists(invoice_number):
-            raise ValueError(
-                "This purchase invoice has already been used for a production batch."
-            )
+            raise ValueError("This purchase invoice has already been used for a production batch.")
 
-        purchase = get_purchase_by_invoice(invoice_number)
-
-        contract_id = safe_string(
-            _pick(production_data, "contract_id", "purchase_contract_id")
-        )
-        if contract_id == "" and purchase is not None:
-            contract_id = safe_string(purchase.get("contract_id"))
-
-        if contract_id == "":
-            raise ValueError("Contract ID could not be resolved from the selected invoice.")
-
-        batch_id = safe_string(_pick(production_data, "batch_id"))
-        if batch_id == "":
-            batch_id = generate_production_batch_id(contract_id)
+        batch_id = generate_production_batch_id(invoice_number)
 
         production_date = _pick(production_data, "production_date")
-        if production_date in (None, ""):
+        if not production_date:
             raise ValueError("Production Date is required.")
 
-        input_quantity = safe_number(
-            _pick(production_data, "input_quantity", "quantity_available")
-        )
-        if input_quantity <= 0 and purchase is not None:
-            input_quantity = get_purchase_quantity(purchase)
-
-        if input_quantity <= 0:
-            raise ValueError("Input Quantity could not be determined from the purchase invoice.")
-
-        output_qty = safe_number(_pick(production_data, "output", "output_weight"))
+        output_qty = safe_number(production_data.get("output"))
         if output_qty <= 0:
             raise ValueError("Output must be greater than zero.")
-
-        if output_qty > input_quantity:
-            raise ValueError("Output cannot be greater than Input Quantity.")
-
-        production_loss = safe_number(
-            _pick(production_data, "production_loss", "loss")
-        )
-        if production_loss == 0:
-            production_loss = input_quantity - output_qty
-
-        initial_drc = safe_number(_pick(production_data, "initial_drc"))
-        if initial_drc == 0 and purchase is not None:
-            initial_drc = get_purchase_initial_drc(purchase)
-
-        if initial_drc < 0:
-            raise ValueError("Initial DRC cannot be negative.")
-
-        actual_drc = safe_number(_pick(production_data, "actual_drc"))
-        if actual_drc == 0:
-            actual_drc = (output_qty / input_quantity) * 100
-
-        drc_variance = safe_number(_pick(production_data, "drc_variance"))
-        if drc_variance == 0:
-            drc_variance = actual_drc - initial_drc
 
         row = first_available_row(sheet, PRODUCTION_USED_COLUMNS)
         sl_no = next_serial_no(sheet, PRODUCTION_USED_COLUMNS)
 
         sheet[f"A{row}"] = sl_no
         sheet[f"B{row}"] = batch_id
-
-        if isinstance(production_date, (datetime, date)):
-            sheet[f"C{row}"] = production_date
-        else:
-            sheet[f"C{row}"] = safe_string(production_date)
-
+        sheet[f"C{row}"] = safe_date(production_date) if isinstance(production_date, (date, datetime)) else safe_string(production_date)
         sheet[f"D{row}"] = invoice_number
-        sheet[f"E{row}"] = input_quantity
-        sheet[f"F{row}"] = output_qty
-        sheet[f"G{row}"] = production_loss
-        sheet[f"H{row}"] = initial_drc
-        sheet[f"I{row}"] = actual_drc
-        sheet[f"J{row}"] = drc_variance
+        sheet[f"E{row}"] = output_qty
 
         save_database(wb)
         return sl_no
