@@ -4,6 +4,86 @@
       xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
       Background="#F5F7F8">
 
+    <Page.Resources>
+
+        <Style x:Key="ProductionActionButtonStyle"
+               TargetType="Button">
+
+            <Setter Property="Height"
+                    Value="76"/>
+
+            <Setter Property="HorizontalAlignment"
+                    Value="Stretch"/>
+
+            <Setter Property="VerticalAlignment"
+                    Value="Center"/>
+
+            <Setter Property="Margin"
+                    Value="0"/>
+
+            <Setter Property="Background"
+                    Value="#1B9AA0"/>
+
+            <Setter Property="Foreground"
+                    Value="White"/>
+
+            <Setter Property="BorderThickness"
+                    Value="0"/>
+
+            <Setter Property="FontSize"
+                    Value="20"/>
+
+            <Setter Property="FontWeight"
+                    Value="SemiBold"/>
+
+            <Setter Property="Cursor"
+                    Value="Hand"/>
+
+            <Setter Property="SnapsToDevicePixels"
+                    Value="True"/>
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="ButtonBorder"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="16"
+                                SnapsToDevicePixels="True">
+
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              RecognizesAccessKey="True"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver"
+                                     Value="True">
+                                <Setter TargetName="ButtonBorder"
+                                        Property="Background"
+                                        Value="#16919A"/>
+                            </Trigger>
+
+                            <Trigger Property="IsPressed"
+                                     Value="True">
+                                <Setter TargetName="ButtonBorder"
+                                        Property="Background"
+                                        Value="#127A81"/>
+                            </Trigger>
+
+                            <Trigger Property="IsEnabled"
+                                     Value="False">
+                                <Setter TargetName="ButtonBorder"
+                                        Property="Opacity"
+                                        Value="0.65"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </Page.Resources>
+
     <ScrollViewer VerticalScrollBarVisibility="Auto">
 
         <!-- ================================================= -->
@@ -81,7 +161,6 @@
                     </StackPanel>
                 </StackPanel>
 
-
                 <!-- ================================================= -->
                 <!-- MODULE CARDS -->
                 <!-- ================================================= -->
@@ -93,7 +172,6 @@
                         <ColumnDefinition Width="32"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-
 
                     <!-- ================================================= -->
                     <!-- PRODUCTION ENTRY CARD -->
@@ -130,7 +208,6 @@
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
 
-
                                 <!-- HEADER -->
 
                                 <StackPanel Orientation="Horizontal">
@@ -165,7 +242,6 @@
                                     </StackPanel>
                                 </StackPanel>
 
-
                                 <!-- DESCRIPTION -->
 
                                 <TextBlock Grid.Row="2"
@@ -175,18 +251,14 @@
                                            TextWrapping="Wrap"
                                            Foreground="#374151"/>
 
-
                                 <!-- BUTTON -->
 
                                 <Button Grid.Row="4"
                                         Content="Enter Production Data"
-                                        Height="76"
-                                        Background="#1B9AA0"
+                                        Click="EnterProductionDataButton_Click"
+                                        Style="{StaticResource ProductionActionButtonStyle}"
                                         Foreground="White"
-                                        BorderThickness="0"
-                                        FontSize="20"
-                                        FontWeight="SemiBold"
-                                        Cursor="Hand">
+                                        Background="#1B9AA0">
 
                                     <Button.Effect>
                                         <DropShadowEffect BlurRadius="14"
@@ -199,7 +271,6 @@
 
                         </Grid>
                     </Border>
-
 
                     <!-- ================================================= -->
                     <!-- PRODUCTION RECORDS CARD -->
@@ -236,7 +307,6 @@
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
 
-
                                 <!-- HEADER -->
 
                                 <StackPanel Orientation="Horizontal">
@@ -271,7 +341,6 @@
                                     </StackPanel>
                                 </StackPanel>
 
-
                                 <!-- DESCRIPTION -->
 
                                 <TextBlock Grid.Row="2"
@@ -281,18 +350,14 @@
                                            TextWrapping="Wrap"
                                            Foreground="#374151"/>
 
-
                                 <!-- BUTTON -->
 
                                 <Button Grid.Row="4"
                                         Content="View / Edit Production Data"
-                                        Height="76"
-                                        Background="#1B9AA0"
+                                        Click="ViewEditProductionDataButton_Click"
+                                        Style="{StaticResource ProductionActionButtonStyle}"
                                         Foreground="White"
-                                        BorderThickness="0"
-                                        FontSize="20"
-                                        FontWeight="SemiBold"
-                                        Cursor="Hand">
+                                        Background="#1B9AA0">
 
                                     <Button.Effect>
                                         <DropShadowEffect BlurRadius="14"

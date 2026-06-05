@@ -14,15 +14,23 @@ namespace RubexOps
             InitializeComponent();
         }
 
-
-
         // =====================================================
         // NAVIGATION
         // =====================================================
 
-   
+        private void EnterProductionDataButton_Click(
+            object sender,
+            RoutedEventArgs e)
+        {
+            NavigateToPage(new EnterProductionDataPage());
+        }
 
-
+        private void ViewEditProductionDataButton_Click(
+            object sender,
+            RoutedEventArgs e)
+        {
+            NavigateToPage(new ViewEditProductionDataPage());
+        }
 
         // =====================================================
         // SAFE NAVIGATION
@@ -49,4 +57,3 @@ namespace RubexOps
         }
     }
 }
-

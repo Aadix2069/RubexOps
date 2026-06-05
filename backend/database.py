@@ -379,7 +379,7 @@ def read_sales() -> List[Dict[str, Any]]:
 
 
 # =========================================================
-# READ PRODUCTION (CLEANED)
+# READ PRODUCTION (UPDATED WITH ROW NUMBER)
 # =========================================================
 
 def read_production() -> List[Dict[str, Any]]:
@@ -399,6 +399,7 @@ def read_production() -> List[Dict[str, Any]]:
 
             records.append(
                 {
+                    "row_number": row,  # <-- Added the exact row tracking identifier here
                     "sl_no": safe_int(safe_cell(sheet, row, "A")),
                     "batch_id": safe_string(safe_cell(sheet, row, "B")),
                     "production_date": safe_date(safe_cell(sheet, row, "C")),
